@@ -22,56 +22,60 @@ import { ColorModeContextProvider } from "./contexts/color-mode";
 import { supabaseClient } from "./utility";
 import { PostCreate, PostEdit, PostList } from "./page/posts";
 import Home from "./page/home/Home";
+import { KBarProviderWrapper } from "./components/kbar";
 
 function App() {
+
   return (
     <BrowserRouter>
       <RefineKbarProvider>
         <ColorModeContextProvider>
-          <AntdApp>
-            <DevtoolsProvider>
-              <Refine
-                notificationProvider={useNotificationProvider}
-                dataProvider={dataProvider(supabaseClient)}
-                resources={[
-                  {
-                    name: "posts",
-                    list: "/posts",
-                    create: "/posts/create",
-                    edit: "/posts/edit/:id",
-                  },
-                ]}
-                liveProvider={liveProvider(supabaseClient)}
-                authProvider={authProvider}
-                routerProvider={routerProvider}
-                options={{
-                  syncWithLocation: true,
-                  warnWhenUnsavedChanges: true,
-                  projectId: "2NUMPD-DunVuJ-oVECSl",
-                }}
-              >
-                <Routes>
-                  <Route
-                    element={
-                      <ThemedLayout Header={Header} Sider={ThemedSider}>
-                        <Outlet />
-                      </ThemedLayout>
-                    }
-                  >
-                    <Route index element={<Navigate to="/home" replace />} />
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/posts" element={<PostList />} />
-                    <Route path="/posts/create" element={<PostCreate />} />
-                    <Route path="/posts/edit/:id" element={<PostEdit />} />
-                  </Route>
-                </Routes>
-                <RefineKbar />
-                <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
-              </Refine>
-              <DevtoolsPanel />
-            </DevtoolsProvider>
-          </AntdApp>
+          <KBarProviderWrapper>
+            <AntdApp>
+              <DevtoolsProvider>
+                <Refine
+                  notificationProvider={useNotificationProvider}
+                  dataProvider={dataProvider(supabaseClient)}
+                  resources={[
+                    {
+                      name: "posts",
+                      list: "/posts",
+                      create: "/posts/create",
+                      edit: "/posts/edit/:id",
+                    },
+                  ]}
+                  liveProvider={liveProvider(supabaseClient)}
+                  authProvider={authProvider}
+                  routerProvider={routerProvider}
+                  options={{
+                    syncWithLocation: true,
+                    warnWhenUnsavedChanges: true,
+                    projectId: "2NUMPD-DunVuJ-oVECSl",
+                  }}
+                >
+                  <Routes>
+                    <Route
+                      element={
+                        <ThemedLayout Header={Header} Sider={ThemedSider}>
+                          <Outlet />
+                        </ThemedLayout>
+                      }
+                    >
+                      <Route index element={<Navigate to="/home" replace />} />
+                      <Route path="/home" element={<Home />} />
+                      <Route path="/posts" element={<PostList />} />
+                      <Route path="/posts/create" element={<PostCreate />} />
+                      <Route path="/posts/edit/:id" element={<PostEdit />} />
+                    </Route>
+                  </Routes>
+                  <RefineKbar />
+                  <UnsavedChangesNotifier />
+                  <DocumentTitleHandler />
+                </Refine>
+                <DevtoolsPanel />
+              </DevtoolsProvider>
+            </AntdApp>
+          </KBarProviderWrapper>
         </ColorModeContextProvider>
       </RefineKbarProvider>
     </BrowserRouter>

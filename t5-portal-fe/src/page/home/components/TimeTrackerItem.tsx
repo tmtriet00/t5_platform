@@ -34,8 +34,9 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
       </div>
 
       {/* Tags */}
-      <div className="h-full flex items-center border-l-2 border-dotted border-gray-200 px-4 min-w-[100px] justify-end">
-        {task.tags && task.tags.length > 0 && (
+      {task.tags && task.tags.length > 0 && (
+        <div className="h-full flex items-center border-l-2 border-dotted border-gray-200 px-4 min-w-[100px] justify-end">
+
           <Flex gap="4px">
             {task.tags.map(tag => (
               <span key={tag} className="text-[11px] font-medium text-[#00A0D2] bg-[#E1F5FE] px-2 py-0.5 rounded-sm uppercase tracking-wide">
@@ -43,8 +44,8 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
               </span>
             ))}
           </Flex>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Time Range */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">

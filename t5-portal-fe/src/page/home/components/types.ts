@@ -9,6 +9,7 @@ export interface Task {
   name: string;
   project?: Project;
   project_id?: number;
+  time_entries?: TimeEntry[];
 }
 
 export interface TimeEntry {

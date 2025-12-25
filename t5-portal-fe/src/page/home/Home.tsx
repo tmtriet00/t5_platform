@@ -2,14 +2,14 @@ import React from "react";
 import { Layout, Spin, Alert } from "antd";
 import { TimeTrackerInput } from "./components/TimeTrackerInput";
 import { TimeTrackerList } from "./components/TimeTrackerList";
-import { useTimeEntries } from "./hooks/useTimeEntries";
+import { useTaskByDate } from "./hooks/useTaskByDate";
 import { useSelect } from "@refinedev/antd";
 import { TimeEntry } from "../home/components/types";
 
 const { Content } = Layout;
 
 const Home: React.FC = () => {
-  const { groups, weekTotal, loading, error } = useTimeEntries();
+  const { groups, weekTotal, loading, error } = useTaskByDate();
   const { selectProps } = useSelect<TimeEntry>({
     resource: "time_entries",
   });

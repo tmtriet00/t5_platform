@@ -1,85 +1,37 @@
 import { useState, useEffect } from 'react';
-import { useList } from '@refinedev/core';
+import { HttpError, useList } from '@refinedev/core';
 import { TimeEntry, Task, Project, TaskGroup, TaskWithDuration } from '../components/types';
+import { formatDuration, calculateDuration, formatTime, getDateLabel } from 'utility/time';
 
-interface UseTimeEntriesReturn {
+interface UseTaskByDateReturn {
     groups: TaskGroup[];
     weekTotal: string;
     loading: boolean;
     error: Error | null;
 }
 
-// Helper function to format duration in hours:minutes
-const formatDuration = (milliseconds: number): string => {
-    const totalMinutes = Math.floor(milliseconds / (1000 * 60));
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${hours}:${minutes.toString().padStart(2, '0')}`;
-};
-
-// Helper function to calculate duration between two timestamps
-const calculateDuration = (startTime: string, endTime: string | null): number => {
-    if (!endTime) return 0; // Running timer, no duration yet
-    const start = new Date(startTime).getTime();
-    const end = new Date(endTime).getTime();
-    return end - start;
-};
-
-// Helper function to format time for display (e.g., "1:00 PM")
-const formatTime = (timestamp: string): string => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-};
-
-// Helper function to get date label (Today, Yesterday, or date)
-const getDateLabel = (timestamp: string): string => {
-    const date = new Date(timestamp);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    // Reset time parts for comparison
-    date.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    yesterday.setHours(0, 0, 0, 0);
-
-    if (date.getTime() === today.getTime()) return 'Today';
-    if (date.getTime() === yesterday.getTime()) return 'Yesterday';
-
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-};
-
-export const useTimeEntries = (): UseTimeEntriesReturn => {
+export const useTaskByDate = (): UseTaskByDateReturn => {
     const [groups, setGroups] = useState<TaskGroup[]>([]);
     const [weekTotal, setWeekTotal] = useState<string>('0:00');
 
-    // Use refine's useList hook for data fetching
-    // Based on type definitions, useList returns { query, result } in this setup
-    const { query } = useList<any>({
-        resource: 'time_entries',
-        sorters: [
-            {
-                field: 'start_time',
-                order: 'desc',
-            },
-        ],
+    const { query } = useList<Task, HttpError>({
+        resource: 'tasks',
         meta: {
             select: `
                 id,
-                description,
-                task_id,
-                tags,
-                start_time,
-                end_time,
-                task:tasks (
+                name,
+                project_id,
+                project:projects (
                     id,
                     name,
-                    project_id,
-                    project:projects (
-                        id,
-                        name,
-                        color
-                    )
+                    color
+                ),
+                time_entries (
+                    id,
+                    description,
+                    tags,
+                    start_time,
+                    end_time
                 )
             `,
         },
@@ -98,7 +50,26 @@ export const useTimeEntries = (): UseTimeEntriesReturn => {
             return;
         }
 
-        const entries = data.data;
+        // Flatten tasks into entries to preserve existing logic
+        const entries: TimeEntry[] = [];
+        data.data.forEach((task) => {
+            if (task.time_entries) {
+                task.time_entries.forEach((entry) => {
+                    entries.push({
+                        ...entry,
+                        task: {
+                            id: task.id,
+                            name: task.name,
+                            project: task.project,
+                            project_id: task.project_id
+                        }
+                    } as TimeEntry);
+                });
+            }
+        });
+
+        // Sort entries by start_time desc to match previous behavior
+        entries.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
 
         if (entries.length === 0) {
             setGroups([]);

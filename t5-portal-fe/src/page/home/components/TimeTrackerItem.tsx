@@ -26,11 +26,11 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ entry }) => {
         <span className="font-medium text-gray-700 text-[15px] mr-2 truncate">
           {entry.description || '(No description)'}
         </span>
-        {entry.project && (
+        {entry.task?.project && (
           <div className="flex items-center whitespace-nowrap">
             <span className="mx-2 text-gray-300">•</span>
-            <span style={{ color: entry.project.color }} className="font-medium max-w-[150px] truncate">
-              {entry.project.name}
+            <span style={{ color: entry.task.project.color }} className="font-medium max-w-[150px] truncate">
+              {entry.task.project.name}
             </span>
           </div>
         )}
@@ -51,12 +51,7 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ entry }) => {
         )}
       </div>
 
-      {/* Billable */}
-      <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-12 text-center">
-        <DollarOutlined
-          className={`text-lg ${entry.billable ? 'text-[#00A0D2]' : 'text-gray-300'}`}
-        />
-      </div>
+      {/* Billable - Removed as per data model update */}
 
       {/* Time Range */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">

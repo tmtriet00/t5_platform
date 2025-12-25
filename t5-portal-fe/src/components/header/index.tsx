@@ -27,23 +27,12 @@ export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
   const { data: user } = useGetIdentity<IUser>();
   const { mode, setMode } = useContext(ColorModeContext);
 
-  const headerStyles: React.CSSProperties = {
-    backgroundColor: token.colorBgElevated,
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    padding: "0px 24px",
-    height: "64px",
-  };
-
-  if (sticky) {
-    headerStyles.position = "sticky";
-    headerStyles.top = 0;
-    headerStyles.zIndex = 1;
-  }
-
   return (
-    <AntdLayout.Header style={headerStyles}>
+    <AntdLayout.Header
+      className={`flex justify-end items-center px-6 h-16 ${sticky ? "sticky top-0 z-[1]" : ""
+        }`}
+      style={{ backgroundColor: token.colorBgElevated }}
+    >
       <Space>
         <Switch
           checkedChildren="🌛"
@@ -51,7 +40,7 @@ export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
           onChange={() => setMode(mode === "light" ? "dark" : "light")}
           defaultChecked={mode === "dark"}
         />
-        <Space style={{ marginLeft: "8px" }} size="middle">
+        <Space className="ml-2" size="middle">
           {user?.name && <Text strong>{user.name}</Text>}
           {user?.avatar && <Avatar src={user?.avatar} alt={user?.name} />}
         </Space>

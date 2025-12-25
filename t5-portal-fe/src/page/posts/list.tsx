@@ -49,7 +49,7 @@ export const PostList: React.FC = () => {
           filterDropdown={(props) => (
             <FilterDropdown {...props}>
               <Select
-                style={{ minWidth: 200 }}
+                className="min-w-[200px]"
                 mode="multiple"
                 placeholder="Select Category"
                 {...selectProps}

@@ -51,9 +51,7 @@ export const PostEdit: React.FC = () => {
         <Alert
           message="This post is changed. Reload to see it's latest version."
           type="warning"
-          style={{
-            marginBottom: 20,
-          }}
+          className="mb-5"
           action={
             <Button onClick={handleRefresh} size="small">
               Refresh

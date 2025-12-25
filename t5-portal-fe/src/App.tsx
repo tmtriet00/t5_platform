@@ -21,6 +21,7 @@ import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { supabaseClient } from "./utility";
 import { PostCreate, PostEdit, PostList } from "./page/posts";
+import Home from "./page/home/Home";
 
 function App() {
   return (
@@ -57,7 +58,8 @@ function App() {
                       </ThemedLayout>
                     }
                   >
-                    <Route index element={<Navigate to="/posts" replace />} />
+                    <Route index element={<Navigate to="/home" replace />} />
+                    <Route path="/home" element={<Home />} />
                     <Route path="/posts" element={<PostList />} />
                     <Route path="/posts/create" element={<PostCreate />} />
                     <Route path="/posts/edit/:id" element={<PostEdit />} />

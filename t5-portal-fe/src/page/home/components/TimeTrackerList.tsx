@@ -1,17 +1,26 @@
 import React from 'react';
-import { Card, Typography, Flex, theme } from 'antd';
-import { TimeEntryGroup } from './types';
+import { Card, Typography, Flex, Empty } from 'antd';
+import { TaskGroup } from './types';
 import { TimeTrackerItem } from './TimeTrackerItem';
 
 const { Text } = Typography;
 
 interface TimeTrackerListProps {
-  groups: TimeEntryGroup[];
+  groups: TaskGroup[];
   weekTotal: string;
 }
 
 export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ groups, weekTotal }) => {
-  const { token } = theme.useToken();
+  if (groups.length === 0) {
+    return (
+      <div className="mt-4">
+        <Empty
+          description="No time entries yet"
+          className="py-12"
+        />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -45,8 +54,8 @@ export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ groups, weekTo
           </div>
 
           <div>
-            {group.entries.map((entry) => (
-              <TimeTrackerItem key={entry.id} entry={entry} />
+            {group.tasks.map((task) => (
+              <TimeTrackerItem key={task.id} task={task} />
             ))}
           </div>
         </Card>

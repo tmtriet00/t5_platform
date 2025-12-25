@@ -1,48 +1,43 @@
 import React from 'react';
-import { Flex, Typography, Tag, Button, theme, Badge } from 'antd';
+import { Flex, Typography, Button } from 'antd';
 import {
-  DollarOutlined,
   CalendarOutlined,
   CaretRightOutlined,
   MoreOutlined
 } from '@ant-design/icons';
-import { TimeEntry } from './types';
+import { TaskWithDuration } from './types';
 
 const { Text } = Typography;
 
 interface TimeTrackerItemProps {
-  entry: TimeEntry;
+  task: TaskWithDuration;
 }
 
-export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ entry }) => {
-  const { token } = theme.useToken();
-
+export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
   return (
     <div
       className="group border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50 h-14 flex items-center bg-white"
     >
-      {/* Description and Project */}
+      {/* Task Name and Project */}
       <div className="flex-1 px-4 flex items-center min-w-0 pr-4">
         <span className="font-medium text-gray-700 text-[15px] mr-2 truncate">
-          {entry.description || '(No description)'}
+          {task.name || '(No task name)'}
         </span>
-        {entry.task?.project && (
+        {task.project && (
           <div className="flex items-center whitespace-nowrap">
             <span className="mx-2 text-gray-300">•</span>
-            <span style={{ color: entry.task.project.color }} className="font-medium max-w-[150px] truncate">
-              {entry.task.project.name}
+            <span style={{ color: task.project.color }} className="font-medium max-w-[150px] truncate">
+              {task.project.name}
             </span>
           </div>
         )}
       </div>
 
-      {/* Tags & Billable & Actions - Separated sections with dotted borders */}
-
       {/* Tags */}
       <div className="h-full flex items-center border-l-2 border-dotted border-gray-200 px-4 min-w-[100px] justify-end">
-        {entry.tags && entry.tags.length > 0 && (
+        {task.tags && task.tags.length > 0 && (
           <Flex gap="4px">
-            {entry.tags.map(tag => (
+            {task.tags.map(tag => (
               <span key={tag} className="text-[11px] font-medium text-[#00A0D2] bg-[#E1F5FE] px-2 py-0.5 rounded-sm uppercase tracking-wide">
                 {tag}
               </span>
@@ -51,12 +46,10 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ entry }) => {
         )}
       </div>
 
-      {/* Billable - Removed as per data model update */}
-
       {/* Time Range */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">
         <span className="text-gray-500 text-[14px] font-medium">
-          {entry.startTime} - {entry.endTime}
+          {task.startTime} - {task.endTime}
         </span>
         <Button type="text" size="small" icon={<CalendarOutlined className="text-gray-400" />} className="ml-1 flex items-center justify-center" />
       </div>
@@ -64,7 +57,7 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ entry }) => {
       {/* Duration */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[80px]">
         <span className="text-gray-800 font-bold text-[16px]">
-          {entry.duration}
+          {task.totalDuration}
         </span>
       </div>
 

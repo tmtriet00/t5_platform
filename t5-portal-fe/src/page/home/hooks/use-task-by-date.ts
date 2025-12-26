@@ -1,9 +1,21 @@
 import { useState, useEffect } from 'react';
 import { HttpError, useList } from '@refinedev/core';
-import { TimeEntry, Task, Project, TaskGroup, TaskWithDuration, UseTaskByDateReturn } from 'interfaces';
+import { Task } from 'interfaces';
 import { formatDuration, calculateDuration, formatTime, getDateLabel } from 'utility/time';
+import dayjs from 'dayjs';
 
-export const useTaskByDate = (): UseTaskByDateReturn => {
+interface UseTaskByDateProps {
+    date: string;
+}
+
+interface UseTaskByDateReturn {
+    tasks: Task[];
+    weekTotal: string;
+    loading: boolean;
+    error: Error | null;
+}
+
+export const useTaskByDate = (props: UseTaskByDateProps): UseTaskByDateReturn => {
     const [weekTotal, setWeekTotal] = useState<string>('0:00');
     const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -19,7 +31,7 @@ export const useTaskByDate = (): UseTaskByDateReturn => {
                     name,
                     color
                 ),
-                time_entries (
+                time_entries!inner (
                     id,
                     description,
                     tags,
@@ -28,6 +40,18 @@ export const useTaskByDate = (): UseTaskByDateReturn => {
                 )
             `,
         },
+        filters: [
+            {
+                field: 'time_entries.start_time',
+                operator: 'gte',
+                value: dayjs(props.date).startOf('day').toISOString(),
+            },
+            {
+                field: 'time_entries.start_time',
+                operator: 'lte',
+                value: dayjs(props.date).endOf('day').toISOString(),
+            },
+        ],
         pagination: {
             mode: "off",
         }

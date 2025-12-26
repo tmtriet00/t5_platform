@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Input, Button, Flex, Typography, theme, Divider } from "antd";
 import {
   PlusCircleOutlined,
@@ -7,20 +7,47 @@ import {
   ClockCircleOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
+import { HttpError, useList } from '@refinedev/core';
+import { Task } from "interfaces";
+import { AutoComplete } from 'antd';
+import { debounce } from 'lodash';
+import { SearchOutlined } from "@ant-design/icons";
 
-const { Text } = Typography;
 
 export const TimeTrackerInput: React.FC = () => {
-  const { token } = theme.useToken();
+  const [keyword, setKeyword] = useState('');
+  const { query } = useList<Task, HttpError>({
+    resource: 'tasks',
+    filters: [
+      {
+        field: 'name',
+        operator: 'contains',
+        value: keyword,
+      },
+    ],
+  });
+
 
   return (
     <Card className="mb-6 shadow-sm rounded-none border-t-0 border-x-0 border-b border-gray-200" styles={{ body: { padding: "8px 16px" } }}>
       <Flex align="center" className="w-full h-12">
-        <Input
-          placeholder="What are you working on?"
-          variant="borderless"
-          className="text-lg flex-1 mr-4 placeholder:text-gray-400"
-        />
+        <AutoComplete
+          options={query.data?.data.map((item) => ({
+            value: item.name,
+            label: item.name,
+          }))}
+          filterOption={false}
+          onSearch={debounce((value: string) => setKeyword(value), 500)}
+          className="flex-1 mr-4"
+        >
+          <Input
+            size="large"
+            placeholder="Search posts or categories"
+            suffix={<SearchOutlined />}
+            variant="borderless"
+            className="text-lg placeholder:text-gray-400"
+          />
+        </AutoComplete>
 
         <div className="flex items-center h-full border-l border-dotted border-gray-300 px-4">
           <Button

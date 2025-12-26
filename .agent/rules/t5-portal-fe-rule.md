@@ -20,6 +20,7 @@ trigger: always_on
 2. Interfaces can be defined directly inside other file usually is 
  - Component File (for props)
  - Context File
+ - Hook File (for input, output. Usually we rarely export input/output as for input we only need to pass data, for output we only need to extract element via spread-operator)
 
 # Naming Convention
 1. Filename is kebab-case

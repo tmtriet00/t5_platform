@@ -10,7 +10,7 @@ import { formatTime } from 'utility/time';
 
 const { Text } = Typography;
 
-export interface TimeTrackerItemProps {
+interface TimeTrackerItemProps {
   task: Task;
 }
 

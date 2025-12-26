@@ -5,12 +5,12 @@ import {
   CaretRightOutlined,
   MoreOutlined
 } from '@ant-design/icons';
-import { Task, TaskWithDuration } from './types';
+import { Task, TaskWithDuration } from 'interfaces';
 import { formatTime } from 'utility/time';
 
 const { Text } = Typography;
 
-interface TimeTrackerItemProps {
+export interface TimeTrackerItemProps {
   task: Task;
 }
 

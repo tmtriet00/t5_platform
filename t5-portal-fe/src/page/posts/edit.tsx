@@ -12,12 +12,12 @@ import { RcFile } from "antd/lib/upload/interface";
 
 import MDEditor from "@uiw/react-md-editor";
 
-import { IPost, ICategory } from "interfaces";
+import { Post, Category } from "interfaces";
 import { supabaseClient, normalizeFile } from "utility";
 
 export const PostEdit: React.FC = () => {
   const [isDeprecated, setIsDeprecated] = useState(false);
-  const { formProps, saveButtonProps, query } = useForm<IPost>({
+  const { formProps, saveButtonProps, query } = useForm<Post>({
     liveMode: "manual",
     onLiveEvent: () => {
       setIsDeprecated(true);
@@ -25,7 +25,7 @@ export const PostEdit: React.FC = () => {
   });
 
   const postData = query?.data?.data;
-  const { selectProps: categorySelectProps } = useSelect<ICategory>({
+  const { selectProps: categorySelectProps } = useSelect<Category>({
     resource: "categories",
     defaultValue: postData?.categoryId,
   });

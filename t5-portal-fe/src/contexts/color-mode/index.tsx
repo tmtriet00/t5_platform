@@ -7,11 +7,10 @@ import {
   useState,
 } from "react";
 
-type ColorModeContextType = {
+export interface ColorModeContextType {
   mode: string;
   setMode: (mode: string) => void;
-};
-
+}
 export const ColorModeContext = createContext<ColorModeContextType>(
   {} as ColorModeContextType
 );

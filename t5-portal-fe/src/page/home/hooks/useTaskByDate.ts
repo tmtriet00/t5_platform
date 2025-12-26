@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import { HttpError, useList } from '@refinedev/core';
-import { TimeEntry, Task, Project, TaskGroup, TaskWithDuration } from '../components/types';
+import { TimeEntry, Task, Project, TaskGroup, TaskWithDuration, UseTaskByDateReturn } from 'interfaces';
 import { formatDuration, calculateDuration, formatTime, getDateLabel } from 'utility/time';
-
-interface UseTaskByDateReturn {
-    tasks: Task[];
-    weekTotal: string;
-    loading: boolean;
-    error: Error | null;
-}
 
 export const useTaskByDate = (): UseTaskByDateReturn => {
     const [weekTotal, setWeekTotal] = useState<string>('0:00');

@@ -9,10 +9,10 @@ import {
 } from "@refinedev/antd";
 import { Table, Space, Select } from "antd";
 
-import { IPost, ICategory } from "interfaces";
+import { Post, Category } from "interfaces";
 
 export const PostList: React.FC = () => {
-  const { tableProps, sorters } = useTable<IPost>({
+  const { tableProps, sorters } = useTable<Post>({
     sorters: {
       initial: [
         {
@@ -26,7 +26,7 @@ export const PostList: React.FC = () => {
     },
   });
 
-  const { selectProps } = useSelect<ICategory>({
+  const { selectProps } = useSelect<Category>({
     resource: "categories",
   });
 
@@ -57,7 +57,7 @@ export const PostList: React.FC = () => {
             </FilterDropdown>
           )}
         />
-        <Table.Column<IPost>
+        <Table.Column<Post>
           title="Actions"
           dataIndex="actions"
           render={(_, record) => (

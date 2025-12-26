@@ -1,16 +1,16 @@
 import React from 'react';
 import { Card, Typography, Flex, Empty } from 'antd';
-import { TaskGroup } from './types';
+import { TaskGroup, Task } from 'interfaces';
 import { TimeTrackerItem } from './TimeTrackerItem';
-import { Task } from './types';
 import { calculateDuration } from 'utility/time';
 
 const { Text } = Typography;
 
-interface TimeTrackerListProps {
+export interface TimeTrackerListProps {
   tasks: Task[];
   weekTotal: string;
 }
+
 
 export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ tasks, weekTotal }) => {
   if (tasks.length === 0) {

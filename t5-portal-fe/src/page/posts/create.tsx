@@ -6,13 +6,13 @@ import { RcFile } from "antd/lib/upload/interface";
 
 import MDEditor from "@uiw/react-md-editor";
 
-import { IPost, ICategory } from "interfaces";
+import { Post, Category } from "interfaces";
 import { supabaseClient, normalizeFile } from "utility";
 
 export const PostCreate: React.FC = () => {
-  const { formProps, saveButtonProps } = useForm<IPost>();
+  const { formProps, saveButtonProps } = useForm<Post>();
 
-  const { selectProps: categorySelectProps } = useSelect<ICategory>({
+  const { selectProps: categorySelectProps } = useSelect<Category>({
     resource: "categories",
   });
 

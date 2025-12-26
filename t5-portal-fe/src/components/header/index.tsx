@@ -10,21 +10,16 @@ import {
 } from "antd";
 import React, { useContext } from "react";
 import { ColorModeContext } from "../../contexts/color-mode";
+import { User } from "interfaces";
 
 const { Text } = Typography;
 const { useToken } = theme;
-
-type IUser = {
-  id: number;
-  name: string;
-  avatar: string;
-};
 
 export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
   sticky = true,
 }) => {
   const { token } = useToken();
-  const { data: user } = useGetIdentity<IUser>();
+  const { data: user } = useGetIdentity<User>();
   const { mode, setMode } = useContext(ColorModeContext);
 
   return (

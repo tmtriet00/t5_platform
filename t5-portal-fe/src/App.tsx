@@ -23,6 +23,7 @@ import { supabaseClient } from "./utility";
 import { PostCreate, PostEdit, PostList } from "./page/posts";
 import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
 import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
+import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entries";
 import Home from "./page/home";
 import { KBarProviderWrapper } from "./components/kbar";
 
@@ -61,6 +62,15 @@ function App() {
                       create: "/projects/create",
                       edit: "/projects/edit/:id",
                     },
+                    {
+                      name: "time_entries",
+                      list: "/time-entries",
+                      create: "/time-entries/create",
+                      edit: "/time-entries/edit/:id",
+                      meta: {
+                        label: "Time Entries",
+                      },
+                    },
                   ]}
                   liveProvider={liveProvider(supabaseClient)}
                   authProvider={authProvider}
@@ -89,6 +99,9 @@ function App() {
                       <Route path="/projects" element={<ProjectList />} />
                       <Route path="/projects/create" element={<ProjectCreate />} />
                       <Route path="/projects/edit/:id" element={<ProjectEdit />} />
+                      <Route path="/time-entries" element={<TimeEntryList />} />
+                      <Route path="/time-entries/create" element={<TimeEntryCreate />} />
+                      <Route path="/time-entries/edit/:id" element={<TimeEntryEdit />} />
                     </Route>
                   </Routes>
                   <RefineKbar />

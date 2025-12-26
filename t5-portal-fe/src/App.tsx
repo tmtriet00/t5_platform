@@ -25,6 +25,7 @@ import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
 import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
 import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entries";
 import Home from "./page/home";
+import { NotionPage } from "./page/notion";
 import { KBarProviderWrapper } from "./components/kbar";
 
 function App() {
@@ -71,6 +72,13 @@ function App() {
                         label: "Time Entries",
                       },
                     },
+                    {
+                      name: "notion",
+                      list: "/notion",
+                      meta: {
+                        label: "Notion",
+                      },
+                    },
                   ]}
                   liveProvider={liveProvider(supabaseClient)}
                   authProvider={authProvider}
@@ -102,6 +110,7 @@ function App() {
                       <Route path="/time-entries" element={<TimeEntryList />} />
                       <Route path="/time-entries/create" element={<TimeEntryCreate />} />
                       <Route path="/time-entries/edit/:id" element={<TimeEntryEdit />} />
+                      <Route path="/notion" element={<NotionPage />} />
                     </Route>
                   </Routes>
                   <RefineKbar />

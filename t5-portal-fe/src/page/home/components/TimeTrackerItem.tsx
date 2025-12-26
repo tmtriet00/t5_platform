@@ -5,12 +5,13 @@ import {
   CaretRightOutlined,
   MoreOutlined
 } from '@ant-design/icons';
-import { TaskWithDuration } from './types';
+import { Task, TaskWithDuration } from './types';
+import { formatTime } from 'utility/time';
 
 const { Text } = Typography;
 
 interface TimeTrackerItemProps {
-  task: TaskWithDuration;
+  task: Task;
 }
 
 export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
@@ -34,7 +35,7 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
       </div>
 
       {/* Tags */}
-      {task.tags && task.tags.length > 0 && (
+      {/* {task.tags && task.tags.length > 0 && (
         <div className="h-full flex items-center border-l-2 border-dotted border-gray-200 px-4 min-w-[100px] justify-end">
 
           <Flex gap="4px">
@@ -45,12 +46,12 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
             ))}
           </Flex>
         </div>
-      )}
+      )} */}
 
       {/* Time Range */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">
         <span className="text-gray-500 text-[14px] font-medium">
-          {task.startTime} - {task.endTime}
+          {formatTime(task?.time_entries?.[0].start_time ?? '')} - {formatTime(task?.time_entries?.[0].end_time ?? '')}
         </span>
         <Button type="text" size="small" icon={<CalendarOutlined className="text-gray-400" />} className="ml-1 flex items-center justify-center" />
       </div>
@@ -58,7 +59,7 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
       {/* Duration */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[80px]">
         <span className="text-gray-800 font-bold text-[16px]">
-          {task.totalDuration}
+          {0}
         </span>
       </div>
 

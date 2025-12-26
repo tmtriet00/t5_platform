@@ -2,16 +2,18 @@ import React from 'react';
 import { Card, Typography, Flex, Empty } from 'antd';
 import { TaskGroup } from './types';
 import { TimeTrackerItem } from './TimeTrackerItem';
+import { Task } from './types';
+import { calculateDuration } from 'utility/time';
 
 const { Text } = Typography;
 
 interface TimeTrackerListProps {
-  groups: TaskGroup[];
+  tasks: Task[];
   weekTotal: string;
 }
 
-export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ groups, weekTotal }) => {
-  if (groups.length === 0) {
+export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ tasks, weekTotal }) => {
+  if (tasks.length === 0) {
     return (
       <div className="mt-4">
         <Empty
@@ -23,7 +25,7 @@ export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ groups, weekTo
   }
 
   return (
-    <div>
+    <div className='flex flex-col gap-5'>
       <Flex
         justify="space-between"
         align="center"
@@ -35,31 +37,28 @@ export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ groups, weekTo
         </div>
       </Flex>
 
-      {groups.map((group) => (
-        <Card
-          key={group.dateLabel}
-          bordered
-          className="mb-4 overflow-hidden rounded-sm shadow-sm border-gray-200"
-          styles={{ body: { padding: 0 } }}
+      <Card
+        bordered
+        className="mb-4 overflow-hidden rounded-sm shadow-sm border-gray-200"
+        styles={{ body: { padding: 0 } }}
+      >
+        <div
+          className="px-4 py-2 border-b bg-[#EAEEF2] border-gray-200"
         >
-          <div
-            className="px-4 py-2 border-b bg-[#EAEEF2] border-gray-200"
-          >
-            <Flex justify="space-between" align="center">
-              <span className="text-gray-500 font-medium text-[13px]">{group.dateLabel}</span>
-              <div className="text-gray-500 text-[13px]">
-                Total: <span className="text-gray-600 font-bold ml-1">{group.totalDuration}</span>
-              </div>
-            </Flex>
-          </div>
+          <Flex justify="space-between" align="center">
+            <span className="text-gray-500 font-medium text-[13px]">{"Today"}</span>
+            <div className="text-gray-500 text-[13px]">
+              Total: <span className="text-gray-600 font-bold ml-1">{"00:00"}</span>
+            </div>
+          </Flex>
+        </div>
 
-          <div>
-            {group.tasks.map((task) => (
-              <TimeTrackerItem key={task.id} task={task} />
-            ))}
-          </div>
-        </Card>
-      ))}
+        <div>
+          {tasks.map((task) => (
+            <TimeTrackerItem key={task.id} task={task} />
+          ))}
+        </div>
+      </Card>
     </div>
   );
 };

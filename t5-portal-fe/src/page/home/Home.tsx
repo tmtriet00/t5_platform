@@ -3,20 +3,15 @@ import { Layout, Spin, Alert } from "antd";
 import { TimeTrackerInput } from "./components/TimeTrackerInput";
 import { TimeTrackerList } from "./components/TimeTrackerList";
 import { useTaskByDate } from "./hooks/useTaskByDate";
-import { useSelect } from "@refinedev/antd";
-import { TimeEntry } from "../home/components/types";
 
 const { Content } = Layout;
 
 const Home: React.FC = () => {
-  const { groups, weekTotal, loading, error } = useTaskByDate();
-  const { selectProps } = useSelect<TimeEntry>({
-    resource: "time_entries",
-  });
+  const { tasks, weekTotal, loading, error } = useTaskByDate();
 
   return (
     <Layout className="min-h-screen bg-[#f0f2f5]">
-      <Content className="p-6 max-w-[1000px] mx-auto w-full">
+      <Content className="flex flex-col gap-5">
         <TimeTrackerInput />
 
         {loading ? (
@@ -32,7 +27,7 @@ const Home: React.FC = () => {
             className="mt-4"
           />
         ) : (
-          <TimeTrackerList groups={groups} weekTotal={weekTotal} />
+          <TimeTrackerList tasks={tasks} weekTotal={weekTotal} />
         )}
       </Content>
     </Layout>

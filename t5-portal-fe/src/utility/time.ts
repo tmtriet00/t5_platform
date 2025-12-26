@@ -1,10 +1,10 @@
 
 // Helper function to format duration in hours:minutes
 export const formatDuration = (seconds: number): string => {
-    const totalMinutes = Math.floor(seconds / 60);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
 // Helper function to calculate duration between two timestamps

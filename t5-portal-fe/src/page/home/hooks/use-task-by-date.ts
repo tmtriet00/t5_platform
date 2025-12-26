@@ -19,6 +19,7 @@ export const useTaskByDate = (props: { date: string }) => {
             return data as TaskSummaryDto[];
         },
         enabled: !!props.date,
+        refetchInterval: 1000
     });
 
     return {

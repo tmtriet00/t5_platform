@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, Typography, Button } from 'antd';
+import { Flex, Typography, Button, Tag } from 'antd';
 import {
   CalendarOutlined,
   CaretRightOutlined,
@@ -45,6 +45,9 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
         <span className="font-medium text-gray-700 text-[15px] mr-2 truncate">
           {task.name || '(No task name)'}
         </span>
+        <span>
+          <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)}</Tag>
+        </span>
         {/* {task.project && (
           <div className="flex items-center whitespace-nowrap">
             <span className="mx-2 text-gray-300">•</span>
@@ -78,9 +81,9 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
       </div> */}
 
       {/* Duration */}
-      <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[80px]">
+      <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[100px]">
         <span className="text-gray-800 font-bold text-[16px]">
-          {formatDuration(task.time_entry_total_duration ?? 0)}
+          {formatDuration(task.time_entry_active_duration ?? 0)}
         </span>
       </div>
 

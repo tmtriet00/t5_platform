@@ -1,7 +1,7 @@
 
 // Helper function to format duration in hours:minutes
-export const formatDuration = (milliseconds: number): string => {
-    const totalMinutes = Math.floor(milliseconds / (1000 * 60));
+export const formatDuration = (seconds: number): string => {
+    const totalMinutes = Math.floor(seconds / 60);
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     return `${hours}:${minutes.toString().padStart(2, '0')}`;

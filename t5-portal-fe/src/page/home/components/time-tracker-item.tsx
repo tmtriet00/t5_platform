@@ -5,14 +5,14 @@ import {
   CaretRightOutlined,
   MoreOutlined
 } from '@ant-design/icons';
-import { Task, TaskWithDuration } from 'interfaces';
-import { formatTime } from 'utility/time';
+import { TaskSummaryDto } from 'interfaces/dto/task';
+import { formatDuration, formatTime } from 'utility/time';
 import { useStopTrackingTask } from '../hooks/use-stop-tracking';
 
 const { Text } = Typography;
 
 interface TimeTrackerItemProps {
-  task: Task;
+  task: TaskSummaryDto;
 }
 
 export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
@@ -27,14 +27,14 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
         <span className="font-medium text-gray-700 text-[15px] mr-2 truncate">
           {task.name || '(No task name)'}
         </span>
-        {task.project && (
+        {/* {task.project && (
           <div className="flex items-center whitespace-nowrap">
             <span className="mx-2 text-gray-300">•</span>
             <span style={{ color: task.project.color }} className="font-medium max-w-[150px] truncate">
               {task.project.name}
             </span>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Tags */}
@@ -54,7 +54,7 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
       {/* Time Range */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">
         <span className="text-gray-500 text-[14px] font-medium">
-          {formatTime(task?.time_entries?.[0].start_time ?? '')} - {formatTime(task?.time_entries?.[0].end_time ?? '')}
+          {/* {formatTime(task?.time_entries?.[0].start_time ?? '')} - {formatTime(task?.time_entries?.[0].end_time ?? '')} */}
         </span>
         <Button type="text" size="small" icon={<CalendarOutlined className="text-gray-400" />} className="ml-1 flex items-center justify-center" />
       </div>
@@ -62,7 +62,7 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
       {/* Duration */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[80px]">
         <span className="text-gray-800 font-bold text-[16px]">
-          {0}
+          {formatDuration(task.time_entry_total_duration ?? 0)}
         </span>
       </div>
 

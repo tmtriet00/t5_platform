@@ -10,7 +10,7 @@ const { Content } = Layout;
 
 const Home: React.FC = () => {
   const [selectedDate, setSelectedDate] = React.useState<string>(dayjs().format("YYYY-MM-DD"));
-  const { tasks, weekTotal, loading, error } = useTaskByDate({ date: selectedDate });
+  const { tasks, loading, error } = useTaskByDate({ date: selectedDate });
 
   return (
     <Layout className="min-h-screen bg-[#f0f2f5]">
@@ -33,7 +33,7 @@ const Home: React.FC = () => {
             className="mt-4"
           />
         ) : (
-          <TimeTrackerList tasks={tasks} weekTotal={weekTotal} />
+          <TimeTrackerList tasks={tasks} />
         )}
       </Content>
     </Layout>

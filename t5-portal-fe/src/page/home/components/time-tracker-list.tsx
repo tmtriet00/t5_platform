@@ -2,17 +2,17 @@ import React from 'react';
 import { Card, Typography, Flex, Empty } from 'antd';
 import { TaskGroup, Task } from 'interfaces';
 import { TimeTrackerItem } from './time-tracker-item';
-import { calculateDuration } from 'utility/time';
+import { TaskSummaryDto } from 'interfaces/dto/task';
+import { formatDuration } from 'utility/time';
 
 const { Text } = Typography;
 
 export interface TimeTrackerListProps {
-  tasks: Task[];
-  weekTotal: string;
+  tasks: TaskSummaryDto[];
 }
 
 
-export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ tasks, weekTotal }) => {
+export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ tasks }) => {
   if (tasks.length === 0) {
     return (
       <div className="mt-4">
@@ -26,7 +26,7 @@ export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ tasks, weekTot
 
   return (
     <div className='flex flex-col gap-5'>
-      <Flex
+      {/* <Flex
         justify="space-between"
         align="center"
         className="mb-2 px-1"
@@ -35,7 +35,7 @@ export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ tasks, weekTot
         <div className="text-gray-500 text-[13px]">
           Week total: <span className="text-gray-800 font-bold ml-1 text-base">{weekTotal}</span>
         </div>
-      </Flex>
+      </Flex> */}
 
       <Card
         bordered

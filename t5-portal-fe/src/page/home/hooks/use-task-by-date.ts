@@ -1,78 +1,28 @@
-import { useState, useEffect } from 'react';
-import { HttpError, useList } from '@refinedev/core';
+import { useQuery } from '@tanstack/react-query';
+import { supabaseClient } from 'utility';
 import { Task } from 'interfaces';
-import { formatDuration, calculateDuration, formatTime, getDateLabel } from 'utility/time';
-import dayjs from 'dayjs';
+import { formatDuration } from 'utility/time';
+import { TaskSummaryDto } from 'interfaces/dto/task';
 
-interface UseTaskByDateProps {
-    date: string;
-}
+export const useTaskByDate = (props: { date: string }) => {
+    const { data: tasks, isLoading, error } = useQuery<TaskSummaryDto[], Error>({
+        queryKey: ['list_task_tracked_by_date', props.date],
+        queryFn: async () => {
+            const { data, error } = await supabaseClient.rpc("list_task_tracked_by_date", {
+                input_date: props.date,
+                timezone: "+07:00"
+            });
 
-interface UseTaskByDateReturn {
-    tasks: Task[];
-    weekTotal: string;
-    loading: boolean;
-    error: Error | null;
-}
-
-export const useTaskByDate = (props: UseTaskByDateProps): UseTaskByDateReturn => {
-    const [weekTotal, setWeekTotal] = useState<string>('0:00');
-    const [tasks, setTasks] = useState<Task[]>([]);
-
-    const { query } = useList<Task, HttpError>({
-        resource: 'tasks',
-        meta: {
-            select: `
-                id,
-                name,
-                project_id,
-                project:projects (
-                    id,
-                    name,
-                    color
-                ),
-                time_entries!inner (
-                    id,
-                    description,
-                    tags,
-                    start_time,
-                    end_time
-                )
-            `,
+            if (error) {
+                throw error;
+            }
+            return data as TaskSummaryDto[];
         },
-        filters: [
-            {
-                field: 'time_entries.start_time',
-                operator: 'gte',
-                value: dayjs(props.date).startOf('day').toISOString(),
-            },
-            {
-                field: 'time_entries.start_time',
-                operator: 'lte',
-                value: dayjs(props.date).endOf('day').toISOString(),
-            },
-        ],
-        pagination: {
-            mode: "off",
-        }
+        enabled: !!props.date,
     });
 
-    const { data: listData, isLoading, isError, error } = query;
-    const data = listData; // Alias to match previous logic
-
-    useEffect(() => {
-        if (!data?.data) {
-            setWeekTotal('0:00');
-            return;
-        }
-
-        setTasks(data.data);
-
-    }, [data]);
-
     return {
-        tasks,
-        weekTotal,
+        tasks: tasks || [],
         loading: isLoading,
         error: error as Error | null
     };

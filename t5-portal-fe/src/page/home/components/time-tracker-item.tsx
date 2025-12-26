@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import { Task, TaskWithDuration } from 'interfaces';
 import { formatTime } from 'utility/time';
+import { useStopTrackingTask } from '../hooks/use-stop-tracking';
 
 const { Text } = Typography;
 
@@ -15,6 +16,8 @@ interface TimeTrackerItemProps {
 }
 
 export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
+  const useStopTrackingReturn = useStopTrackingTask();
+
   return (
     <div
       className="group border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50 h-14 flex items-center bg-white"
@@ -69,6 +72,7 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
           type="text"
           icon={<CaretRightOutlined className="text-gray-500 text-xl hover:text-[#00A0D2]" />}
           className="flex items-center justify-center w-full h-full"
+          onClick={() => useStopTrackingReturn.mutate({ task })}
         />
       </div>
 

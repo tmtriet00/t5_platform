@@ -7,12 +7,12 @@ import {
   ClockCircleOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { HttpError, useList } from '@refinedev/core';
-import { Task } from "interfaces";
+import { HttpError, useCreate, useList } from '@refinedev/core';
+import { Task, TimeEntry } from "interfaces";
 import { AutoComplete } from 'antd';
 import { debounce } from 'lodash';
 import { SearchOutlined } from "@ant-design/icons";
-
+import { useStartTrackingTask } from "../hooks/use-start-tracking";
 
 export const TimeTrackerInput: React.FC = () => {
   const [keyword, setKeyword] = useState('');
@@ -27,18 +27,26 @@ export const TimeTrackerInput: React.FC = () => {
     ],
   });
 
+  const useStartTrackingTaskReturn = useStartTrackingTask();
 
   return (
     <Card className="mb-6 shadow-sm rounded-none border-t-0 border-x-0 border-b border-gray-200" styles={{ body: { padding: "8px 16px" } }}>
       <Flex align="center" className="w-full h-12">
         <AutoComplete
           options={query.data?.data.map((item) => ({
+            task: item,
             value: item.name,
             label: item.name,
           }))}
           filterOption={false}
           onSearch={debounce((value: string) => setKeyword(value), 500)}
           className="flex-1 mr-4"
+          onSelect={(_: string, option: any) => {
+            const selectedTask = option?.task as Task | undefined;
+            if (selectedTask) {
+              useStartTrackingTaskReturn.mutate({ task: selectedTask });
+            }
+          }}
         >
           <Input
             size="large"

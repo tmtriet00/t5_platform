@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Typography, Flex, Empty } from 'antd';
 import { TaskGroup, Task } from 'interfaces';
-import { TimeTrackerItem } from './time-tracker-item';
+import { TaskSummaryItem } from './task-summary-item';
 import { TaskSummaryDto } from 'interfaces/dto/task';
 import { formatDuration } from 'utility/time';
 
@@ -55,7 +55,7 @@ export const TimeTrackerList: React.FC<TimeTrackerListProps> = ({ tasks }) => {
 
         <div>
           {tasks.map((task) => (
-            <TimeTrackerItem key={task.id} task={task} />
+            <TaskSummaryItem key={task.id} task={task} />
           ))}
         </div>
       </Card>

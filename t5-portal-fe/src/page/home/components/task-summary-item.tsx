@@ -3,6 +3,7 @@ import { Flex, Typography, Button } from 'antd';
 import {
   CalendarOutlined,
   CaretRightOutlined,
+  PauseOutlined,
   MoreOutlined
 } from '@ant-design/icons';
 import { TaskSummaryDto } from 'interfaces/dto/task';
@@ -11,12 +12,29 @@ import { useStopTrackingTask } from '../hooks/use-stop-tracking';
 
 const { Text } = Typography;
 
-interface TimeTrackerItemProps {
+interface TaskSummaryItemProps {
   task: TaskSummaryDto;
 }
 
-export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
+export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   const useStopTrackingReturn = useStopTrackingTask();
+
+  const getTagColor = (tag: string) => {
+    switch (tag) {
+      case 'high':
+        return '#be1f2edd';
+      case 'medium':
+        return '#9f942fff';
+      case 'low':
+        return '#C8E6C9';
+      case 'active':
+        return '#a8eeabff';
+      case 'inactive':
+        return '#bec9beff';
+      default:
+        return '#ECEFF1';
+    }
+  }
 
   return (
     <div
@@ -38,26 +56,26 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
       </div>
 
       {/* Tags */}
-      {/* {task.tags && task.tags.length > 0 && (
-        <div className="h-full flex items-center border-l-2 border-dotted border-gray-200 px-4 min-w-[100px] justify-end">
+      {task.tags && task.tags.length > 0 && (
+        <div className="h-full flex items-center border-r-dotted border-gray-200 px-4 min-w-[100px] justify-end">
 
           <Flex gap="4px">
             {task.tags.map(tag => (
-              <span key={tag} className="text-[11px] font-medium text-[#00A0D2] bg-[#E1F5FE] px-2 py-0.5 rounded-sm uppercase tracking-wide">
+              <span key={tag} style={{ backgroundColor: getTagColor(tag) }} className="text-[11px] font-medium px-2 py-0.5 rounded-sm uppercase tracking-wide">
                 {tag}
               </span>
             ))}
           </Flex>
         </div>
-      )} */}
+      )}
 
       {/* Time Range */}
-      <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">
+      {/* <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">
         <span className="text-gray-500 text-[14px] font-medium">
-          {/* {formatTime(task?.time_entries?.[0].start_time ?? '')} - {formatTime(task?.time_entries?.[0].end_time ?? '')} */}
+          {formatTime(task?.time_entries?.[0].start_time ?? '')} - {formatTime(task?.time_entries?.[0].end_time ?? '')}
         </span>
         <Button type="text" size="small" icon={<CalendarOutlined className="text-gray-400" />} className="ml-1 flex items-center justify-center" />
-      </div>
+      </div> */}
 
       {/* Duration */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[80px]">
@@ -70,7 +88,11 @@ export const TimeTrackerItem: React.FC<TimeTrackerItemProps> = ({ task }) => {
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-14">
         <Button
           type="text"
-          icon={<CaretRightOutlined className="text-gray-500 text-xl hover:text-[#00A0D2]" />}
+          icon={task.tags?.includes('active') ? (
+            <PauseOutlined className="text-gray-500 text-xl hover:text-[#00A0D2]" />
+          ) : (
+            <CaretRightOutlined className="text-gray-500 text-xl hover:text-[#00A0D2]" />
+          )}
           className="flex items-center justify-center w-full h-full"
           onClick={() => useStopTrackingReturn.mutate({ task })}
         />

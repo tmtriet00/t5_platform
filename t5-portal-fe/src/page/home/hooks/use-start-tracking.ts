@@ -1,8 +1,11 @@
 import { useCreate, useInvalidate } from "@refinedev/core";
 import { Task, TimeEntry } from "interfaces";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useStartTrackingTask = () => {
     const invalidate = useInvalidate();
+    const queryClient = useQueryClient();
+
     const { mutate: createMutate, mutation: createMutation } = useCreate<TimeEntry>({
         resource: 'time_entries',
         mutationOptions: {
@@ -10,6 +13,9 @@ export const useStartTrackingTask = () => {
                 invalidate({
                     resource: 'tasks',
                     invalidates: ['all'],
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ['list_task_tracked_by_date'],
                 });
             },
         }

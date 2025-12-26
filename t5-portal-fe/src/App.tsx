@@ -21,6 +21,8 @@ import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { supabaseClient } from "./utility";
 import { PostCreate, PostEdit, PostList } from "./page/posts";
+import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
+import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
 import Home from "./page/home";
 import { KBarProviderWrapper } from "./components/kbar";
 
@@ -38,10 +40,26 @@ function App() {
                   dataProvider={dataProvider(supabaseClient)}
                   resources={[
                     {
+                      name: "home",
+                      list: "/home",
+                    },
+                    {
                       name: "posts",
                       list: "/posts",
                       create: "/posts/create",
                       edit: "/posts/edit/:id",
+                    },
+                    {
+                      name: "tasks",
+                      list: "/tasks",
+                      create: "/tasks/create",
+                      edit: "/tasks/edit/:id",
+                    },
+                    {
+                      name: "projects",
+                      list: "/projects",
+                      create: "/projects/create",
+                      edit: "/projects/edit/:id",
                     },
                   ]}
                   liveProvider={liveProvider(supabaseClient)}
@@ -50,7 +68,6 @@ function App() {
                   options={{
                     syncWithLocation: true,
                     warnWhenUnsavedChanges: true,
-                    projectId: "2NUMPD-DunVuJ-oVECSl",
                   }}
                 >
                   <Routes>
@@ -66,6 +83,12 @@ function App() {
                       <Route path="/posts" element={<PostList />} />
                       <Route path="/posts/create" element={<PostCreate />} />
                       <Route path="/posts/edit/:id" element={<PostEdit />} />
+                      <Route path="/tasks" element={<TaskList />} />
+                      <Route path="/tasks/create" element={<TaskCreate />} />
+                      <Route path="/tasks/edit/:id" element={<TaskEdit />} />
+                      <Route path="/projects" element={<ProjectList />} />
+                      <Route path="/projects/create" element={<ProjectCreate />} />
+                      <Route path="/projects/edit/:id" element={<ProjectEdit />} />
                     </Route>
                   </Routes>
                   <RefineKbar />

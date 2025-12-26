@@ -1,8 +1,8 @@
 import React from "react";
 import { Layout, Spin, Alert } from "antd";
-import { TimeTrackerInput } from "./components/TimeTrackerInput";
-import { TimeTrackerList } from "./components/TimeTrackerList";
-import { useTaskByDate } from "./hooks/useTaskByDate";
+import { TimeTrackerInput } from "./components/time-tracker-input";
+import { TimeTrackerList } from "./components/time-tracker-list";
+import { useTaskByDate } from "./hooks/use-task-by-date";
 
 const { Content } = Layout;
 

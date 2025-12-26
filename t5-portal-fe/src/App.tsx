@@ -21,7 +21,7 @@ import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { supabaseClient } from "./utility";
 import { PostCreate, PostEdit, PostList } from "./page/posts";
-import Home from "./page/home/Home";
+import Home from "./page/home";
 import { KBarProviderWrapper } from "./components/kbar";
 
 function App() {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Typography, Flex, Empty } from 'antd';
 import { TaskGroup, Task } from 'interfaces';
-import { TimeTrackerItem } from './TimeTrackerItem';
+import { TimeTrackerItem } from './time-tracker-item';
 import { calculateDuration } from 'utility/time';
 
 const { Text } = Typography;

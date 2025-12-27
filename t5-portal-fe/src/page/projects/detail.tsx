@@ -1,23 +1,40 @@
 import { Card, theme } from "antd";
-import { Project } from "interfaces";
+import { Project, Task } from "interfaces";
 import { useParams } from "react-router";
-import { useOne, HttpError } from "@refinedev/core";
+import { useOne, useList, HttpError } from "@refinedev/core";
 import { useState } from "react";
-import { AgGridReact } from 'ag-grid-react';
+import { TaskListTable } from "../../components/tasks/task-list-table";
+import { ProjectTimeline } from "../../components/projects/project-timeline";
 
 const { useToken } = theme;
 
 export const ProjectDetail = () => {
     const params = useParams()
     const { token } = useToken();
+    const [activeTabKey, setActiveTabKey] = useState("overview");
 
-    const {
-        result: project,
-        query: { isLoading, isError },
-    } = useOne<Project, HttpError>({
+    const { query: projectQuery } = useOne<Project, HttpError>({
         resource: "projects",
         id: params.id,
     });
+    const { data: projectResponse } = projectQuery;
+    const project = projectResponse?.data;
+
+    const { query: taskQuery } = useList<Task>({
+        resource: "tasks",
+        filters: [
+            {
+                field: "project_id",
+                operator: "eq",
+                value: params.id,
+            },
+        ],
+        queryOptions: {
+            enabled: !!params.id,
+        }
+    });
+    const { data: taskResponse, isLoading: isTaskLoading } = taskQuery;
+    const tasks = taskResponse?.data || [];
 
     const items = [
         {
@@ -30,29 +47,38 @@ export const ProjectDetail = () => {
         },
     ]
 
-    // Row Data: The data to be displayed.
-    const [rowData, setRowData] = useState([
-        { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-        { make: "Ford", model: "F-Series", price: 33850, electric: false },
-        { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-    ]);
-
-    // Column Definitions: Defines the columns to be displayed.
-    const [colDefs, setColDefs] = useState([
-        { field: "make" },
-        { field: "model" },
-        { field: "price" },
-        { field: "electric" }
-    ]);
+    const renderContent = () => {
+        if (activeTabKey === "overview") {
+            return (
+                <div style={{ display: "flex", gap: "16px" }}>
+                    <div style={{ flex: 2 }}>
+                        <TaskListTable
+                            rowData={tasks}
+                            isLoading={isTaskLoading}
+                        />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <ProjectTimeline />
+                    </div>
+                </div>
+            );
+        }
+        return <div>Brainstorm Content</div>;
+    };
 
     return (
         <div>
-            <Card title={
-                <div>
-                    <span>Project: <span style={{ color: token.colorPrimary }}>{project?.name}</span></span>
-                </div>
-            } tabList={items}>
-
+            <Card
+                title={
+                    <div>
+                        <span>Project: <span style={{ color: token.colorPrimary }}>{project?.name}</span></span>
+                    </div>
+                }
+                tabList={items}
+                activeTabKey={activeTabKey}
+                onTabChange={setActiveTabKey}
+            >
+                {renderContent()}
             </Card>
         </div>
     );

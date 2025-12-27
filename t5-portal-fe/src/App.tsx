@@ -56,23 +56,17 @@ function App() {
                       list: "/home",
                     },
                     {
-                      name: "posts",
-                      list: "/posts",
-                      create: "/posts/create",
-                      edit: "/posts/edit/:id",
+                      name: "projects",
+                      list: "/projects",
+                      create: "/projects/create",
+                      edit: "/projects/edit/:id",
+                      show: "/projects/:id",
                     },
                     {
                       name: "tasks",
                       list: "/tasks",
                       create: "/tasks/create",
                       edit: "/tasks/edit/:id",
-                    },
-                    {
-                      name: "projects",
-                      list: "/projects",
-                      create: "/projects/create",
-                      edit: "/projects/edit/:id",
-                      show: "/projects/:id",
                     },
                     {
                       name: "time_entries",

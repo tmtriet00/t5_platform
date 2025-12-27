@@ -2,6 +2,7 @@ import React from "react";
 import { Layout, Spin, Alert, DatePicker } from "antd";
 import { TimeTrackerInput } from "./components/time-tracker-input";
 import { TimeTrackerList } from "./components/time-tracker-list";
+import { TimelineChart } from "./components/timeline-chart";
 import { useTaskByDate } from "./hooks/use-task-by-date";
 
 import dayjs from "dayjs";
@@ -19,6 +20,7 @@ const Home: React.FC = () => {
           <DatePicker size="large" value={dayjs(selectedDate)} onChange={(date) => setSelectedDate(date?.format("YYYY-MM-DD") || "")} />
         </div>
         <TimeTrackerInput />
+        <TimelineChart date={selectedDate} />
 
         {loading ? (
           <div className="flex justify-center items-center py-12">

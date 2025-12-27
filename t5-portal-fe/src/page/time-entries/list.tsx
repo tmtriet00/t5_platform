@@ -18,6 +18,9 @@ export const TimeEntryList: React.FC = () => {
         meta: {
             select: "*, task:tasks(id, name)",
         },
+        pagination: {
+            mode: "off",
+        },
         sorters: [
             {
                 field: "start_time",

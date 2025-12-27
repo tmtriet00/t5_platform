@@ -11,6 +11,7 @@ import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
 // import "ag-grid-community/styles/ag-theme-alpine.css";
 import { useMemo } from "react";
 import { Task } from "interfaces";
+import { Tag } from "antd";
 
 export const TaskList: React.FC = () => {
     const { query } = useList<Task>({
@@ -90,7 +91,21 @@ export const TaskList: React.FC = () => {
             field: "status",
             headerName: "Status",
             sortable: true,
-            filter: true
+            filter: true,
+            cellRenderer: (params: any) => {
+                if (!params.value) return null;
+                let color = "grey"
+                switch (params.value) {
+                    case "completed":
+                        color = "green";
+                        break;
+                    case "in-progress":
+                        color = "yellow";
+                        break;
+                }
+
+                return <Tag color={color}>{params.value}</Tag>;
+            }
         },
         {
             headerName: "Actions",

@@ -7,6 +7,6 @@ export interface Task {
     project?: Project;
     project_id?: number;
     time_entries?: TimeEntry[];
-    risk_type?: string;
+    risk_type?: 'low' | 'medium' | 'high';
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
 }

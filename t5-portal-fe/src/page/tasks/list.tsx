@@ -61,7 +61,6 @@ export const TaskList: React.FC = () => {
         {
             field: "id",
             headerName: "ID",
-            width: 80,
             sortable: true,
             filter: true
         },
@@ -77,6 +76,19 @@ export const TaskList: React.FC = () => {
             field: "project.name",
             headerName: "Project",
             flex: 1,
+            sortable: true,
+            filter: true
+        },
+        {
+            field: "risk_type",
+            headerName: "Risk Type",
+            sortable: true,
+            filter: true,
+            rowGroup: true
+        },
+        {
+            field: "status",
+            headerName: "Status",
             sortable: true,
             filter: true
         },

@@ -1,74 +1,91 @@
 import {
     List,
-    useTable,
     EditButton,
-    getDefaultSortOrder,
-    FilterDropdown,
-    useSelect,
     DeleteButton,
 } from "@refinedev/antd";
-import { Table, Space, Select } from "antd";
+import { useList } from "@refinedev/core";
+import { Space } from "antd";
+import { AgGridReact } from 'ag-grid-react';
+import { ColDef } from 'ag-grid-community';
+import { useMemo } from "react";
 
-import { TaskEstimation, Task } from "interfaces";
+import { TaskEstimation } from "interfaces";
 
 export const TaskEstimationList: React.FC = () => {
-    const { tableProps, sorters } = useTable<TaskEstimation>({
-        sorters: {
-            initial: [
-                {
-                    field: "id",
-                    order: "asc",
-                },
-            ],
-        },
+    const { query } = useList<TaskEstimation>({
+        resource: "task_estimations",
         meta: {
             select: "*, tasks(name)",
         },
+        sorters: [
+            {
+                field: "id",
+                order: "asc",
+            },
+        ],
     });
 
-    const { selectProps } = useSelect<Task>({
-        resource: "tasks",
-        optionLabel: "name",
-        optionValue: "id",
-    });
+    const { data, isLoading } = query;
+    const rowData = data?.data || [];
+
+    const columnDefs = useMemo<ColDef[]>(() => [
+        {
+            field: "id",
+            headerName: "ID",
+            sortable: true,
+            filter: true
+        },
+        {
+            field: "tasks.name",
+            headerName: "Task",
+            flex: 1,
+            sortable: true,
+            filter: true
+        },
+        {
+            field: "estimation_time",
+            headerName: "Estimation Time",
+            width: 150,
+            sortable: true,
+            filter: true
+        },
+        {
+            headerName: "Actions",
+            field: "id",
+            cellRenderer: (params: any) => {
+                return (
+                    <Space>
+                        <EditButton hideText size="small" recordItemId={params.value} />
+                        <DeleteButton hideText size="small" recordItemId={params.value} />
+                    </Space>
+                );
+            },
+            width: 120,
+            sortable: false,
+            filter: false
+        }
+    ], []);
+
+    const defaultColDef = useMemo(() => ({
+        resizable: true,
+    }), []);
 
     return (
         <List>
-            <Table {...tableProps} rowKey="id">
-                <Table.Column
-                    key="id"
-                    dataIndex="id"
-                    title="ID"
-                    sorter
-                    defaultSortOrder={getDefaultSortOrder("id", sorters)}
+            <div style={{ height: 600, flex: 1 }}>
+                <AgGridReact
+                    rowData={rowData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    pagination={true}
+                    paginationPageSize={10}
+                    loading={isLoading}
+                    sideBar={{
+                        toolPanels: ['columns', 'filters'],
+                        hiddenByDefault: false
+                    }}
                 />
-                <Table.Column
-                    key="task_id"
-                    dataIndex={["tasks", "name"]}
-                    title="Task"
-                    filterDropdown={(props) => (
-                        <FilterDropdown {...props}>
-                            <Select
-                                style={{ minWidth: 200 }}
-                                mode="multiple"
-                                placeholder="Select Task"
-                                {...selectProps}
-                            />
-                        </FilterDropdown>
-                    )}
-                />
-                <Table.Column key="estimation_time" dataIndex="estimation_time" title="Estimation Time" sorter />
-                <Table.Column<TaskEstimation>
-                    title="Actions"
-                    dataIndex="actions"
-                    render={(_, record) => (
-                        <Space>
-                            <EditButton hideText size="small" recordItemId={record.id} />
-                            <DeleteButton hideText size="small" recordItemId={record.id} />
-                        </Space>
-                    )}
-                />
-            </Table>
+            </div>
         </List>
     );
 };

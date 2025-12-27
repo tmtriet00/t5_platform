@@ -30,6 +30,9 @@ import { NotionPage } from "./page/notion";
 import { RemoteBrowser } from "./page/remote-browser";
 import { KBarProviderWrapper } from "./components/kbar";
 
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
+
 function App() {
 
   return (

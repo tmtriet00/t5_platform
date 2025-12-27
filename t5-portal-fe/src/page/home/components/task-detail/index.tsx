@@ -1,13 +1,14 @@
 import { Tabs } from 'antd';
 import { TabsProps } from 'antd';
+import { TaskDetailEditor } from './task-detail-editor';
 
 export const TaskDetail: React.FC = () => {
 
     const items: TabsProps['items'] = [
         {
             key: '1',
-            label: 'Tab 1',
-            children: 'Content of Tab Pane 1',
+            label: 'Description',
+            children: <TaskDetailEditor />,
         },
         {
             key: '2',

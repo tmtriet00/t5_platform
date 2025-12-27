@@ -1,5 +1,6 @@
 import React from "react";
-import { Layout, Spin, Alert, DatePicker } from "antd";
+import { Layout, Spin, Alert, DatePicker, Segmented } from "antd";
+import { UnorderedListOutlined, CalendarOutlined } from "@ant-design/icons";
 import { TimeTrackerInput } from "./components/time-tracker-input";
 import { TimeTrackerList } from "./components/time-tracker-list";
 import { TimelineChart } from "./components/timeline-chart";
@@ -11,6 +12,7 @@ const { Content } = Layout;
 
 const Home: React.FC = () => {
   const [selectedDate, setSelectedDate] = React.useState<string>(dayjs().format("YYYY-MM-DD"));
+  const [viewMode, setViewMode] = React.useState<'list' | 'timeline'>('list');
   const { tasks, loading, error } = useTaskByDate({ date: selectedDate });
 
   return (
@@ -20,22 +22,36 @@ const Home: React.FC = () => {
           <DatePicker size="large" value={dayjs(selectedDate)} onChange={(date) => setSelectedDate(date?.format("YYYY-MM-DD") || "")} />
         </div>
         <TimeTrackerInput />
-        <TimelineChart date={selectedDate} />
 
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <Spin size="large" />
-          </div>
-        ) : error ? (
-          <Alert
-            message="Error loading time entries"
-            description={error.message}
-            type="error"
-            showIcon
-            className="mt-4"
+        <div className="flex justify-end">
+          <Segmented
+            options={[
+              { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
+              { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
+            ]}
+            value={viewMode}
+            onChange={(value) => setViewMode(value as 'list' | 'timeline')}
           />
-        ) : (
-          <TimeTrackerList tasks={tasks} />
+        </div>
+
+        {viewMode === 'timeline' && <TimelineChart date={selectedDate} />}
+
+        {viewMode === 'list' && (
+          loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Spin size="large" />
+            </div>
+          ) : error ? (
+            <Alert
+              message="Error loading time entries"
+              description={error.message}
+              type="error"
+              showIcon
+              className="mt-4"
+            />
+          ) : (
+            <TimeTrackerList tasks={tasks} />
+          )
         )}
       </Content>
     </Layout>

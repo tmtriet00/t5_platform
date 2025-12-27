@@ -31,6 +31,12 @@ export const TaskEdit: React.FC = () => {
         setIsDeprecated(false);
     };
 
+    const riskTypeOptions = [
+        { label: "High", value: "high" },
+        { label: "Medium", value: "medium" },
+        { label: "Low", value: "low" },
+    ];
+
     return (
         <Edit
             saveButtonProps={saveButtonProps}
@@ -78,6 +84,17 @@ export const TaskEdit: React.FC = () => {
                     ]}
                 >
                     <Select {...projectSelectProps} />
+                </Form.Item>
+                <Form.Item
+                    label="Risk Type"
+                    name="risk_type"
+                    rules={[
+                        {
+                            required: false,
+                        },
+                    ]}
+                >
+                    <Select options={riskTypeOptions} />
                 </Form.Item>
             </Form>
         </Edit>

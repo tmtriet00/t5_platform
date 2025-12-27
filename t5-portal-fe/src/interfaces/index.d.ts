@@ -7,4 +7,5 @@ export * from "./model/task-group";
 export * from "./model/user";
 export * from "./model/upload";
 export * from "./model/category";
+export * from "./model/task-estimation";
 export * from "./dto/home";

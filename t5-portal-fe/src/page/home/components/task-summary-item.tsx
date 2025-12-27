@@ -22,15 +22,19 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   const getTagColor = (tag: string) => {
     switch (tag) {
       case 'high':
-        return '#be1f2edd';
+        return 'red';
       case 'medium':
-        return '#9f942fff';
+        return 'gold';
       case 'low':
-        return '#C8E6C9';
+        return 'geekblue';
       case 'active':
-        return '#a8eeabff';
+        return 'green';
       case 'inactive':
         return '#bec9beff';
+      case 'unestimated':
+        return 'red';
+      case 'estimated':
+        return 'cyan';
       default:
         return '#ECEFF1';
     }
@@ -64,9 +68,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
 
           <Flex gap="4px">
             {task.tags.map(tag => (
-              <span key={tag} style={{ backgroundColor: getTagColor(tag) }} className="text-[11px] font-medium px-2 py-0.5 rounded-sm uppercase tracking-wide">
-                {tag}
-              </span>
+              <Tag color={getTagColor(tag)}>{tag}</Tag>
             ))}
           </Flex>
         </div>

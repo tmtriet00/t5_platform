@@ -24,6 +24,7 @@ import { PostCreate, PostEdit, PostList } from "./page/posts";
 import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
 import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
 import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entries";
+import { TaskEstimationCreate, TaskEstimationEdit, TaskEstimationList } from "./page/task_estimations";
 import Home from "./page/home";
 import { NotionPage } from "./page/notion";
 import { KBarProviderWrapper } from "./components/kbar";
@@ -73,6 +74,15 @@ function App() {
                       },
                     },
                     {
+                      name: "task_estimations",
+                      list: "/task-estimations",
+                      create: "/task-estimations/create",
+                      edit: "/task-estimations/edit/:id",
+                      meta: {
+                        label: "Task Estimations",
+                      },
+                    },
+                    {
                       name: "notion",
                       list: "/notion",
                       meta: {
@@ -110,6 +120,9 @@ function App() {
                       <Route path="/time-entries" element={<TimeEntryList />} />
                       <Route path="/time-entries/create" element={<TimeEntryCreate />} />
                       <Route path="/time-entries/edit/:id" element={<TimeEntryEdit />} />
+                      <Route path="/task-estimations" element={<TaskEstimationList />} />
+                      <Route path="/task-estimations/create" element={<TaskEstimationCreate />} />
+                      <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
                       <Route path="/notion" element={<NotionPage />} />
                     </Route>
                   </Routes>

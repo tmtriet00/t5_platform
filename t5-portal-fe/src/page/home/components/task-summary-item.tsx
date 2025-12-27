@@ -133,7 +133,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
             {task.name || '(No task name)'}
           </span>
           <span>
-            <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)}</Tag>
+            <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)} ({Math.floor(task.time_entry_total_duration ?? 0 / (task.total_estimation_time ?? 0) * 100)}%) - {formatDuration(task.total_estimation_time ?? 0)})</Tag>
           </span>
           {/* {task.project && (
             <div className="flex items-center whitespace-nowrap">
@@ -202,7 +202,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
       {expanded && (
         <div className="bg-gray-50 border-b border-gray-100 p-4">
           {/* TODO: Add TaskDetail component here */}
-          <TaskDetail />
+          <TaskDetail taskId={task.id} />
         </div>
       )}
 

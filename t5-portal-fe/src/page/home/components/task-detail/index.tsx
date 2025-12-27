@@ -1,8 +1,13 @@
 import { Tabs } from 'antd';
 import { TabsProps } from 'antd';
 import { TaskDetailEditor } from './task-detail-editor';
+import { TrackingList } from './tracking-list';
 
-export const TaskDetail: React.FC = () => {
+interface TaskDetailProps {
+    taskId: number;
+}
+
+export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId }) => {
 
     const items: TabsProps['items'] = [
         {
@@ -12,8 +17,8 @@ export const TaskDetail: React.FC = () => {
         },
         {
             key: '2',
-            label: 'Tab 2',
-            children: 'Content of Tab Pane 2',
+            label: 'Tracking History',
+            children: <TrackingList taskId={taskId} />,
         },
         {
             key: '3',

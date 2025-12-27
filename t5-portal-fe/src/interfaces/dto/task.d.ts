@@ -8,4 +8,5 @@ export interface TaskSummaryDto {
     tags?: string[];
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
     risk_type?: string;
+    total_estimation_time?: number;
 }

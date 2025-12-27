@@ -7,13 +7,17 @@ import {
   MoreOutlined,
   CheckCircleOutlined,
   RightOutlined,
-  DownOutlined
+  DownOutlined,
+  EditOutlined,
+  PlusOutlined
 } from '@ant-design/icons';
 import { useUpdate, useInvalidate } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { TaskSummaryDto } from 'interfaces/dto/task';
 import { formatDuration, formatTime } from 'utility/time';
 import { useStopTrackingTask } from '../hooks/use-stop-tracking';
+import { UpdateRiskTypeModal } from './modals/update-risk-type-modal';
+import { AddEstimationModal } from './modals/add-estimation-modal';
 
 const { Text } = Typography;
 
@@ -23,6 +27,8 @@ interface TaskSummaryItemProps {
 
 export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   const [expanded, setExpanded] = useState(false);
+  const [riskTypeModalOpen, setRiskTypeModalOpen] = useState(false);
+  const [estimationModalOpen, setEstimationModalOpen] = useState(false);
   const useStopTrackingReturn = useStopTrackingTask();
   const { mutate: updateTask } = useUpdate();
   const invalidate = useInvalidate();
@@ -86,7 +92,19 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
           }
         });
       }
-    }
+    },
+    {
+      key: 'update-risk-type',
+      label: 'Update Risk Type',
+      icon: <EditOutlined />,
+      onClick: () => setRiskTypeModalOpen(true),
+    },
+    {
+      key: 'add-estimation',
+      label: 'Add Estimation',
+      icon: <PlusOutlined />,
+      onClick: () => setEstimationModalOpen(true),
+    },
   ];
 
   return (
@@ -188,6 +206,19 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <UpdateRiskTypeModal
+        open={riskTypeModalOpen}
+        onClose={() => setRiskTypeModalOpen(false)}
+        taskId={task.id}
+        currentRiskType={task.risk_type}
+      />
+      <AddEstimationModal
+        open={estimationModalOpen}
+        onClose={() => setEstimationModalOpen(false)}
+        taskId={task.id}
+      />
     </>
   );
 };

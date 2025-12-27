@@ -111,7 +111,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   return (
     <>
       <div
-        className="group border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50 h-14 flex items-center bg-white"
+        className="group border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50 h-22 flex items-center bg-white"
       >
         {/* Expand Icon */}
         <div className="h-full flex items-center justify-center w-10 border-r-2 border-dotted border-gray-200">
@@ -128,25 +128,22 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
         </div>
 
         {/* Task Name and Project */}
-        <div className="flex-1 px-4 flex items-center min-w-0 pr-4">
-          <span className="font-medium text-gray-700 text-[15px] mr-2 truncate">
-            {task.name || '(No task name)'}
-          </span>
-          <span>
-            <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)} ({Math.floor(task.time_entry_total_duration ?? 0 / (task.total_estimation_time ?? 0) * 100)}%) - {formatDuration(task.total_estimation_time ?? 0)})</Tag>
-          </span>
-          {/* {task.project && (
-            <div className="flex items-center whitespace-nowrap">
-              <span className="mx-2 text-gray-300">•</span>
-              <span style={{ color: task.project.color }} className="font-medium max-w-[150px] truncate">
-                {task.project.name}
-              </span>
-            </div>
-          )} */}
+        <div className="h-full flex-1 flex-col px-4 flex items-start justify-between min-w-0 pr-4 py-4 gap-1">
+          <div>
+            <span className="font-medium text-gray-700 text-[15px] mr-2 truncate">
+              {task.name || '(No task name)'}
+            </span>
+            <span>
+              <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)} ({Math.floor((task.time_entry_total_duration ?? 0) / (task.total_estimation_time ?? 0) * 100)}% - {formatDuration(task.total_estimation_time ?? 0)})</Tag>
+            </span>
+          </div>
+          <div>
+            <span className='font-small text-gray-500 text-[12px]'>Today Tracked: {formatDuration(task.time_entry_total_duration ?? 0)}</span>
+          </div>
         </div>
 
         {/* Tags */}
-        <div className="h-full flex items-center border-r-dotted border-gray-200 px-4 min-w-[100px] justify-end">
+        <div className="h-full flex flex-col items-center border-r-dotted border-gray-200 px-4 min-w-[100px] justify-between py-4">
           <Flex gap="4px">
             {activeTag && <Tag color={getTagColor(activeTag)}>{activeTag}</Tag>}
             {task.status && <Tag color={getTagColor(task.status)}>{task.status}</Tag>}

@@ -27,24 +27,62 @@ export const TimeTrackerInput: React.FC = () => {
     ],
   });
 
+  const createTaskMutation = useCreate<Task, HttpError>({
+    resource: 'tasks',
+    mutationOptions: {
+      onSuccess: (data) => {
+        useStartTrackingTaskReturn.mutate({ task: data.data });
+        setKeyword('');
+      }
+    }
+  });
+
   const useStartTrackingTaskReturn = useStartTrackingTask();
 
   return (
     <Card className="mb-6 shadow-sm rounded-none border-t-0 border-x-0 border-b border-gray-200" styles={{ body: { padding: "8px 16px" } }}>
       <Flex align="center" className="w-full h-12">
         <AutoComplete
-          options={query.data?.data.map((item) => ({
-            task: item,
-            value: item.name,
-            label: item.name,
-          }))}
+          options={(() => {
+            const taskOptions = query.data?.data.map((item) => ({
+              task: item,
+              value: item.name,
+              label: item.name,
+            })) || [];
+
+            if (taskOptions.length === 0 && keyword) {
+              return [
+                {
+                  value: `NEW_TASK::${keyword}`,
+                  label: (
+                    <Flex justify="space-between">
+                      <span>Track A New Task</span>
+                      <span>{keyword}</span>
+                    </Flex>
+                  ),
+                  isNew: true,
+                }
+              ]
+            }
+
+            return taskOptions;
+          })()}
           filterOption={false}
           onSearch={debounce((value: string) => setKeyword(value), 100)}
           className="flex-1 mr-4"
           onSelect={(_: string, option: any) => {
-            const selectedTask = option?.task as Task | undefined;
-            if (selectedTask) {
-              useStartTrackingTaskReturn.mutate({ task: selectedTask });
+            if (option.isNew) {
+              createTaskMutation.mutate({
+                values: {
+                  name: keyword,
+                  risk_type: 'high',
+                }
+              });
+            } else {
+              const selectedTask = option?.task as Task | undefined;
+              if (selectedTask) {
+                useStartTrackingTaskReturn.mutate({ task: selectedTask });
+              }
             }
           }}
         >

@@ -18,6 +18,7 @@ import { formatDuration, formatTime } from 'utility/time';
 import { useStopTrackingTask } from '../hooks/use-stop-tracking';
 import { UpdateRiskTypeModal } from './modals/update-risk-type-modal';
 import { AddEstimationModal } from './modals/add-estimation-modal';
+import { TaskDetail } from './task-detail';
 
 const { Text } = Typography;
 
@@ -201,9 +202,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
       {expanded && (
         <div className="bg-gray-50 border-b border-gray-100 p-4">
           {/* TODO: Add TaskDetail component here */}
-          <div className="text-gray-500 text-sm">
-            Task details will be displayed here. This component will be developed later.
-          </div>
+          <TaskDetail />
         </div>
       )}
 

@@ -138,7 +138,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
             </span>
           </div>
           <div>
-            <span className='font-small text-gray-500 text-[12px]'>Today Tracked: {formatDuration(task.time_entry_total_duration ?? 0)}</span>
+            <span className='font-small text-gray-500 text-[12px]'>Today Tracked: {formatDuration(task.time_entry_total_duration_in_date ?? 0)}</span>
           </div>
         </div>
 

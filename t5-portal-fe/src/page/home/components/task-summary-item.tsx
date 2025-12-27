@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flex, Typography, Button, Tag, Dropdown, MenuProps } from 'antd';
+import { Flex, Typography, Button, Tag, Dropdown, MenuProps, Modal } from 'antd';
 import {
   CalendarOutlined,
   CaretRightOutlined,
@@ -9,9 +9,10 @@ import {
   RightOutlined,
   DownOutlined,
   EditOutlined,
-  PlusOutlined
+  PlusOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
-import { useUpdate, useInvalidate } from "@refinedev/core";
+import { useUpdate, useInvalidate, useDelete, useDeleteMany, useDataProvider } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { TaskSummaryDto } from 'interfaces/dto/task';
 import { formatDuration, formatTime } from 'utility/time';
@@ -66,9 +67,85 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
     }
   }
 
+  const { mutate: deleteTask } = useDelete();
+  const { mutate: deleteManyTimeEntries } = useDeleteMany();
+  const dataProvider = useDataProvider();
+  const [modal, contextHolder] = Modal.useModal();
+
   const activeTag = task.tags?.find(tag => ['active', 'inactive'].includes(tag));
   const estimatedTag = task.tags?.find(tag => ['estimated', 'unestimated'].includes(tag));
   const otherTags = task.tags?.filter(tag => !['active', 'inactive', 'estimated', 'unestimated'].includes(tag));
+
+  const handleDelete = () => {
+    modal.confirm({
+      title: 'Delete Task',
+      content: 'Are you sure you want to delete this task? All related time entries will also be deleted.',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          // 1. Fetch all time entries for this task
+          const { data: timeEntries } = await dataProvider().getList({
+            resource: 'time_entries',
+            filters: [
+              {
+                field: 'task_id',
+                operator: 'eq',
+                value: task.id,
+              },
+            ],
+            pagination: {
+              mode: 'off',
+            },
+          });
+
+          // 2. Delete all time entries
+          if (timeEntries && timeEntries.length > 0) {
+            const timeEntryIds = timeEntries.map((entry: any) => entry.id);
+            await new Promise<void>((resolve, reject) => {
+              deleteManyTimeEntries(
+                {
+                  resource: 'time_entries',
+                  ids: timeEntryIds,
+                },
+                {
+                  onSuccess: () => resolve(),
+                  onError: (error) => reject(error),
+                }
+              );
+            });
+          }
+
+          // 3. Delete the task
+          deleteTask(
+            {
+              resource: 'tasks',
+              id: task.id,
+              successNotification: { message: 'Task deleted successfully', type: 'success' },
+            },
+            {
+              onSuccess: () => {
+                invalidate({
+                  resource: 'tasks',
+                  invalidates: ['all'],
+                });
+                queryClient.invalidateQueries({
+                  queryKey: ['list_task_tracked_by_date'],
+                });
+              }
+            }
+          );
+        } catch (error) {
+          console.error("Error deleting task or time entries:", error);
+          modal.error({
+            title: 'Error',
+            content: 'Failed to delete task or its time entries. Please try again.',
+          });
+        }
+      },
+    });
+  };
 
   const menuItems: MenuProps['items'] = [
     {
@@ -106,10 +183,21 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
       icon: <PlusOutlined />,
       onClick: () => setEstimationModalOpen(true),
     },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'delete',
+      label: 'Delete',
+      icon: <DeleteOutlined />,
+      danger: true,
+      onClick: handleDelete,
+    },
   ];
 
   return (
     <>
+      {contextHolder}
       <div
         className="group border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50 h-22 flex items-center bg-white"
       >

@@ -32,6 +32,7 @@ import { KBarProviderWrapper } from "./components/kbar";
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
+import { ProjectDetail } from "./page/projects/detail";
 
 function App() {
 
@@ -67,6 +68,7 @@ function App() {
                       list: "/projects",
                       create: "/projects/create",
                       edit: "/projects/edit/:id",
+                      show: "/projects/:id",
                     },
                     {
                       name: "time_entries",
@@ -127,6 +129,7 @@ function App() {
                       <Route path="/tasks/edit/:id" element={<TaskEdit />} />
                       <Route path="/projects" element={<ProjectList />} />
                       <Route path="/projects/create" element={<ProjectCreate />} />
+                      <Route path="/projects/:id" element={<ProjectDetail />} />
                       <Route path="/projects/edit/:id" element={<ProjectEdit />} />
                       <Route path="/time-entries" element={<TimeEntryList />} />
                       <Route path="/time-entries/create" element={<TimeEntryCreate />} />

@@ -22,8 +22,11 @@ supabase/objects/
 2.  **Generate Migration**: Run the helper script to create a versioned migration file from your changes.
 
     ```bash
-    npm run db:new-migration -- --name update_my_function --target supabase/objects/functions/my_function.sql
+    npm run db:new-migration -- --target supabase/objects/functions/my_function.sql
     ```
+    
+    *Note: The `--name` argument is optional. If omitted, it defaults to `update_<type>_<filename>` (e.g., `update_function_my_function`).*
+
 
 3.  **Apply**: The new migration file in `supabase/migrations/` will be picked up by Supabase.
 

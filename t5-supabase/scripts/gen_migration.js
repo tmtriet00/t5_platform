@@ -12,16 +12,36 @@ const getArg = (name) => {
 const name = getArg('--name');
 const target = getArg('--target');
 
-if (!name) {
-    console.error('Error: --name is required');
-    process.exit(1);
+let migrationName = name;
+
+if (!migrationName) {
+    if (target) {
+        const parsePath = path.parse(target);
+        const filename = parsePath.name;
+        // Extract parent directory to guess type (e.g., supabase/objects/functions -> functions)
+        const dirs = parsePath.dir.split(path.sep);
+        const parentDir = dirs[dirs.length - 1];
+
+        // Simple mapping singularization
+        let type = parentDir;
+        if (type.endsWith('s')) {
+            type = type.slice(0, -1);
+        }
+
+        migrationName = `update_${type}_${filename}`;
+        console.log(`Auto-generated migration name: ${migrationName}`);
+
+    } else {
+        console.error('Error: --name is required if --target is not provided');
+        process.exit(1);
+    }
 }
 
 // Generate timestamp YYYYMMDDHHmmss
 const now = new Date();
 const timestamp = now.toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
 
-const migrationFileName = `${timestamp}_${name}.sql`;
+const migrationFileName = `${timestamp}_${migrationName}.sql`;
 const migrationPath = path.join(__dirname, '../supabase/migrations', migrationFileName);
 
 let content = '';

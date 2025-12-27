@@ -103,7 +103,7 @@ export const TaskList: React.FC = () => {
 
     return (
         <List>
-            <div style={{ height: 600, width: '100%' }}>
+            <div style={{ height: 600, flex: 1 }}>
                 <AgGridReact
                     rowData={rowData}
                     columnDefs={columnDefs}
@@ -112,6 +112,10 @@ export const TaskList: React.FC = () => {
                     paginationPageSize={10}
                     loading={isLoading}
                     onCellValueChanged={onCellValueChanged}
+                    sideBar={{
+                        toolPanels: ['columns', 'filters'],
+                        hiddenByDefault: false
+                    }}
                 />
             </div>
         </List>

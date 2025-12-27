@@ -31,11 +31,12 @@ import { RemoteBrowser } from "./page/remote-browser";
 import { KBarProviderWrapper } from "./components/kbar";
 import { ProjectDetail } from "./page/projects/detail";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { AllEnterpriseModule } from "ag-grid-enterprise";
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
 function App() {
 

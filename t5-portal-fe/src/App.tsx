@@ -27,6 +27,7 @@ import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entri
 import { TaskEstimationCreate, TaskEstimationEdit, TaskEstimationList } from "./page/task_estimations";
 import Home from "./page/home";
 import { NotionPage } from "./page/notion";
+import { RemoteBrowser } from "./page/remote-browser";
 import { KBarProviderWrapper } from "./components/kbar";
 
 function App() {
@@ -89,6 +90,13 @@ function App() {
                         label: "Notion",
                       },
                     },
+                    {
+                      name: "remote_browser",
+                      list: "/remote-browser",
+                      meta: {
+                        label: "Remote Browser",
+                      },
+                    },
                   ]}
                   liveProvider={liveProvider(supabaseClient)}
                   authProvider={authProvider}
@@ -124,6 +132,7 @@ function App() {
                       <Route path="/task-estimations/create" element={<TaskEstimationCreate />} />
                       <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
                       <Route path="/notion" element={<NotionPage />} />
+                      <Route path="/remote-browser" element={<RemoteBrowser />} />
                     </Route>
                   </Routes>
                   <RefineKbar />

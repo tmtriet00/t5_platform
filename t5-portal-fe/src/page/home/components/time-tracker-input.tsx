@@ -39,7 +39,7 @@ export const TimeTrackerInput: React.FC = () => {
             label: item.name,
           }))}
           filterOption={false}
-          onSearch={debounce((value: string) => setKeyword(value), 500)}
+          onSearch={debounce((value: string) => setKeyword(value), 100)}
           className="flex-1 mr-4"
           onSelect={(_: string, option: any) => {
             const selectedTask = option?.task as Task | undefined;
@@ -57,7 +57,7 @@ export const TimeTrackerInput: React.FC = () => {
           />
         </AutoComplete>
 
-        <div className="flex items-center h-full border-l border-dotted border-gray-300 px-4">
+        {/* <div className="flex items-center h-full border-l border-dotted border-gray-300 px-4">
           <Button
             type="text"
             className="flex items-center gap-1 text-[#1890ff] hover:text-[#40a9ff] hover:bg-transparent p-0"
@@ -92,7 +92,7 @@ export const TimeTrackerInput: React.FC = () => {
           <div className="h-1/2 flex items-center justify-center">
             <Button type="text" icon={<UnorderedListOutlined className="text-gray-400 text-[12px]" />} className="w-6 h-6 min-w-0 p-0" />
           </div>
-        </div>
+        </div> */}
       </Flex>
     </Card>
   );

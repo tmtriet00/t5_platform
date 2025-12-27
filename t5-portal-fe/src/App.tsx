@@ -29,10 +29,13 @@ import Home from "./page/home";
 import { NotionPage } from "./page/notion";
 import { RemoteBrowser } from "./page/remote-browser";
 import { KBarProviderWrapper } from "./components/kbar";
+import { ProjectDetail } from "./page/projects/detail";
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
-import { ProjectDetail } from "./page/projects/detail";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 function App() {
 

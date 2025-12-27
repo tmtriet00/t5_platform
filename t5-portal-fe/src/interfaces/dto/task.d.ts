@@ -6,4 +6,5 @@ export interface TaskSummaryDto {
     time_entry_total_duration?: number;
     time_entry_active_duration?: number;
     tags?: string[];
+    status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
 }

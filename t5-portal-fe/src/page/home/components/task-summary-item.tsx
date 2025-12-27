@@ -1,11 +1,14 @@
 import React from 'react';
-import { Flex, Typography, Button, Tag } from 'antd';
+import { Flex, Typography, Button, Tag, Dropdown, MenuProps } from 'antd';
 import {
   CalendarOutlined,
   CaretRightOutlined,
   PauseOutlined,
-  MoreOutlined
+  MoreOutlined,
+  CheckCircleOutlined
 } from '@ant-design/icons';
+import { useUpdate, useInvalidate } from "@refinedev/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { TaskSummaryDto } from 'interfaces/dto/task';
 import { formatDuration, formatTime } from 'utility/time';
 import { useStopTrackingTask } from '../hooks/use-stop-tracking';
@@ -18,6 +21,9 @@ interface TaskSummaryItemProps {
 
 export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   const useStopTrackingReturn = useStopTrackingTask();
+  const { mutate: updateTask } = useUpdate();
+  const invalidate = useInvalidate();
+  const queryClient = useQueryClient();
 
   const getTagColor = (tag: string) => {
     switch (tag) {
@@ -35,10 +41,50 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
         return 'red';
       case 'estimated':
         return 'cyan';
+      case 'new':
+        return 'blue';
+      case 'in_progress':
+        return 'orange';
+      case 'completed':
+        return 'green';
+      case 'canceled':
+        return 'red';
+      case 'blocked':
+        return 'magenta';
       default:
         return '#ECEFF1';
     }
   }
+
+  const activeTag = task.tags?.find(tag => ['active', 'inactive'].includes(tag));
+  const estimatedTag = task.tags?.find(tag => ['estimated', 'unestimated'].includes(tag));
+  const otherTags = task.tags?.filter(tag => !['active', 'inactive', 'estimated', 'unestimated'].includes(tag));
+
+  const menuItems: MenuProps['items'] = [
+    {
+      key: 'completed',
+      label: 'Mark as completed',
+      icon: <CheckCircleOutlined />,
+      onClick: () => {
+        updateTask({
+          resource: 'tasks',
+          id: task.id,
+          values: { status: 'completed' },
+          successNotification: { message: 'Task marked as completed', type: 'success' },
+        }, {
+          onSuccess: () => {
+            invalidate({
+              resource: 'tasks',
+              invalidates: ['all'],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['list_task_tracked_by_date'],
+            });
+          }
+        });
+      }
+    }
+  ];
 
   return (
     <div
@@ -63,16 +109,16 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
       </div>
 
       {/* Tags */}
-      {task.tags && task.tags.length > 0 && (
-        <div className="h-full flex items-center border-r-dotted border-gray-200 px-4 min-w-[100px] justify-end">
-
-          <Flex gap="4px">
-            {task.tags.map(tag => (
-              <Tag color={getTagColor(tag)}>{tag}</Tag>
-            ))}
-          </Flex>
-        </div>
-      )}
+      <div className="h-full flex items-center border-r-dotted border-gray-200 px-4 min-w-[100px] justify-end">
+        <Flex gap="4px">
+          {activeTag && <Tag color={getTagColor(activeTag)}>{activeTag}</Tag>}
+          {task.status && <Tag color={getTagColor(task.status)}>{task.status}</Tag>}
+          {estimatedTag && <Tag color={getTagColor(estimatedTag)}>{estimatedTag}</Tag>}
+          {otherTags?.map(tag => (
+            <Tag color={getTagColor(tag)} key={tag}>{tag}</Tag>
+          ))}
+        </Flex>
+      </div>
 
       {/* Time Range */}
       {/* <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">
@@ -105,11 +151,13 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
 
       {/* Menu Action */}
       <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-10">
-        <Button
-          type="text"
-          icon={<MoreOutlined className="text-gray-400 text-lg" />}
-          className="flex items-center justify-center w-full h-full"
-        />
+        <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+          <Button
+            type="text"
+            icon={<MoreOutlined className="text-gray-400 text-lg" />}
+            className="flex items-center justify-center w-full h-full"
+          />
+        </Dropdown>
       </div>
 
     </div>

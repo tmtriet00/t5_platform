@@ -7,15 +7,6 @@ export interface Task {
     project?: Project;
     project_id?: number;
     time_entries?: TimeEntry[];
-}
-
-export interface TaskWithDuration {
-    id: number;
-    name: string;
-    project?: Project;
-    tags: string[];
-    totalDuration: string;
-    timeEntries: TimeEntry[];
-    startTime: string;
-    endTime: string;
+    risk_type?: string;
+    status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
 }

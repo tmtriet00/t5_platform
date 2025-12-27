@@ -37,6 +37,26 @@ export const TaskCreate: React.FC = () => {
                 >
                     <Select {...projectSelectProps} />
                 </Form.Item>
+                <Form.Item
+                    label="Status"
+                    name="status"
+                    initialValue="new"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Select
+                        options={[
+                            { label: "New", value: "new" },
+                            { label: "In Progress", value: "in_progress" },
+                            { label: "Completed", value: "completed" },
+                            { label: "Canceled", value: "canceled" },
+                            { label: "Blocked", value: "blocked" },
+                        ]}
+                    />
+                </Form.Item>
             </Form>
         </Create>
     );

@@ -96,6 +96,25 @@ export const TaskEdit: React.FC = () => {
                 >
                     <Select options={riskTypeOptions} />
                 </Form.Item>
+                <Form.Item
+                    label="Status"
+                    name="status"
+                    rules={[
+                        {
+                            required: true,
+                        },
+                    ]}
+                >
+                    <Select
+                        options={[
+                            { label: "New", value: "new" },
+                            { label: "In Progress", value: "in_progress" },
+                            { label: "Completed", value: "completed" },
+                            { label: "Canceled", value: "canceled" },
+                            { label: "Blocked", value: "blocked" },
+                        ]}
+                    />
+                </Form.Item>
             </Form>
         </Edit>
     );

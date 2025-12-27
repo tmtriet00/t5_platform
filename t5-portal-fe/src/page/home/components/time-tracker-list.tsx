@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Typography, Flex, Empty } from 'antd';
-import { TaskGroup, Task } from 'interfaces';
 import { TaskSummaryItem } from './task-summary-item';
 import { TaskSummaryDto } from 'interfaces/dto/task';
 import { formatDuration } from 'utility/time';

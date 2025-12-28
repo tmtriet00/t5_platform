@@ -55,6 +55,7 @@ export const ProjectDetail = () => {
                         <TaskListTable
                             rowData={tasks}
                             isLoading={isTaskLoading}
+                            projectId={project?.id}
                         />
                     </div>
                     <div style={{ flex: 1 }}>

@@ -38,6 +38,13 @@ import "@blocknote/mantine/style.css";
 
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 function App() {
 
   return (

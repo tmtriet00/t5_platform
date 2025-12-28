@@ -1,4 +1,6 @@
 
+import dayjs from "dayjs";
+
 // Helper function to format duration in hours:minutes
 export const formatDuration = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
@@ -38,3 +40,18 @@ export const getDateLabel = (timestamp: string): string => {
 
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
+
+export const getRemainingTimeDayJS = (zone: string) => {
+    try {
+        const now = dayjs().tz(zone);
+        const endOfDay = now.endOf('day');
+
+        // Diff in milliseconds
+        const diffMs = endOfDay.diff(now);
+
+        return Math.floor(diffMs / 1000);
+    } catch (error) {
+        console.error('Error getting remaining time:', error);
+        return 0;
+    }
+}

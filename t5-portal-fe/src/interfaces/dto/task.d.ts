@@ -10,4 +10,5 @@ export interface TaskSummaryDto {
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
     risk_type?: 'low' | 'medium' | 'high';
     total_estimation_time?: number;
+    task_type?: 'work' | 'break';
 }

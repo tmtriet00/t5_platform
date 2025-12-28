@@ -1,19 +1,35 @@
-import { Tabs } from 'antd';
+import { Tabs, Spin } from 'antd';
 import { TabsProps } from 'antd';
 import { TaskDetailEditor } from './task-detail-editor';
 import { TrackingList } from './tracking-list';
+import { useOne } from '@refinedev/core';
+import { Task } from 'interfaces';
 
 interface TaskDetailProps {
     taskId: number;
 }
 
 export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId }) => {
+    const { query } = useOne<Task>({
+        resource: "tasks",
+        id: taskId,
+    });
+
+    const task = query?.data?.data;
 
     const items: TabsProps['items'] = [
         {
             key: '1',
-            label: 'Description',
-            children: <TaskDetailEditor />,
+            label: 'Note',
+            children: query?.isLoading ? (
+                <Spin />
+            ) : (
+                <TaskDetailEditor
+                    key={`${taskId}-${task?.note?.substring(0, 20) ?? 'empty'}`}
+                    taskId={taskId}
+                    initialNote={task?.note}
+                />
+            ),
         },
         {
             key: '2',

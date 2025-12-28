@@ -5,6 +5,7 @@ import { TimeTrackerInput } from "./components/time-tracker-input";
 import { TimeTrackerList } from "./components/time-tracker-list";
 import { TimelineChart } from "./components/timeline-chart";
 import { useTaskByDate } from "./hooks/use-task-by-date";
+import { TimeSummaryFromTask } from "./components/time-summary-from-task";
 
 import dayjs from "dayjs";
 
@@ -23,7 +24,8 @@ const Home: React.FC = () => {
         </div>
         <TimeTrackerInput />
 
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <TimeSummaryFromTask tasks={tasks} />
           <Segmented
             options={[
               { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },

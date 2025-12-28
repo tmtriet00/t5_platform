@@ -10,4 +10,5 @@ export interface Task {
     risk_type?: 'low' | 'medium' | 'high';
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
     task_type?: 'work' | 'break';
+    note?: string;
 }

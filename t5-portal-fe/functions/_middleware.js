@@ -5,7 +5,7 @@ export async function onRequest(context) {
         return context.next();
     }
 
-    return new Response("Sorry, this application is only available in Singapore.", {
+    return new Response("Sorry, this application is only available in some countries.", {
         status: 403,
         headers: { 'Content-Type': 'text/plain' }
     });

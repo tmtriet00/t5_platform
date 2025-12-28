@@ -44,71 +44,72 @@ function App() {
     <BrowserRouter>
       <RefineKbarProvider>
         <ColorModeContextProvider>
-          <KBarProviderWrapper>
-            <AntdApp>
-              <DevtoolsProvider>
-                <Refine
-                  notificationProvider={useNotificationProvider}
-                  dataProvider={dataProvider(supabaseClient)}
-                  resources={[
-                    {
-                      name: "home",
-                      list: "/home",
+          <AntdApp>
+            <DevtoolsProvider>
+              <Refine
+                notificationProvider={useNotificationProvider}
+                dataProvider={dataProvider(supabaseClient)}
+                resources={[
+                  {
+                    name: "home",
+                    list: "/home",
+                  },
+                  {
+                    name: "projects",
+                    list: "/projects",
+                    create: "/projects/create",
+                    edit: "/projects/edit/:id",
+                    show: "/projects/:id",
+                  },
+                  {
+                    name: "tasks",
+                    list: "/tasks",
+                    create: "/tasks/create",
+                    edit: "/tasks/edit/:id",
+                  },
+                  {
+                    name: "time_entries",
+                    list: "/time-entries",
+                    create: "/time-entries/create",
+                    edit: "/time-entries/edit/:id",
+                    meta: {
+                      label: "Time Entries",
                     },
-                    {
-                      name: "projects",
-                      list: "/projects",
-                      create: "/projects/create",
-                      edit: "/projects/edit/:id",
-                      show: "/projects/:id",
+                  },
+                  {
+                    name: "task_estimations",
+                    list: "/task-estimations",
+                    create: "/task-estimations/create",
+                    edit: "/task-estimations/edit/:id",
+                    meta: {
+                      label: "Task Estimations",
                     },
-                    {
-                      name: "tasks",
-                      list: "/tasks",
-                      create: "/tasks/create",
-                      edit: "/tasks/edit/:id",
+                  },
+                  {
+                    name: "notion",
+                    list: "/notion",
+                    meta: {
+                      label: "Notion",
                     },
-                    {
-                      name: "time_entries",
-                      list: "/time-entries",
-                      create: "/time-entries/create",
-                      edit: "/time-entries/edit/:id",
-                      meta: {
-                        label: "Time Entries",
-                      },
+                  },
+                  {
+                    name: "remote_browser",
+                    list: "/remote-browser",
+                    meta: {
+                      label: "Remote Browser",
                     },
-                    {
-                      name: "task_estimations",
-                      list: "/task-estimations",
-                      create: "/task-estimations/create",
-                      edit: "/task-estimations/edit/:id",
-                      meta: {
-                        label: "Task Estimations",
-                      },
-                    },
-                    {
-                      name: "notion",
-                      list: "/notion",
-                      meta: {
-                        label: "Notion",
-                      },
-                    },
-                    {
-                      name: "remote_browser",
-                      list: "/remote-browser",
-                      meta: {
-                        label: "Remote Browser",
-                      },
-                    },
-                  ]}
-                  liveProvider={liveProvider(supabaseClient)}
-                  authProvider={authProvider}
-                  routerProvider={routerProvider}
-                  options={{
-                    syncWithLocation: true,
-                    warnWhenUnsavedChanges: true,
-                  }}
-                >
+                  },
+                ]}
+                liveProvider={liveProvider(supabaseClient)}
+                authProvider={authProvider}
+                routerProvider={routerProvider}
+                options={{
+                  syncWithLocation: true,
+                  warnWhenUnsavedChanges: true,
+                }}
+              >
+                <KBarProviderWrapper>
+
                   <Routes>
                     <Route
                       element={
@@ -142,11 +143,11 @@ function App() {
                   <RefineKbar />
                   <UnsavedChangesNotifier />
                   <DocumentTitleHandler />
-                </Refine>
-                <DevtoolsPanel />
-              </DevtoolsProvider>
-            </AntdApp>
-          </KBarProviderWrapper>
+                </KBarProviderWrapper>
+              </Refine>
+              <DevtoolsPanel />
+            </DevtoolsProvider>
+          </AntdApp>
         </ColorModeContextProvider>
       </RefineKbarProvider>
     </BrowserRouter>

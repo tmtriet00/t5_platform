@@ -1,14 +1,95 @@
-import { Modal } from "antd";
+import { Modal, Form, Input, Button, message } from "antd";
+import { useCreate, useInvalidate } from "@refinedev/core";
+import { useQueryClient } from "@tanstack/react-query";
+import { Task } from "../../interfaces";
 
-export const TrackBreakTaskModal: React.FC = () => {
+interface TrackBreakTaskModalProps {
+    open: boolean;
+    onClose: () => void;
+}
+
+export const TrackBreakTaskModal: React.FC<TrackBreakTaskModalProps> = ({ open, onClose }) => {
+    const [form] = Form.useForm();
+    const invalidate = useInvalidate();
+    const queryClient = useQueryClient();
+
+    const { mutate: createTask, mutation: taskMutation } = useCreate<Task>();
+    const { mutate: createTimeEntry, mutation: timeEntryMutation } = useCreate();
+
+    const handleSubmit = async (values: { task_name: string }) => {
+        createTask({
+            resource: "tasks",
+            values: {
+                name: values.task_name,
+                task_type: "break",
+                status: "in_progress",
+                risk_type: "low",
+            },
+        }, {
+            onSuccess: (data) => {
+                // Create time entry immediately after task creation
+                createTimeEntry({
+                    resource: "time_entries",
+                    values: {
+                        task_id: data.data.id,
+                        start_time: new Date().toISOString(),
+                    },
+                }, {
+                    onSuccess: () => {
+                        message.success("Break task created and tracking started!");
+                        invalidate({
+                            resource: 'tasks',
+                            invalidates: ['all'],
+                        });
+                        queryClient.invalidateQueries({
+                            queryKey: ['list_task_tracked_by_date'],
+                        });
+                        form.resetFields();
+                        onClose();
+                    },
+                    onError: () => {
+                        message.error("Failed to start tracking the break task");
+                    }
+                });
+            },
+            onError: () => {
+                message.error("Failed to create break task");
+            }
+        });
+    };
+
     return (
         <Modal
             title="Track Break Task"
-            open
-            onCancel={() => { }}
+            open={open}
+            onCancel={onClose}
             footer={null}
         >
-            <p>Track Break Task</p>
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+            >
+                <Form.Item
+                    name="task_name"
+                    label="Task Name"
+                    rules={[{ required: true, message: "Please enter a task name" }]}
+                >
+                    <Input placeholder="Enter break task name (e.g., Coffee break, Lunch)" autoFocus />
+                </Form.Item>
+                <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+                    <Button onClick={onClose} style={{ marginRight: 8 }}>
+                        Cancel
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={taskMutation.isPending || timeEntryMutation.isPending}
+                    >
+                        Start Break
+                    </Button>
+                </Form.Item>
+            </Form>
         </Modal>
     );
 };

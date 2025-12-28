@@ -43,8 +43,8 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
 
     const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
         const { data, colDef, newValue } = event;
-        // Fields that can be edited: name, risk_type, status
-        if (['name', 'risk_type', 'status'].includes(colDef.field || '')) {
+        // Fields that can be edited: name, risk_type, status, task_type
+        if (['name', 'risk_type', 'status', 'task_type'].includes(colDef.field || '')) {
             mutateUpdate({
                 resource: "tasks",
                 id: data.id,
@@ -85,6 +85,22 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             flex: 1,
             sortable: true,
             filter: true
+        },
+        {
+            field: "task_type",
+            headerName: "Type",
+            sortable: true,
+            filter: true,
+            editable: true,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['work', 'break'],
+            },
+            width: 100,
+            cellRenderer: (params: any) => {
+                if (!params.value) return <Tag color="blue">work</Tag>;
+                return <Tag color={params.value === 'break' ? 'orange' : 'blue'}>{params.value}</Tag>;
+            }
         },
         {
             field: "risk_type",

@@ -20,6 +20,7 @@ import { useStopTrackingTask } from '../hooks/use-stop-tracking';
 import { UpdateRiskTypeModal } from './modals/update-risk-type-modal';
 import { AddEstimationModal } from './modals/add-estimation-modal';
 import { TaskDetail } from './task-detail';
+import { roundDecimal } from 'utility/number';
 
 const { Text } = Typography;
 
@@ -222,7 +223,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
               {task.name || '(No task name)'}
             </span>
             <span>
-              <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)} ({Math.floor((task.time_entry_total_duration ?? 0) / (task.total_estimation_time ?? 0) * 100)}% - {formatDuration(task.total_estimation_time ?? 0)})</Tag>
+              <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)} {task.total_estimation_time && <span>({roundDecimal((task.time_entry_total_duration ?? 0) / task.total_estimation_time * 100, 2)}% - {formatDuration(task.total_estimation_time ?? 0)})</span>}</Tag>
             </span>
           </div>
           <div>

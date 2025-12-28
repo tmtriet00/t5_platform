@@ -9,4 +9,5 @@ export interface Task {
     time_entries?: TimeEntry[];
     risk_type?: 'low' | 'medium' | 'high';
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
+    task_type?: 'work' | 'break';
 }

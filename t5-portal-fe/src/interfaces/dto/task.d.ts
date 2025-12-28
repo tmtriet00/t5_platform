@@ -8,6 +8,6 @@ export interface TaskSummaryDto {
     time_entry_active_duration?: number;
     tags?: string[];
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
-    risk_type?: string;
+    risk_type?: 'low' | 'medium' | 'high';
     total_estimation_time?: number;
 }

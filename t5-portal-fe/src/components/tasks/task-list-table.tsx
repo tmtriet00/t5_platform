@@ -34,7 +34,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 status: "new",
                 risk_type: "low"
             },
-            successNotification: (data: any) => {
+            successNotification: () => {
                 return {
                     message: `Successfully created task`,
                     description: "Success with no errors",

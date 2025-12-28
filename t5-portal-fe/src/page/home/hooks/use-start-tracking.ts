@@ -3,7 +3,7 @@ import { Task, TimeEntry } from "interfaces";
 import { useQueryClient } from "@tanstack/react-query";
 import { App, message } from 'antd';
 
-const validateBeforeStartTracking = async ({ task, dataProviderInstance }: { task: Task, dataProviderInstance: DataProvider }) => {
+const validateBeforeStartTracking = async ({ dataProviderInstance }: { dataProviderInstance: DataProvider }) => {
     const { data: activeTimeEntries } = await dataProviderInstance.getList<TimeEntry>({
         resource: 'time_entries',
         filters: [
@@ -53,7 +53,7 @@ export const useStartTrackingTask = () => {
 
     return {
         mutate: async ({ task }: { task: Task }) => {
-            const { isValid, note, requireConfirm } = await validateBeforeStartTracking({ task, dataProviderInstance });
+            const { isValid, note, requireConfirm } = await validateBeforeStartTracking({ dataProviderInstance });
             const startTrackingPayload = {
                 task_id: task.id,
                 start_time: new Date().toISOString(),

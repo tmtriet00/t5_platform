@@ -210,6 +210,9 @@ const authProvider: AuthProvider = {
       };
     }
 
+    // MFA Check removed as per new requirement
+
+
     return {
       authenticated: true,
     };

@@ -33,6 +33,8 @@ import { NotionPage } from "./page/notion";
 import { RemoteBrowser } from "./page/remote-browser";
 import { KBarProviderWrapper } from "./components/kbar";
 import { ProjectDetail } from "./page/projects/detail";
+import { ProfilePage } from "./page/profile";
+import { MfaVerifyPage } from "./page/mfa-verify";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 
@@ -124,6 +126,18 @@ function App() {
                     <Route
                       element={
                         <Authenticated
+                          key="authenticated-mfa"
+                          fallback={<CatchAllNavigate to="/login" />}
+                        >
+                          <Outlet />
+                        </Authenticated>
+                      }
+                    >
+                      <Route path="/mfa-verify" element={<MfaVerifyPage />} />
+                    </Route>
+                    <Route
+                      element={
+                        <Authenticated
                           key="authenticated-inner"
                           fallback={<CatchAllNavigate to="/login" />}
                         >
@@ -153,6 +167,7 @@ function App() {
                       <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
                       <Route path="/notion" element={<NotionPage />} />
                       <Route path="/remote-browser" element={<RemoteBrowser />} />
+                      <Route path="/profile" element={<ProfilePage />} />
                     </Route>
                     <Route
                       element={

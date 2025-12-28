@@ -43,10 +43,11 @@ export const TimeTrackerInput: React.FC = () => {
     <Card className="mb-6 shadow-sm rounded-none border-t-0 border-x-0 border-b border-gray-200" styles={{ body: { padding: "8px 16px" } }}>
       <Flex align="center" className="w-full h-12">
         <AutoComplete
+          value={keyword}
           options={(() => {
             const taskOptions = query.data?.data.map((item) => ({
               task: item,
-              value: item.name,
+              value: item.id,
               label: item.name,
             })) || [];
 
@@ -68,6 +69,7 @@ export const TimeTrackerInput: React.FC = () => {
             return taskOptions;
           })()}
           filterOption={false}
+          onChange={(value: string) => setKeyword(value)}
           onSearch={debounce((value: string) => setKeyword(value), 100)}
           className="flex-1 mr-4"
           onSelect={(_: string, option: any) => {
@@ -82,6 +84,7 @@ export const TimeTrackerInput: React.FC = () => {
               const selectedTask = option?.task as Task | undefined;
               if (selectedTask) {
                 useStartTrackingTaskReturn.mutate({ task: selectedTask });
+                setKeyword('');
               }
             }
           }}

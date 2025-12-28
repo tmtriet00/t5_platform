@@ -51,7 +51,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 values: {
                     [colDef.field!]: newValue,
                 },
-                mutationMode: "optimistic",
+                // mutationMode: "optimistic",
             }, {
                 onSuccess: () => {
                     // Optional: Silent success or small notification

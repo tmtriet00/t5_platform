@@ -3,7 +3,7 @@ import {
     EditButton,
     ShowButton,
 } from "@refinedev/antd";
-import { useList } from "@refinedev/core";
+import { Link, useList } from "@refinedev/core";
 import { Space, Tag } from "antd";
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef } from 'ag-grid-community';
@@ -17,7 +17,7 @@ export const ProjectList: React.FC = () => {
         sorters: [
             {
                 field: "id",
-                order: "asc",
+                order: "desc",
             },
         ],
     });
@@ -37,7 +37,10 @@ export const ProjectList: React.FC = () => {
             headerName: "Name",
             flex: 1,
             sortable: true,
-            filter: true
+            filter: true,
+            cellRenderer: (params: any) => {
+                return <Link to={`/projects/${params?.data?.id}`}>{params?.value}</Link>;
+            }
         },
         {
             field: "color",

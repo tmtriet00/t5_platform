@@ -2,9 +2,11 @@ import { EditButton, ShowButton } from "@refinedev/antd";
 import { Space, Tag, Button, message } from "antd";
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { Task } from "../../interfaces";
 import { useCreate, useUpdate } from "@refinedev/core";
+import { FilterOutlined } from "@ant-design/icons";
+import { Segmented } from "antd";
 
 interface TaskListTableProps {
     rowData: Task[];
@@ -21,6 +23,7 @@ const CreateButton = (props: any) => {
 export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading, projectId }) => {
     const { mutate: mutateCreate } = useCreate();
     const { mutate: mutateUpdate } = useUpdate();
+    const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list');
 
     const handleCreate = useCallback(() => {
         mutateCreate({
@@ -181,6 +184,14 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
 
     return (
         <div style={{ height: 600, width: '100%' }}>
+            <Segmented
+                options={[
+                    { label: 'List', value: 'list', icon: <FilterOutlined /> },
+                    { label: 'Timeline', value: 'timeline', icon: <FilterOutlined /> },
+                ]}
+                value={viewMode}
+                onChange={(value) => setViewMode(value as 'list' | 'timeline')}
+            />
             <AgGridReact
                 rowData={rowData}
                 columnDefs={columnDefs}

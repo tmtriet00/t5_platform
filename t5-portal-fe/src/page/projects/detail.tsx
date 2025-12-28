@@ -29,6 +29,12 @@ export const ProjectDetail = () => {
                 value: params.id,
             },
         ],
+        sorters: [
+            {
+                field: "id",
+                order: "desc",
+            },
+        ],
         queryOptions: {
             enabled: !!params.id,
         }

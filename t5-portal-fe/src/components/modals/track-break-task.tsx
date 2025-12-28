@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Modal, Form, Input, Button, message } from "antd";
 import { useCreate, useInvalidate } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,10 +14,12 @@ export const TrackBreakTaskModal: React.FC<TrackBreakTaskModalProps> = ({ open, 
     const invalidate = useInvalidate();
     const queryClient = useQueryClient();
 
-    const { mutate: createTask, mutation: taskMutation } = useCreate<Task>();
-    const { mutate: createTimeEntry, mutation: timeEntryMutation } = useCreate();
+    const [isLoading, setIsLoading] = useState(false);
+    const { mutate: createTask } = useCreate<Task>();
+    const { mutate: createTimeEntry } = useCreate();
 
     const handleSubmit = async (values: { task_name: string }) => {
+        setIsLoading(true);
         createTask({
             resource: "tasks",
             values: {
@@ -45,15 +48,18 @@ export const TrackBreakTaskModal: React.FC<TrackBreakTaskModalProps> = ({ open, 
                             queryKey: ['list_task_tracked_by_date'],
                         });
                         form.resetFields();
+                        setIsLoading(false);
                         onClose();
                     },
                     onError: () => {
                         message.error("Failed to start tracking the break task");
+                        setIsLoading(false);
                     }
                 });
             },
             onError: () => {
                 message.error("Failed to create break task");
+                setIsLoading(false);
             }
         });
     };
@@ -84,7 +90,7 @@ export const TrackBreakTaskModal: React.FC<TrackBreakTaskModalProps> = ({ open, 
                     <Button
                         type="primary"
                         htmlType="submit"
-                        loading={taskMutation.isPending || timeEntryMutation.isPending}
+                        loading={isLoading}
                     >
                         Start Break
                     </Button>

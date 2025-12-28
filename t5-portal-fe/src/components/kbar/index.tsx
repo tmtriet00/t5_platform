@@ -1,5 +1,7 @@
-import { KBarProvider } from "kbar";
-import { useState } from "react";
+import {
+    useRegisterActions,
+} from "@refinedev/kbar";
+import React, { useState } from "react";
 import { TrackBreakTaskModal } from "../modals/track-break-task";
 
 export const KBarProviderWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -10,21 +12,23 @@ export const KBarProviderWrapper = ({ children }: { children: React.ReactNode })
             id: "track_break_task",
             name: "Track Break Task",
             shortcut: ["b"],
-            keywords: "track break task",
+            keywords: "track break task pause",
+            section: "Quick Actions",
             perform: () => {
                 setIsBreakModalOpen(true);
             },
         },
-    ]
+    ];
 
+    useRegisterActions(actions, []);
 
     return (
-        <KBarProvider actions={actions}>
+        <>
             {children}
             <TrackBreakTaskModal
                 open={isBreakModalOpen}
                 onClose={() => setIsBreakModalOpen(false)}
             />
-        </KBarProvider>
+        </>
     );
 };

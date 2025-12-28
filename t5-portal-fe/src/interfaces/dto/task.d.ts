@@ -11,4 +11,5 @@ export interface TaskSummaryDto {
     risk_type?: 'low' | 'medium' | 'high';
     total_estimation_time?: number;
     task_type?: 'work' | 'break';
+    latest_time_entry_start_time?: string;
 }

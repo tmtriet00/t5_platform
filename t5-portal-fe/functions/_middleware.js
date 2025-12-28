@@ -1,14 +1,11 @@
 export async function onRequest(context) {
-    // Get the country code from the request
     const country = context.request.cf.country;
 
-    // Allow only Vietnam (VN)
-    if (country === 'VN') {
+    if (country === 'SG') {
         return context.next();
     }
 
-    // Block everyone else
-    return new Response("Sorry, this application is only available in Vietnam.", {
+    return new Response("Sorry, this application is only available in Singapore.", {
         status: 403,
         headers: { 'Content-Type': 'text/plain' }
     });

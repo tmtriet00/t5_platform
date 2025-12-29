@@ -28,6 +28,7 @@ import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
 import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
 import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entries";
 import { TaskEstimationCreate, TaskEstimationEdit, TaskEstimationList } from "./page/task_estimations";
+import { EmergencyKitCreate, EmergencyKitEdit, EmergencyKitList } from "./page/emergency-tickets";
 import Home from "./page/home";
 import { NotionPage } from "./page/notion";
 import { RemoteBrowser } from "./page/remote-browser";
@@ -98,6 +99,15 @@ function App() {
                     },
                   },
                   {
+                    name: "emergency_tickets",
+                    list: "/emergency-tickets",
+                    create: "/emergency-tickets/create",
+                    edit: "/emergency-tickets/edit/:id",
+                    meta: {
+                      label: "Emergency Tickets",
+                    },
+                  },
+                  {
                     name: "notion",
                     list: "/notion",
                     meta: {
@@ -165,6 +175,9 @@ function App() {
                       <Route path="/task-estimations" element={<TaskEstimationList />} />
                       <Route path="/task-estimations/create" element={<TaskEstimationCreate />} />
                       <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
+                      <Route path="/emergency-tickets" element={<EmergencyKitList />} />
+                      <Route path="/emergency-tickets/create" element={<EmergencyKitCreate />} />
+                      <Route path="/emergency-tickets/edit/:id" element={<EmergencyKitEdit />} />
                       <Route path="/notion" element={<NotionPage />} />
                       <Route path="/remote-browser" element={<RemoteBrowser />} />
                       <Route path="/profile" element={<ProfilePage />} />

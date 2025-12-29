@@ -4,7 +4,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
 import { useMemo, useCallback, useState } from "react";
 import { Task } from "../../interfaces";
-import { useCreate, useUpdate } from "@refinedev/core";
+import { useCreate, useUpdate, useSelect } from "@refinedev/core";
 import { FilterOutlined } from "@ant-design/icons";
 import { Segmented } from "antd";
 
@@ -24,6 +24,20 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     const { mutate: mutateCreate } = useCreate();
     const { mutate: mutateUpdate } = useUpdate();
     const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list');
+
+    const { options } = useSelect({
+        resource: "projects",
+        optionLabel: "name",
+        optionValue: "id",
+    });
+
+    const projectSelect = useMemo(() => {
+        const projectOptions = options || [];
+        return {
+            names: projectOptions.map((p) => p.label),
+            map: new Map(projectOptions.map((p) => [p.label, p.value])),
+        };
+    }, [options]);
 
     const handleCreate = useCallback(() => {
         mutateCreate({
@@ -63,8 +77,23 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     message.error("Failed to update task");
                 }
             });
+        } else if (colDef.field === 'project.name') {
+            const newProjectId = projectSelect.map.get(newValue) as number | undefined;
+            if (newProjectId !== undefined) {
+                mutateUpdate({
+                    resource: "tasks",
+                    id: data.id,
+                    values: {
+                        project_id: newProjectId,
+                    },
+                }, {
+                    onError: () => {
+                        message.error("Failed to update project");
+                    }
+                });
+            }
         }
-    }, [mutateUpdate]);
+    }, [mutateUpdate, projectSelect]);
 
     const columnDefs = useMemo<ColDef<Task>[]>(() => [
         {
@@ -87,7 +116,12 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             headerName: "Project",
             flex: 1,
             sortable: true,
-            filter: true
+            filter: true,
+            editable: true,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: projectSelect.names,
+            },
         },
         {
             field: "task_type",
@@ -164,7 +198,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             sortable: false,
             filter: false
         }
-    ], []);
+    ], [projectSelect]);
 
     const defaultColDef = useMemo(() => ({
         resizable: true,

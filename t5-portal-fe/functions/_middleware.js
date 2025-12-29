@@ -1,7 +1,7 @@
 export async function onRequest(context) {
     const country = context.request.cf.country;
 
-    if (country === 'SG') {
+    if (country === 'SG' || country === 'VN') {
         return context.next();
     }
 

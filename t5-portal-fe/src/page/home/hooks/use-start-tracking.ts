@@ -1,13 +1,20 @@
 import { DataProvider, useCreate, useDataProvider, useInvalidate } from "@refinedev/core";
-import { Task, TimeEntry } from "interfaces";
+import { Task, TaskEstimation, TimeEntry } from "interfaces";
 import { useQueryClient } from "@tanstack/react-query";
 import { App, message } from 'antd';
 
-const validateBeforeStartTracking = async ({ dataProviderInstance }: { dataProviderInstance: DataProvider }) => {
+const validateBeforeStartTracking = async ({ dataProviderInstance, task }: { dataProviderInstance: DataProvider, task: Task }) => {
     const { data: activeTimeEntries } = await dataProviderInstance.getList<TimeEntry>({
         resource: 'time_entries',
         filters: [
             { field: 'end_time', operator: 'null', value: null },
+        ],
+    });
+
+    const { data: taskEstimations } = await dataProviderInstance.getList<TaskEstimation>({
+        resource: 'task_estimations',
+        filters: [
+            { field: 'task_id', operator: 'eq', value: task.id },
         ],
     });
 
@@ -19,6 +26,13 @@ const validateBeforeStartTracking = async ({ dataProviderInstance }: { dataProvi
         };
     }
 
+    if (!taskEstimations?.length) {
+        return {
+            isValid: false,
+            requireConfirm: true,
+            note: `You don't have estimation for this task. Please consider adding an estimation before starting to track`,
+        };
+    }
 
     return {
         isValid: true,
@@ -33,8 +47,6 @@ export const useStartTrackingTask = () => {
     const { modal, message } = App.useApp();
     const dataProvider = useDataProvider();
     const dataProviderInstance = dataProvider();
-
-
 
     const { mutate: createMutate, mutation: createMutation } = useCreate<TimeEntry>({
         resource: 'time_entries',
@@ -53,7 +65,7 @@ export const useStartTrackingTask = () => {
 
     return {
         mutate: async ({ task }: { task: Task }) => {
-            const { isValid, note, requireConfirm } = await validateBeforeStartTracking({ dataProviderInstance });
+            const { isValid, note, requireConfirm } = await validateBeforeStartTracking({ dataProviderInstance, task });
             const startTrackingPayload = {
                 task_id: task.id,
                 start_time: new Date().toISOString(),

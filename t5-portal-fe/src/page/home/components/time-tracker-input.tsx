@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Input, Button, Flex, Typography, theme, Divider } from "antd";
+import { Card, Input, Button, Flex, Typography, theme, Divider, Tabs } from "antd";
 import {
   PlusCircleOutlined,
   TagOutlined,
@@ -16,6 +16,7 @@ import { useStartTrackingTask } from "../hooks/use-start-tracking";
 
 export const TimeTrackerInput: React.FC = () => {
   const [keyword, setKeyword] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
   const { query } = useList<Task, HttpError>({
     resource: 'tasks',
     filters: [
@@ -45,7 +46,12 @@ export const TimeTrackerInput: React.FC = () => {
         <AutoComplete
           value={keyword}
           options={(() => {
-            const taskOptions = query.data?.data.map((item) => ({
+            const filteredTasks = query.data?.data.filter(task => {
+              if (activeTab === 'all') return true;
+              return task.risk_type === activeTab;
+            }) || [];
+
+            const taskOptions = filteredTasks.map((item) => ({
               task: item,
               value: item.id,
               label: item.name,
@@ -68,6 +74,27 @@ export const TimeTrackerInput: React.FC = () => {
 
             return taskOptions;
           })()}
+          dropdownRender={(menu) => (
+            <div>
+              <Tabs
+                activeKey={activeTab}
+                onChange={setActiveTab}
+                size="small"
+                tabBarStyle={{ margin: 0, padding: '0 12px' }}
+                items={[
+                  { key: 'high', label: 'High risk' },
+                  { key: 'medium', label: 'Medium risk' },
+                  { key: 'low', label: 'Low risk' },
+                  { key: 'all', label: 'All task' },
+                ]}
+                onTabClick={(key, e) => {
+                  e.stopPropagation();
+                }}
+              />
+              <Divider style={{ margin: 0 }} />
+              {menu}
+            </div>
+          )}
           filterOption={false}
           onChange={(value: string) => setKeyword(value)}
           className="flex-1 mr-4"

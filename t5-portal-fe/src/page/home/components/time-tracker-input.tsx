@@ -70,7 +70,6 @@ export const TimeTrackerInput: React.FC = () => {
           })()}
           filterOption={false}
           onChange={(value: string) => setKeyword(value)}
-          onSearch={debounce((value: string) => setKeyword(value), 100)}
           className="flex-1 mr-4"
           onSelect={(_: string, option: any) => {
             if (option.isNew) {

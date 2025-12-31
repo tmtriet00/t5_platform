@@ -1,5 +1,6 @@
 import { Project } from "./project";
 import { TimeEntry } from "./time-entry";
+import { TaskEstimation } from "./task-estimation";
 
 export interface Task {
     id: number;
@@ -11,4 +12,5 @@ export interface Task {
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
     task_type?: 'work' | 'break';
     note?: string;
+    task_estimations?: TaskEstimation[];
 }

@@ -13,6 +13,7 @@ import { AutoComplete } from 'antd';
 import { debounce } from 'lodash';
 import { SearchOutlined } from "@ant-design/icons";
 import { useStartTrackingTask } from "../hooks/use-start-tracking";
+import { TaskTags } from "./task-tags";
 
 export const TimeTrackerInput: React.FC = () => {
   const [keyword, setKeyword] = useState('');
@@ -26,6 +27,9 @@ export const TimeTrackerInput: React.FC = () => {
         value: keyword,
       },
     ],
+    meta: {
+      select: '*, task_estimations(id)'
+    }
   });
 
   const createTaskMutation = useCreate<Task, HttpError>({
@@ -54,7 +58,16 @@ export const TimeTrackerInput: React.FC = () => {
             const taskOptions = filteredTasks.map((item) => ({
               task: item,
               value: item.id,
-              label: item.name,
+              label: (
+                <div className="py-1">
+                  <Flex justify="space-between" align="center">
+                    <Typography.Text style={{ flex: 1 }} ellipsis>
+                      {item.name}
+                    </Typography.Text>
+                    <TaskTags task={item} />
+                  </Flex>
+                </div>
+              ),
             })) || [];
 
             if (taskOptions.length === 0 && keyword) {
@@ -87,7 +100,7 @@ export const TimeTrackerInput: React.FC = () => {
                   { key: 'low', label: 'Low risk' },
                   { key: 'all', label: 'All task' },
                 ]}
-                onTabClick={(key, e) => {
+                onTabClick={(_key, e) => {
                   e.stopPropagation();
                 }}
               />

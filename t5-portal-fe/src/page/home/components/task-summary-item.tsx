@@ -21,6 +21,7 @@ import { UpdateRiskTypeModal } from './modals/update-risk-type-modal';
 import { AddEstimationModal } from './modals/add-estimation-modal';
 import { TaskDetail } from './task-detail';
 import { roundDecimal } from 'utility/number';
+import { TaskTags } from './task-tags';
 
 const { Text } = Typography;
 
@@ -37,45 +38,10 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   const invalidate = useInvalidate();
   const queryClient = useQueryClient();
 
-  const getTagColor = (tag: string) => {
-    switch (tag) {
-      case 'high':
-        return 'red';
-      case 'medium':
-        return 'gold';
-      case 'low':
-        return 'geekblue';
-      case 'active':
-        return 'green';
-      case 'inactive':
-        return '#bec9beff';
-      case 'unestimated':
-        return 'red';
-      case 'estimated':
-        return 'cyan';
-      case 'new':
-        return 'blue';
-      case 'in_progress':
-        return 'orange';
-      case 'completed':
-        return 'green';
-      case 'canceled':
-        return 'red';
-      case 'blocked':
-        return 'magenta';
-      default:
-        return '#ECEFF1';
-    }
-  }
-
   const { mutate: deleteTask } = useDelete();
   const { mutate: deleteManyTimeEntries } = useDeleteMany();
   const dataProvider = useDataProvider();
   const [modal, contextHolder] = Modal.useModal();
-
-  const activeTag = task.tags?.find(tag => ['active', 'inactive'].includes(tag));
-  const estimatedTag = task.tags?.find(tag => ['estimated', 'unestimated'].includes(tag));
-  const otherTags = task.tags?.filter(tag => !['active', 'inactive', 'estimated', 'unestimated'].includes(tag));
 
   const handleDelete = () => {
     modal.confirm({
@@ -233,14 +199,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
 
         {/* Tags */}
         <div className="h-full flex flex-col items-center border-r-dotted border-gray-200 px-4 min-w-[100px] justify-between py-4">
-          <Flex gap="4px">
-            {activeTag && <Tag color={getTagColor(activeTag)}>{activeTag}</Tag>}
-            {task.status && <Tag color={getTagColor(task.status)}>{task.status}</Tag>}
-            {estimatedTag && <Tag color={getTagColor(estimatedTag)}>{estimatedTag}</Tag>}
-            {otherTags?.map(tag => (
-              <Tag color={getTagColor(tag)} key={tag}>{tag}</Tag>
-            ))}
-          </Flex>
+          <TaskTags task={task} />
         </div>
 
         {/* Time Range */}

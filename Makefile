@@ -15,3 +15,9 @@ setup-supabase:
 
 start-supabase:
 	cd supabase && docker-compose up -d
+
+build-fe:
+	docker-compose build t5-portal-fe
+
+start-fe:
+	docker-compose up -d t5-portal-fe

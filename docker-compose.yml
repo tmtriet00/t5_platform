@@ -1,0 +1,9 @@
+services:
+  t5-portal-fe:
+    build:
+      context: ./t5-portal-fe
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production

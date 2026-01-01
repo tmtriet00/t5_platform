@@ -9,3 +9,9 @@ stop-browser:
 	@echo "Stopping Neko browser..."
 	@cd t5-browser && docker-compose down
 	@echo "Neko browser stopped."
+
+setup-supabase:
+	cd supabase && sh ./utils/generate-keys.sh
+
+start-supabase:
+	cd supabase && docker-compose up -d

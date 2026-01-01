@@ -1,6 +1,7 @@
 import React, { useImperativeHandle, useState } from 'react'
 import { Form, Modal, InputNumber, Button, Select, message } from 'antd';
 import { useCreate, useInvalidate } from "@refinedev/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { TaskEstimation } from '../../interfaces';
 
 export interface AddEstimationForTaskModalRef {
@@ -16,6 +17,7 @@ export const AddEstimationForTaskModal = React.forwardRef<AddEstimationForTaskMo
     const [taskId, setTaskId] = useState<number | null>(null);
     const [form] = Form.useForm();
     const invalidate = useInvalidate();
+    const queryClient = useQueryClient();
 
     useImperativeHandle(ref, () => ({
         open: (id: number) => {
@@ -56,6 +58,14 @@ export const AddEstimationForTaskModal = React.forwardRef<AddEstimationForTaskMo
                     resource: "tasks",
                     invalidates: ["list", "detail"],
                     id: taskId
+                });
+                invalidate({
+                    resource: "task_estimations",
+                    invalidates: ["list", "detail"],
+                    id: taskId
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ["list_task_tracked_by_date"]
                 });
                 setIsLoading(false);
                 onClose();

@@ -18,8 +18,8 @@ import { TaskSummaryDto } from 'interfaces/dto/task';
 import { formatDuration, formatTime } from 'utility/time';
 import { useStopTrackingTask } from '../hooks/use-stop-tracking';
 import { UpdateRiskTypeModal } from './modals/update-risk-type-modal';
-import { AddEstimationModal } from './modals/add-estimation-modal';
 import { TaskDetail } from './task-detail';
+import { ModalProviderService } from 'components/modals/modal-provider-wrapper';
 import { roundDecimal } from 'utility/number';
 import { TaskTags } from './task-tags';
 
@@ -32,7 +32,6 @@ interface TaskSummaryItemProps {
 export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   const [expanded, setExpanded] = useState(false);
   const [riskTypeModalOpen, setRiskTypeModalOpen] = useState(false);
-  const [estimationModalOpen, setEstimationModalOpen] = useState(false);
   const useStopTrackingReturn = useStopTrackingTask();
   const { mutate: updateTask } = useUpdate();
   const invalidate = useInvalidate();
@@ -148,7 +147,7 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
       key: 'add-estimation',
       label: 'Add Estimation',
       icon: <PlusOutlined />,
-      onClick: () => setEstimationModalOpen(true),
+      onClick: () => ModalProviderService.getAddEstimationForTaskModal().current?.open(task.id),
     },
     {
       type: 'divider',
@@ -257,11 +256,6 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
         onClose={() => setRiskTypeModalOpen(false)}
         taskId={task.id}
         currentRiskType={task.risk_type}
-      />
-      <AddEstimationModal
-        open={estimationModalOpen}
-        onClose={() => setEstimationModalOpen(false)}
-        taskId={task.id}
       />
     </>
   );

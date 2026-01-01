@@ -21,3 +21,6 @@ build-fe:
 
 start-fe:
 	docker-compose up -d t5-portal-fe
+
+stop-fe:
+	docker-compose down t5-portal-fe

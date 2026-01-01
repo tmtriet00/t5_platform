@@ -30,3 +30,6 @@ stop-fe:
 
 start-fe-tmux:
 	tmux new-session -d -s t5-portal-fe "cd t5-portal-fe && npm run dev"
+
+stop-fe-tmux:
+	tmux kill-session -t t5-portal-fe

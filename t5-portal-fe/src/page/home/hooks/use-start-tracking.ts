@@ -21,22 +21,30 @@ const validateBeforeStartTracking = async ({ dataProviderInstance, task }: { dat
     if (activeTimeEntries?.length) {
         return {
             isValid: false,
-            requireConfirm: false,
+            confirmObject: undefined,
             note: `You're having active time entry. Please stop it before starting a new one`,
         };
     }
 
     if (!taskEstimations?.length) {
         return {
-            isValid: false,
-            requireConfirm: true,
+            isValid: true,
             note: `You don't have estimation for this task. Please consider adding an estimation before starting to track`,
+            confirmObject: ({ startTrack }: { startTrack: () => Promise<void> }) => {
+                return {
+                    title: 'Add estimation',
+                    content: null,
+                    onOk() {
+                        startTrack()
+                    },
+                }
+            }
         };
     }
 
     return {
         isValid: true,
-        requireConfirm: false,
+        confirmObject: undefined,
         note: 'You can start tracking this task',
     };
 }
@@ -65,7 +73,7 @@ export const useStartTrackingTask = () => {
 
     return {
         mutate: async ({ task }: { task: Task }) => {
-            const { isValid, note, requireConfirm } = await validateBeforeStartTracking({ dataProviderInstance, task });
+            const { isValid, note, confirmObject } = await validateBeforeStartTracking({ dataProviderInstance, task });
             const startTrackingPayload = {
                 task_id: task.id,
                 start_time: new Date().toISOString(),
@@ -76,14 +84,12 @@ export const useStartTrackingTask = () => {
                 return;
             }
 
-            if (requireConfirm) {
-                modal.confirm({
-                    title: 'Need confirmation',
-                    content: note,
-                    onOk() {
+            if (confirmObject) {
+                modal.confirm(confirmObject({
+                    startTrack: async () => {
                         createMutate({ values: startTrackingPayload });
-                    },
-                });
+                    }
+                }));
             } else {
                 createMutate({ values: startTrackingPayload });
             }

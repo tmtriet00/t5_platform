@@ -14,7 +14,7 @@ setup-supabase:
 	cd supabase && sh ./utils/generate-keys.sh
 
 start-supabase:
-	cd supabase && docker compose up -d
+	cd supabase && unset POSTGRES_PASSWORD && unset POSTGRES_HOST && docker compose up -d
 
 stop-supabase:
 	cd supabase && docker compose down

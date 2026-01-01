@@ -1,2 +1,2 @@
 .env
-./volumes/db/data/
+volumes/db/data/

@@ -2,7 +2,9 @@ import { DataProvider, useCreate, useDataProvider, useInvalidate } from "@refine
 import { Task, TaskEstimation, TimeEntry } from "interfaces";
 import { useQueryClient } from "@tanstack/react-query";
 import { App, message } from 'antd';
+import { ModalProviderService } from "components/modals/modal-provider-wrapper";
 
+// onNextStep is used in case we want to override action after validation
 const validateBeforeStartTracking = async ({ dataProviderInstance, task }: { dataProviderInstance: DataProvider, task: Task }) => {
     const { data: activeTimeEntries } = await dataProviderInstance.getList<TimeEntry>({
         resource: 'time_entries',
@@ -21,7 +23,7 @@ const validateBeforeStartTracking = async ({ dataProviderInstance, task }: { dat
     if (activeTimeEntries?.length) {
         return {
             isValid: false,
-            confirmObject: undefined,
+            onNextStep: undefined,
             note: `You're having active time entry. Please stop it before starting a new one`,
         };
     }
@@ -30,21 +32,15 @@ const validateBeforeStartTracking = async ({ dataProviderInstance, task }: { dat
         return {
             isValid: true,
             note: `You don't have estimation for this task. Please consider adding an estimation before starting to track`,
-            confirmObject: ({ startTrack }: { startTrack: () => Promise<void> }) => {
-                return {
-                    title: 'Add estimation',
-                    content: null,
-                    onOk() {
-                        startTrack()
-                    },
-                }
+            onNextStep: () => {
+                ModalProviderService.getAddEstimationForTaskModal().current?.open(task.id);
             }
         };
     }
 
     return {
         isValid: true,
-        confirmObject: undefined,
+        onNextStep: undefined,
         note: 'You can start tracking this task',
     };
 }
@@ -73,7 +69,7 @@ export const useStartTrackingTask = () => {
 
     return {
         mutate: async ({ task }: { task: Task }) => {
-            const { isValid, note, confirmObject } = await validateBeforeStartTracking({ dataProviderInstance, task });
+            const { isValid, note, onNextStep } = await validateBeforeStartTracking({ dataProviderInstance, task });
             const startTrackingPayload = {
                 task_id: task.id,
                 start_time: new Date().toISOString(),
@@ -84,12 +80,8 @@ export const useStartTrackingTask = () => {
                 return;
             }
 
-            if (confirmObject) {
-                modal.confirm(confirmObject({
-                    startTrack: async () => {
-                        createMutate({ values: startTrackingPayload });
-                    }
-                }));
+            if (onNextStep) {
+                onNextStep();
             } else {
                 createMutate({ values: startTrackingPayload });
             }

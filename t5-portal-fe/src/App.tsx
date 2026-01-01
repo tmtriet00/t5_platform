@@ -38,6 +38,7 @@ import { ProfilePage } from "./page/profile";
 import { MfaVerifyPage } from "./page/mfa-verify";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
+import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
@@ -131,76 +132,77 @@ function App() {
                 }}
               >
                 <KBarProviderWrapper>
-
-                  <Routes>
-                    <Route
-                      element={
-                        <Authenticated
-                          key="authenticated-mfa"
-                          fallback={<CatchAllNavigate to="/login" />}
-                        >
-                          <Outlet />
-                        </Authenticated>
-                      }
-                    >
-                      <Route path="/mfa-verify" element={<MfaVerifyPage />} />
-                    </Route>
-                    <Route
-                      element={
-                        <Authenticated
-                          key="authenticated-inner"
-                          fallback={<CatchAllNavigate to="/login" />}
-                        >
-                          <ThemedLayout Header={Header} Sider={ThemedSider}>
+                  <ModalProviderWrapper>
+                    <Routes>
+                      <Route
+                        element={
+                          <Authenticated
+                            key="authenticated-mfa"
+                            fallback={<CatchAllNavigate to="/login" />}
+                          >
                             <Outlet />
-                          </ThemedLayout>
-                        </Authenticated>
-                      }
-                    >
-                      <Route index element={<Navigate to="/home" replace />} />
-                      <Route path="/home" element={<Home />} />
-                      <Route path="/posts" element={<PostList />} />
-                      <Route path="/posts/create" element={<PostCreate />} />
-                      <Route path="/posts/edit/:id" element={<PostEdit />} />
-                      <Route path="/tasks" element={<TaskList />} />
-                      <Route path="/tasks/create" element={<TaskCreate />} />
-                      <Route path="/tasks/edit/:id" element={<TaskEdit />} />
-                      <Route path="/projects" element={<ProjectList />} />
-                      <Route path="/projects/create" element={<ProjectCreate />} />
-                      <Route path="/projects/:id" element={<ProjectDetail />} />
-                      <Route path="/projects/edit/:id" element={<ProjectEdit />} />
-                      <Route path="/time-entries" element={<TimeEntryList />} />
-                      <Route path="/time-entries/create" element={<TimeEntryCreate />} />
-                      <Route path="/time-entries/edit/:id" element={<TimeEntryEdit />} />
-                      <Route path="/task-estimations" element={<TaskEstimationList />} />
-                      <Route path="/task-estimations/create" element={<TaskEstimationCreate />} />
-                      <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
-                      <Route path="/emergency-tickets" element={<EmergencyKitList />} />
-                      <Route path="/emergency-tickets/create" element={<EmergencyKitCreate />} />
-                      <Route path="/emergency-tickets/edit/:id" element={<EmergencyKitEdit />} />
-                      <Route path="/notion" element={<NotionPage />} />
-                      <Route path="/remote-browser" element={<RemoteBrowser />} />
-                      <Route path="/profile" element={<ProfilePage />} />
-                    </Route>
-                    <Route
-                      element={
-                        <Authenticated
-                          key="authenticated-outer"
-                          fallback={<Outlet />}
-                        >
-                          <NavigateToResource />
-                        </Authenticated>
-                      }
-                    >
-                      <Route path="/login" element={<AuthPage type="login" />} />
-                      <Route path="/register" element={<AuthPage type="register" />} />
-                      <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
-                      <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
-                    </Route>
-                  </Routes>
-                  <RefineKbar />
-                  <UnsavedChangesNotifier />
-                  <DocumentTitleHandler />
+                          </Authenticated>
+                        }
+                      >
+                        <Route path="/mfa-verify" element={<MfaVerifyPage />} />
+                      </Route>
+                      <Route
+                        element={
+                          <Authenticated
+                            key="authenticated-inner"
+                            fallback={<CatchAllNavigate to="/login" />}
+                          >
+                            <ThemedLayout Header={Header} Sider={ThemedSider}>
+                              <Outlet />
+                            </ThemedLayout>
+                          </Authenticated>
+                        }
+                      >
+                        <Route index element={<Navigate to="/home" replace />} />
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/posts" element={<PostList />} />
+                        <Route path="/posts/create" element={<PostCreate />} />
+                        <Route path="/posts/edit/:id" element={<PostEdit />} />
+                        <Route path="/tasks" element={<TaskList />} />
+                        <Route path="/tasks/create" element={<TaskCreate />} />
+                        <Route path="/tasks/edit/:id" element={<TaskEdit />} />
+                        <Route path="/projects" element={<ProjectList />} />
+                        <Route path="/projects/create" element={<ProjectCreate />} />
+                        <Route path="/projects/:id" element={<ProjectDetail />} />
+                        <Route path="/projects/edit/:id" element={<ProjectEdit />} />
+                        <Route path="/time-entries" element={<TimeEntryList />} />
+                        <Route path="/time-entries/create" element={<TimeEntryCreate />} />
+                        <Route path="/time-entries/edit/:id" element={<TimeEntryEdit />} />
+                        <Route path="/task-estimations" element={<TaskEstimationList />} />
+                        <Route path="/task-estimations/create" element={<TaskEstimationCreate />} />
+                        <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
+                        <Route path="/emergency-tickets" element={<EmergencyKitList />} />
+                        <Route path="/emergency-tickets/create" element={<EmergencyKitCreate />} />
+                        <Route path="/emergency-tickets/edit/:id" element={<EmergencyKitEdit />} />
+                        <Route path="/notion" element={<NotionPage />} />
+                        <Route path="/remote-browser" element={<RemoteBrowser />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                      </Route>
+                      <Route
+                        element={
+                          <Authenticated
+                            key="authenticated-outer"
+                            fallback={<Outlet />}
+                          >
+                            <NavigateToResource />
+                          </Authenticated>
+                        }
+                      >
+                        <Route path="/login" element={<AuthPage type="login" />} />
+                        <Route path="/register" element={<AuthPage type="register" />} />
+                        <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
+                        <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
+                      </Route>
+                    </Routes>
+                    <RefineKbar />
+                    <UnsavedChangesNotifier />
+                    <DocumentTitleHandler />
+                  </ModalProviderWrapper>
                 </KBarProviderWrapper>
               </Refine>
               <DevtoolsPanel />

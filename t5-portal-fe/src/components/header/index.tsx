@@ -71,14 +71,19 @@ export const Header: React.FC<RefineThemedLayoutHeaderProps> = ({
           defaultChecked={mode === "dark"}
         />
         <Space className="ml-2" size="middle">
-          {needMfaVerification && (
+          {
+            !needMfaVerification && !mfaVerified && (
+              <Tag color="red">MFA is required but not registered. Please register in Profile page</Tag>
+            )
+          }
+          {needMfaVerification && !mfaVerified && (
             <Link to="/mfa-verify">
               <Button type="primary" danger size="small">
                 Verify MFA
               </Button>
             </Link>
           )}
-          {mfaVerified && (
+          {!needMfaVerification && mfaVerified && (
             <Tag color="green">MFA Verified</Tag>
           )}
 

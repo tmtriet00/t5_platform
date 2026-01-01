@@ -27,3 +27,6 @@ start-fe:
 
 stop-fe:
 	docker compose down t5-portal-fe
+
+start-fe-tmux:
+	tmux new-session -d -s t5-portal-fe "cd t5-portal-fe && npm run dev"

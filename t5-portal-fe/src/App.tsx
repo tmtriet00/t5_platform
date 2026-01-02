@@ -37,6 +37,7 @@ import { ProjectDetail } from "./page/projects/detail";
 import { ProfilePage } from "./page/profile";
 import { MfaVerifyPage } from "./page/mfa-verify";
 import { NoteCreate, NoteEdit, NoteList } from "./page/notes";
+import { DailyNotePage } from "./page/daily-notes";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
@@ -68,6 +69,10 @@ function App() {
                   {
                     name: "home",
                     list: "/home",
+                  },
+                  {
+                    name: "daily_notes",
+                    list: "/daily-notes",
                   },
                   {
                     name: "projects",
@@ -170,6 +175,7 @@ function App() {
                       >
                         <Route index element={<Navigate to="/home" replace />} />
                         <Route path="/home" element={<Home />} />
+                        <Route path="/daily-notes" element={<DailyNotePage />} />
                         <Route path="/posts" element={<PostList />} />
                         <Route path="/posts/create" element={<PostCreate />} />
                         <Route path="/posts/edit/:id" element={<PostEdit />} />

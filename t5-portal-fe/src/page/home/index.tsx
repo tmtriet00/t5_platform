@@ -55,6 +55,12 @@ const Home: React.FC = () => {
             <TimeTrackerList tasks={tasks} />
           )
         )}
+
+        <div className="flex justify-center mt-8">
+          <a href="/daily-notes" className="text-blue-500 hover:underline">
+            Go to Daily Notes
+          </a>
+        </div>
       </Content>
     </Layout>
   );

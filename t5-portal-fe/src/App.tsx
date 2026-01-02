@@ -39,6 +39,7 @@ import { MfaVerifyPage } from "./page/mfa-verify";
 import { NoteCreate, NoteEdit, NoteList } from "./page/notes";
 import { DailyNotePage } from "./page/daily-notes";
 import { WishListList } from "./page/wish-lists/list";
+import { LedgerList } from "./page/ledgers/list";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
@@ -145,6 +146,19 @@ function App() {
                       label: "Wish Lists",
                     },
                   },
+                  {
+                    name: "ledgers",
+                    list: "/ledgers",
+                    meta: {
+                      label: "Ledgers",
+                    },
+                  },
+                  {
+                    name: "transactions",
+                    meta: {
+                      hide: true,
+                    },
+                  },
                 ]}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
@@ -210,6 +224,7 @@ function App() {
                         <Route path="/notes/edit/:id" element={<NoteEdit />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/wish-lists" element={<WishListList />} />
+                        <Route path="/ledgers" element={<LedgerList />} />
                       </Route>
                       <Route
                         element={

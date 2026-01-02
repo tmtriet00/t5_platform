@@ -64,7 +64,7 @@ export const WishListDetail: React.FC<WishListDetailProps> = ({ data }) => {
                     dataSource={tracksData?.data || []}
                     columns={columns}
                     rowKey="id"
-                    pagination={{ pageSize: 10 }}
+                    pagination={{ pageSize: 5 }}
                     size="small"
                     scroll={{ y: 280 }}
                 />

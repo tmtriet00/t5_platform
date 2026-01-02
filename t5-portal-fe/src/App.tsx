@@ -36,6 +36,7 @@ import { KBarProviderWrapper } from "./components/kbar";
 import { ProjectDetail } from "./page/projects/detail";
 import { ProfilePage } from "./page/profile";
 import { MfaVerifyPage } from "./page/mfa-verify";
+import { NoteCreate, NoteEdit, NoteList } from "./page/notes";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
@@ -122,6 +123,15 @@ function App() {
                       label: "Remote Browser",
                     },
                   },
+                  {
+                    name: "notes",
+                    list: "/notes",
+                    create: "/notes/create",
+                    edit: "/notes/edit/:id",
+                    meta: {
+                      label: "Notes",
+                    },
+                  },
                 ]}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
@@ -181,6 +191,9 @@ function App() {
                         <Route path="/emergency-tickets/edit/:id" element={<EmergencyKitEdit />} />
                         <Route path="/notion" element={<NotionPage />} />
                         <Route path="/remote-browser" element={<RemoteBrowser />} />
+                        <Route path="/notes" element={<NoteList />} />
+                        <Route path="/notes/create" element={<NoteCreate />} />
+                        <Route path="/notes/edit/:id" element={<NoteEdit />} />
                         <Route path="/profile" element={<ProfilePage />} />
                       </Route>
                       <Route

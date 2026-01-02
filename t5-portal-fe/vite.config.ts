@@ -13,6 +13,7 @@ export default defineConfig({
       interfaces: path.resolve(__dirname, "src/interfaces"),
       utility: path.resolve(__dirname, "src/utility"),
       components: path.resolve(__dirname, "src/components"),
+      page: path.resolve(__dirname, "src/page"),
     },
   },
 });

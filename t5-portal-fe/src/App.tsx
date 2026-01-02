@@ -44,14 +44,19 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
 
+import { AllEnterpriseModule as AgChartsAllEnterpriseModule, ModuleRegistry as AgChartsModuleRegistry } from 'ag-charts-enterprise';
+
+
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
+AgChartsModuleRegistry.registerModules([AgChartsAllEnterpriseModule]);
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { FinancialStatistic } from "page/financial-statistic";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -71,6 +76,10 @@ function App() {
                   {
                     name: "home",
                     list: "/home",
+                  },
+                  {
+                    name: "financial-statistic",
+                    list: "/financial-statistic",
                   },
                   {
                     name: "daily_notes",
@@ -211,6 +220,7 @@ function App() {
                       >
                         <Route index element={<Navigate to="/home" replace />} />
                         <Route path="/home" element={<Home />} />
+                        <Route path="/financial-statistic" element={<FinancialStatistic />} />
                         <Route path="/daily-notes" element={<DailyNotePage />} />
                         <Route path="/posts" element={<PostList />} />
                         <Route path="/posts/create" element={<PostCreate />} />

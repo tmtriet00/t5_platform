@@ -1,0 +1,1 @@
+alter table "public"."finance_checkin_records" add column "currency" text default 'VND';

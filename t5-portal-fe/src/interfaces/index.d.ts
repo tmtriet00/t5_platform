@@ -11,3 +11,4 @@ export * from "./model/task-estimation";
 export * from "./model/emergency-kit";
 export * from "./dto/home";
 export * from "./model/note";
+export * from "./model/finance";

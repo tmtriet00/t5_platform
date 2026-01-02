@@ -60,6 +60,8 @@ import { FinancialStatistic } from "page/financial-statistic";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
+
 
 function App() {
 
@@ -177,6 +179,13 @@ function App() {
                     },
                   },
                   {
+                    name: "finance_checkin_records",
+                    list: "/finance-checkin-records",
+                    meta: {
+                      label: "Finance Checkin Records",
+                    },
+                  },
+                  {
                     name: "transactions",
                     meta: {
                       hide: true,
@@ -249,6 +258,7 @@ function App() {
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/wish-lists" element={<WishListList />} />
                         <Route path="/ledgers" element={<LedgerList />} />
+                        <Route path="/finance-checkin-records" element={<FinanceCheckinRecordList />} />
                       </Route>
                       <Route
                         element={

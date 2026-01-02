@@ -134,7 +134,7 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
                 onCellValueChanged={onCellValueChanged}
                 masterDetail={true}
                 detailCellRenderer={detailCellRenderer}
-                detailRowHeight={200}
+                detailRowHeight={400}
                 onFirstDataRendered={onFirstDataRendered} // Optional
                 sideBar={{
                     toolPanels: ['columns', 'filters'],

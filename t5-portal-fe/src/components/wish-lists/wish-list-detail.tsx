@@ -1,14 +1,18 @@
 
-import { Tabs, List, Typography, Space, Tag } from "antd";
+import { Tabs, Table, Button } from "antd";
 import { useList } from "@refinedev/core";
 import dayjs from "dayjs";
+import { useRef } from "react";
+import { AddTrackModal, AddTrackModalRef } from "../modals";
 
 interface WishListDetailProps {
     data: any;
 }
 
 export const WishListDetail: React.FC<WishListDetailProps> = ({ data }) => {
-    const { data: tracksData, isLoading } = useList({
+    const addTrackModalRef = useRef<AddTrackModalRef>(null);
+
+    const { query } = useList({
         resource: "wish_list_items_track",
         filters: [
             {
@@ -19,38 +23,67 @@ export const WishListDetail: React.FC<WishListDetailProps> = ({ data }) => {
         ],
         pagination: {
             mode: "off",
-        }
+        },
+        sorters: [
+            {
+                field: "created_at",
+                order: "desc",
+            },
+        ]
     });
+
+    const { data: tracksData, isLoading } = query || {};
+
+    const columns = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: 80,
+        },
+        {
+            title: 'Point',
+            dataIndex: 'point',
+            key: 'point',
+        },
+        {
+            title: 'Created At',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            render: (value: string) => dayjs(value).format('YYYY-MM-DD HH:mm'),
+        },
+    ];
 
     const items = [
         {
             key: '1',
             label: 'Tracks',
             children: (
-                <List
+                <Table
                     loading={isLoading}
                     dataSource={tracksData?.data || []}
-                    renderItem={(item: any) => (
-                        <List.Item>
-                            <Space direction="vertical" style={{ width: '100%' }}>
-                                <Space>
-                                    <Tag>ID: {item.id}</Tag>
-                                    <Typography.Text>Point: {item.point}</Typography.Text>
-                                </Space>
-                                <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                    Created: {dayjs(item.created_at).format('YYYY-MM-DD HH:mm')}
-                                </Typography.Text>
-                            </Space>
-                        </List.Item>
-                    )}
+                    columns={columns}
+                    rowKey="id"
+                    pagination={{ pageSize: 10 }}
+                    size="small"
+                    scroll={{ y: 280 }}
                 />
             ),
         }
     ];
 
     return (
-        <div style={{ padding: '20px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
-            <Tabs defaultActiveKey="1" items={items} />
+        <div className="p-4">
+            <Tabs
+                defaultActiveKey="1"
+                items={items}
+                tabBarExtraContent={
+                    <Button type="primary" size="small" onClick={() => addTrackModalRef.current?.open(data.id)}>
+                        Add Track
+                    </Button>
+                }
+            />
+            <AddTrackModal ref={addTrackModalRef} />
         </div>
     );
 };

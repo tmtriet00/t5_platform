@@ -8,6 +8,7 @@ import {
   ThemedSider,
   AuthPage,
 } from "@refinedev/antd";
+import { CustomSider } from "./components/layout/sider";
 import "@refinedev/antd/dist/reset.css";
 
 import routerProvider, {
@@ -221,7 +222,7 @@ function App() {
                             key="authenticated-inner"
                             fallback={<CatchAllNavigate to="/login" />}
                           >
-                            <ThemedLayout Header={Header} Sider={ThemedSider}>
+                            <ThemedLayout Header={Header} Sider={CustomSider}>
                               <Outlet />
                             </ThemedLayout>
                           </Authenticated>

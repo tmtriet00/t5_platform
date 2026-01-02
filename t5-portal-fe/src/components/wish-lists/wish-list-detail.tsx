@@ -1,6 +1,7 @@
 
 import { Tabs, Table, Button } from "antd";
 import { useList } from "@refinedev/core";
+import { DeleteButton } from "@refinedev/antd";
 import dayjs from "dayjs";
 import { useRef } from "react";
 import { AddTrackModal, AddTrackModalRef } from "../modals";
@@ -52,6 +53,13 @@ export const WishListDetail: React.FC<WishListDetailProps> = ({ data }) => {
             key: 'created_at',
             render: (value: string) => dayjs(value).format('YYYY-MM-DD HH:mm'),
         },
+        {
+            title: 'Actions',
+            dataIndex: 'id',
+            key: 'actions',
+            width: 80,
+            render: (value: string) => <DeleteButton hideText size="small" recordItemId={value} resource="wish_list_items_track" />
+        }
     ];
 
     const items = [

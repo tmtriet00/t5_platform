@@ -1,6 +1,7 @@
 
 import { Table, Button } from "antd";
 import { useList } from "@refinedev/core";
+import { DeleteButton } from "@refinedev/antd";
 import dayjs from "dayjs";
 import { useRef } from "react";
 import { AddTransactionModal, AddTransactionModalRef } from "../modals";
@@ -70,6 +71,13 @@ export const LedgerDetail: React.FC<LedgerDetailProps> = ({ data }) => {
             key: 'created_at',
             render: (value: string) => dayjs(value).format('YYYY-MM-DD HH:mm'),
         },
+        {
+            title: 'Actions',
+            dataIndex: 'id',
+            key: 'actions',
+            width: 80,
+            render: (value: string) => <DeleteButton hideText size="small" recordItemId={value} resource="transactions" />
+        }
     ];
 
     return (

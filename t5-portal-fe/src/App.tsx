@@ -77,6 +77,20 @@ function App() {
                     list: "/daily-notes",
                   },
                   {
+                    name: "ledgers",
+                    list: "/ledgers",
+                    meta: {
+                      label: "Ledgers",
+                    },
+                  },
+                  {
+                    name: "wish_list_items",
+                    list: "/wish-lists",
+                    meta: {
+                      label: "Wish Lists",
+                    },
+                  },
+                  {
                     name: "projects",
                     list: "/projects",
                     create: "/projects/create",

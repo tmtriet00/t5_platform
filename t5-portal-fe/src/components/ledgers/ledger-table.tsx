@@ -1,4 +1,4 @@
-import { EditButton, ShowButton } from "@refinedev/antd";
+import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Button, message } from "antd";
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent, FirstDataRenderedEvent, IDetailCellRendererParams } from 'ag-grid-community';
@@ -85,6 +85,7 @@ export const LedgerTable: React.FC<LedgerTableProps> = ({ rowData, isLoading }) 
                     <Space>
                         <EditButton hideText size="small" recordItemId={params.value} />
                         <ShowButton hideText size="small" recordItemId={params.value} />
+                        <DeleteButton hideText size="small" recordItemId={params.value} />
                     </Space>
                 );
             },

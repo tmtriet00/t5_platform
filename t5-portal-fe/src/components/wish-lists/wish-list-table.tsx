@@ -1,5 +1,5 @@
 
-import { EditButton, ShowButton } from "@refinedev/antd";
+import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Button, message } from "antd";
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent, FirstDataRenderedEvent, IDetailCellRendererParams } from 'ag-grid-community';
@@ -86,6 +86,7 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
                     <Space>
                         <EditButton hideText size="small" recordItemId={params.value} />
                         <ShowButton hideText size="small" recordItemId={params.value} />
+                        <DeleteButton hideText size="small" recordItemId={params.value} />
                     </Space>
                 );
             },
@@ -117,7 +118,7 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
         }
     }, []);
 
-    const onFirstDataRendered = useCallback((params: FirstDataRenderedEvent) => {
+    const onFirstDataRendered = useCallback(() => {
         // Arbitrarily expand the first row to demonstrate, or leave collapsed
         // params.api.getDisplayedRowAtIndex(0)?.setExpanded(true);
     }, []);

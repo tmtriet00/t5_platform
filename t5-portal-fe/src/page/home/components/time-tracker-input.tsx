@@ -130,7 +130,7 @@ export const TimeTrackerInput: React.FC = () => {
         >
           <Input
             size="large"
-            placeholder="Search posts or categories"
+            placeholder="Search tasks"
             suffix={<SearchOutlined />}
             variant="borderless"
             className="text-lg placeholder:text-gray-400"

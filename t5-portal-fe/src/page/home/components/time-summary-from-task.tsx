@@ -21,14 +21,35 @@ export const TimeSummaryFromTask = ({ tasks }: { tasks: TaskSummaryDto[] }) => {
     }, 1000);
 
     return (
-        <div className="flex items-center gap-2">
-            <div>Remaining time ({roundDecimal((remainingTimeInDate / (24 * 3600)) * 100, 2)}%): <span style={{ color: token.colorPrimary }} className="font-semibold">{formatDuration(remainingTimeInDate)}</span></div>
-            <div>{"/"}</div>
-            <div>Total Working Time ({roundDecimal((totalWorkDurationInDate / (24 * 3600)) * 100, 2)}%): <span style={{ color: token.green }} className="font-semibold">{formatDuration(totalWorkDurationInDate)}</span></div>
-            <div>{"/"}</div>
-            <div>Total Break Time ({roundDecimal((totalBreakDurationInDate / (24 * 3600)) * 100, 2)}%): <span style={{ color: token.red }} className="font-semibold">{formatDuration(totalBreakDurationInDate)}</span></div>
-            <div>{"/"}</div>
-            <div>Vague Thinking Time ({roundDecimal((untrackedTimeInDate / (24 * 3600)) * 100, 2)}%): <span style={{ color: token.gold }} className="font-semibold">{formatDuration(untrackedTimeInDate)}</span></div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 w-full">
+            <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                <span className="text-gray-500 text-xs uppercase font-semibold">Remaining</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                    <span style={{ color: token.colorPrimary }} className="text-lg font-bold">{formatDuration(remainingTimeInDate)}</span>
+                    <span className="text-xs text-gray-400">({roundDecimal((remainingTimeInDate / (24 * 3600)) * 100, 0)}%)</span>
+                </div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                <span className="text-gray-500 text-xs uppercase font-semibold">Working</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                    <span style={{ color: token.green }} className="text-lg font-bold">{formatDuration(totalWorkDurationInDate)}</span>
+                    <span className="text-xs text-gray-400">({roundDecimal((totalWorkDurationInDate / (24 * 3600)) * 100, 0)}%)</span>
+                </div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                <span className="text-gray-500 text-xs uppercase font-semibold">Break</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                    <span style={{ color: token.red }} className="text-lg font-bold">{formatDuration(totalBreakDurationInDate)}</span>
+                    <span className="text-xs text-gray-400">({roundDecimal((totalBreakDurationInDate / (24 * 3600)) * 100, 0)}%)</span>
+                </div>
+            </div>
+            <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                <span className="text-gray-500 text-xs uppercase font-semibold">Vague</span>
+                <div className="flex items-baseline gap-1 mt-1">
+                    <span style={{ color: token.gold }} className="text-lg font-bold">{formatDuration(untrackedTimeInDate)}</span>
+                    <span className="text-xs text-gray-400">({roundDecimal((untrackedTimeInDate / (24 * 3600)) * 100, 0)}%)</span>
+                </div>
+            </div>
         </div>
     )
 };

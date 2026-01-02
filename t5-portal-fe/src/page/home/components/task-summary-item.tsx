@@ -165,80 +165,116 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
     <>
       {contextHolder}
       <div
-        className="group border-b border-gray-100 last:border-b-0 transition-colors hover:bg-gray-50 h-22 flex items-center bg-white"
+        className="group border-b border-gray-100 last:border-b-0 transition-all hover:bg-white hover:shadow-md flex flex-col md:flex-row md:items-center bg-white/50 py-3 md:py-0 md:h-20"
       >
-        {/* Expand Icon */}
-        <div className="h-full flex items-center justify-center w-10 border-r-2 border-dotted border-gray-200">
-          <Button
-            type="text"
-            icon={expanded ? (
-              <DownOutlined className="text-gray-500 text-sm" />
-            ) : (
-              <RightOutlined className="text-gray-500 text-sm" />
-            )}
-            className="flex items-center justify-center w-full h-full"
-            onClick={() => setExpanded(!expanded)}
-          />
-        </div>
-
-        {/* Task Name and Project */}
-        <div className="h-full flex-1 flex-col px-4 flex items-start justify-between min-w-0 pr-4 py-4 gap-1">
-          <div>
-            <span className="font-medium text-gray-700 text-[15px] mr-2 truncate">
-              {task.name || '(No task name)'}
-            </span>
-            <span>
-              <Tag color="blue">{formatDuration(task.time_entry_total_duration ?? 0)} {task.total_estimation_time && <span>({roundDecimal((task.time_entry_total_duration ?? 0) / task.total_estimation_time * 100, 2)}% - {formatDuration(task.total_estimation_time ?? 0)})</span>}</Tag>
-            </span>
-          </div>
-          <div>
-            <span className='font-small text-gray-500 text-[12px]'>Today Tracked: {formatDuration(task.time_entry_total_duration_in_date ?? 0)}</span>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="h-full flex flex-col items-center border-r-dotted border-gray-200 px-4 min-w-[100px] justify-between py-4">
-          <TaskTags task={task} />
-        </div>
-
-        {/* Time Range */}
-        {/* <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[180px]">
-          <span className="text-gray-500 text-[14px] font-medium">
-            {formatTime(task?.time_entries?.[0].start_time ?? '')} - {formatTime(task?.time_entries?.[0].end_time ?? '')}
-          </span>
-          <Button type="text" size="small" icon={<CalendarOutlined className="text-gray-400" />} className="ml-1 flex items-center justify-center" />
-        </div> */}
-
-        {/* Duration */}
-        <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-[100px]">
-          <span className="text-gray-800 font-bold text-[16px]">
-            {formatDuration(task.time_entry_active_duration ?? 0)}
-          </span>
-        </div>
-
-        {/* Play Action */}
-        <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-14">
-          <Button
-            type="text"
-            icon={task.tags?.includes('active') ? (
-              <PauseOutlined className="text-gray-500 text-xl hover:text-[#00A0D2]" />
-            ) : (
-              <CaretRightOutlined className="text-gray-500 text-xl hover:text-[#00A0D2]" />
-            )}
-            className="flex items-center justify-center w-full h-full"
-            onClick={() => useStopTrackingReturn.mutate({ task })}
-          />
-        </div>
-
-        {/* Menu Action */}
-        <div className="h-full flex items-center justify-center border-l-2 border-dotted border-gray-200 w-10">
-          <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+        {/* Mobile Top Row: Expand | Name | Menu */}
+        <div className="flex items-center w-full md:w-[45%] md:h-full">
+          {/* Expand Icon */}
+          <div className="flex items-center justify-center w-10 md:h-full">
             <Button
               type="text"
-              icon={<MoreOutlined className="text-gray-400 text-lg" />}
-              className="flex items-center justify-center w-full h-full"
+              size="small"
+              icon={expanded ? (
+                <DownOutlined className="text-gray-400 text-xs" />
+              ) : (
+                <RightOutlined className="text-gray-400 text-xs" />
+              )
+              }
+              className="flex items-center justify-center w-full md:h-full"
+              onClick={() => setExpanded(!expanded)}
             />
-          </Dropdown>
+          </div>
+
+          {/* Task Name and Project (Mobile & Desktop) */}
+          <div className="flex-1 flex-col px-2 flex items-start justify-center min-w-0 md:h-full md:justify-center gap-1">
+            <div className="w-full flex justify-between items-start md:block">
+              <span className="font-medium text-gray-700 text-[14px] md:text-[15px] truncate block" title={task.name}>
+                {task.name || '(No task name)'}
+              </span>
+
+              {/* Mobile Menu Action (moved here) */}
+              <div className="md:hidden">
+                <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<MoreOutlined className="text-gray-400 text-lg" />}
+                  />
+                </Dropdown>
+              </div>
+            </div>
+
+            {/* Desktop: Progress Text */}
+            <div className="hidden md:block">
+              {task.total_estimation_time ? (
+                <span className="text-xs text-gray-400">
+                  Progress: <span className="font-medium text-blue-600">{roundDecimal((task.time_entry_total_duration ?? 0) / task.total_estimation_time * 100, 0)}%</span>
+                  <span className="mx-1">•</span>
+                  Est: {formatDuration(task.total_estimation_time)}
+                </span>
+              ) : (
+                <span className="text-xs text-gray-400">No estimation</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: Tags Column */}
+        <div className="flex flex-wrap items-center px-4 gap-2 mb-2 md:mb-0 md:h-full md:w-[25%] md:justify-center md:px-2">
+          {/* Progress Tag (Mobile Only) */}
+          <div className="md:hidden w-full flex justify-between items-center">
+            <Tag color="blue" className="mr-0">{formatDuration(task.time_entry_total_duration ?? 0)} {task.total_estimation_time && <span>({roundDecimal((task.time_entry_total_duration ?? 0) / task.total_estimation_time * 100, 0)}% - {formatDuration(task.total_estimation_time ?? 0)})</span>}</Tag>
+            <span className='font-small text-gray-500 text-[12px]'>Today: {formatDuration(task.time_entry_total_duration_in_date ?? 0)}</span>
+          </div>
+
+          <div className="w-full flex md:justify-center">
+            <TaskTags task={task} />
+          </div>
+        </div>
+
+        {/* Desktop: Tracked Today Column */}
+        <div className="hidden md:flex flex-col items-center justify-center w-[15%] h-full border-l border-dotted border-gray-200/50">
+          <span className="text-[10px] text-gray-400 uppercase font-semibold">Today</span>
+          <span className='font-medium text-gray-600 text-[13px]'>{formatDuration(task.time_entry_total_duration_in_date ?? 0)}</span>
+        </div>
+
+        {/* Bottom Row: Duration | Play Action | Desktop Menu */}
+        <div className="flex items-center justify-between px-4 w-full md:w-[15%] md:h-full md:px-0 md:justify-end md:pr-4">
+
+          {/* Duration */}
+          <div className="flex items-center md:justify-end md:w-full md:mr-4">
+            <span className={`font-mono text-[16px] font-bold ${task.tags?.includes('active') ? 'text-blue-600' : 'text-gray-700'}`}>
+              {formatDuration(task.time_entry_active_duration ?? 0)}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1 md:h-full">
+            {/* Play Action */}
+            <div className="flex items-center justify-center">
+              <Button
+                type="text"
+                shape="circle"
+                size="large"
+                icon={task.tags?.includes('active') ? (
+                  <PauseOutlined className="text-blue-500 text-xl" />
+                ) : (
+                  <CaretRightOutlined className="text-gray-400 text-xl hover:text-blue-500 transition-colors" />
+                )}
+                onClick={() => useStopTrackingReturn.mutate({ task })}
+              />
+            </div>
+
+            {/* Desktop Menu Action */}
+            <div className="hidden md:flex items-center justify-center">
+              <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={<MoreOutlined className="text-gray-400 text-lg" />}
+                />
+              </Dropdown>
+            </div>
+          </div>
         </div>
       </div>
 

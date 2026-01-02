@@ -79,7 +79,7 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
-                initialValues={{ currency: 'USD', type: 'debit' }}
+                initialValues={{ currency: 'VND', type: 'debit' }}
             >
                 <Form.Item
                     name="amount"

@@ -19,21 +19,26 @@ const Home: React.FC = () => {
   return (
     <Layout className="min-h-screen bg-[#f0f2f5]">
       <Content className="flex flex-col gap-5">
-        <div className="flex justify-end">
-          <DatePicker size="large" value={dayjs(selectedDate)} onChange={(date) => setSelectedDate(date?.format("YYYY-MM-DD") || "")} />
+        <div className="flex flex-col md:flex-row justify-end gap-2">
+          <DatePicker size="large" value={dayjs(selectedDate)} onChange={(date) => setSelectedDate(date?.format("YYYY-MM-DD") || "")} className="w-full md:w-auto" />
         </div>
-        <TimeTrackerInput />
+        <div className="mx-auto w-full max-w-4xl">
+          <TimeTrackerInput />
+        </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <p className="text-lg font-semibold text-gray-700 mb-0!">Daily Summary</p>
+            <Segmented
+              options={[
+                { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
+                { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
+              ]}
+              value={viewMode}
+              onChange={(value) => setViewMode(value as 'list' | 'timeline')}
+            />
+          </div>
           <TimeSummaryFromTask tasks={tasks} />
-          <Segmented
-            options={[
-              { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
-              { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
-            ]}
-            value={viewMode}
-            onChange={(value) => setViewMode(value as 'list' | 'timeline')}
-          />
         </div>
 
         {viewMode === 'timeline' && <TimelineChart date={selectedDate} />}

@@ -64,6 +64,18 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
                     message.error("Failed to update status");
                 }
             });
+        } else if (['amount', 'currency'].includes(colDef.field || '')) {
+            mutateUpdate({
+                resource: "wish_list_items",
+                id: data.id,
+                values: {
+                    [colDef.field!]: newValue,
+                },
+            }, {
+                onError: () => {
+                    message.error(`Failed to update ${colDef.field}`);
+                }
+            });
         }
     }, [mutateUpdate]);
 
@@ -99,6 +111,23 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
                 if (!params.value) return '';
                 return params.value.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
             }
+        },
+        {
+            field: "amount",
+            headerName: "Amount",
+            width: 150,
+            editable: true,
+            sortable: true,
+            filter: true,
+            type: 'numericColumn'
+        },
+        {
+            field: "currency",
+            headerName: "Currency",
+            width: 120,
+            editable: true,
+            sortable: true,
+            filter: true
         },
         {
             field: "created_at",

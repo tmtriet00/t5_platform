@@ -1,10 +1,12 @@
 
 import { Tabs, Table, Button } from "antd";
-import { useList } from "@refinedev/core";
+import { useList, useOne } from "@refinedev/core";
 import { DeleteButton } from "@refinedev/antd";
 import dayjs from "dayjs";
 import { useRef } from "react";
 import { AddTrackModal, AddTrackModalRef } from "../modals";
+import { WishListItem } from "interfaces/model/wish-list-item";
+import { roundDecimal } from "utility/number";
 
 interface WishListDetailProps {
     data: any;
@@ -71,7 +73,7 @@ export const WishListDetail: React.FC<WishListDetailProps> = ({ data }) => {
     const items = [
         {
             key: '1',
-            label: 'Tracks',
+            label: `Tracks (${roundDecimal((tracksData?.data?.reduce((total, item) => total + item.point, 0) ?? 0) / (data?.amount || 1) * 100, 2)}%)`,
             children: (
                 <Table
                     loading={isLoading}
@@ -92,9 +94,11 @@ export const WishListDetail: React.FC<WishListDetailProps> = ({ data }) => {
                 defaultActiveKey="1"
                 items={items}
                 tabBarExtraContent={
-                    <Button type="primary" size="small" onClick={() => addTrackModalRef.current?.open(data.id)}>
-                        Add Track
-                    </Button>
+                    <div>
+                        <Button type="primary" size="small" onClick={() => addTrackModalRef.current?.open(data.id)}>
+                            Add Track
+                        </Button>
+                    </div>
                 }
             />
             <AddTrackModal ref={addTrackModalRef} />

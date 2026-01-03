@@ -62,6 +62,8 @@ import { FinancialStatistic } from "page/financial-statistic";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
+import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./page/configurations";
+
 
 
 function App() {
@@ -187,6 +189,15 @@ function App() {
                     },
                   },
                   {
+                    name: "configurations",
+                    list: "/configurations",
+                    create: "/configurations/create",
+                    edit: "/configurations/edit/:id",
+                    meta: {
+                      label: "Configurations",
+                    },
+                  },
+                  {
                     name: "transactions",
                     meta: {
                       hide: true,
@@ -260,6 +271,10 @@ function App() {
                         <Route path="/wish-lists" element={<WishListList />} />
                         <Route path="/ledgers" element={<LedgerList />} />
                         <Route path="/finance-checkin-records" element={<FinanceCheckinRecordList />} />
+                        <Route path="/configurations" element={<ConfigurationList />} />
+                        <Route path="/configurations/create" element={<ConfigurationCreate />} />
+                        <Route path="/configurations/edit/:id" element={<ConfigurationEdit />} />
+
                       </Route>
                       <Route
                         element={

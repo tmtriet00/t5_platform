@@ -91,11 +91,17 @@ export const TimeEntryListTable: React.FC<TimeEntryListTableProps> = ({ rowData,
                 });
             }
         } else if (['description', 'start_time', 'end_time'].includes(colDef.field || '')) {
+            let valueToUpdate = newValue;
+
+            if (['start_time', 'end_time'].includes(colDef.field || '') && newValue) {
+                valueToUpdate = dayjs(newValue).toISOString();
+            }
+
             mutateUpdate({
                 resource: "time_entries",
                 id: data.id,
                 values: {
-                    [colDef.field!]: newValue,
+                    [colDef.field!]: valueToUpdate,
                 },
                 successNotification: () => ({
                     message: `Successfully updated ${colDef.headerName}`,

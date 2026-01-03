@@ -100,6 +100,16 @@ export const FinanceCheckinRecordListTable: React.FC<FinanceCheckinRecordListTab
             width: 80
         },
         {
+            field: "created_at",
+            headerName: "Created At",
+            sortable: true,
+            filter: true,
+            width: 200,
+            valueFormatter: (params: any) => {
+                return params.value ? new Date(params.value).toLocaleString() : '';
+            }
+        },
+        {
             field: "currency",
             headerName: "Currency",
             editable: true,

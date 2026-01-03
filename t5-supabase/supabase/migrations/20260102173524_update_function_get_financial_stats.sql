@@ -1,5 +1,3 @@
-DROP FUNCTION IF EXISTS get_financial_stats();
-
 -- Tip for writing left join, be careful with the join increase granularity of the table. It can make the calculation complex. Ex: task <-> time_entries <-> task_estimations
 -- Save left join should be created with the purpose increase detail of row not granularity of row. Try to split to WITH as view to reduce granularity if needed
 

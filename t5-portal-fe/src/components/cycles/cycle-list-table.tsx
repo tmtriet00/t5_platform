@@ -48,7 +48,7 @@ export const CycleListTable: React.FC<CycleListTableProps> = ({ rowData, isLoadi
     const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
         const { data, colDef, newValue } = event;
         // Fields that can be edited: name, description, start_time, end_time
-        if (['name', 'description', 'start_time', 'end_time'].includes(colDef.field || '')) {
+        if (['name', 'description'].includes(colDef.field || '')) {
             mutateUpdate({
                 resource: "cycles",
                 id: data.id,
@@ -63,6 +63,24 @@ export const CycleListTable: React.FC<CycleListTableProps> = ({ rowData, isLoadi
                     message.error("Failed to update cycle");
                 }
             });
+        } else if (['start_time', 'end_time'].includes(colDef.field || '')) {
+            if (newValue) {
+                const isoDate = dayjs(newValue).toISOString();
+                mutateUpdate({
+                    resource: "cycles",
+                    id: data.id,
+                    values: {
+                        [colDef.field!]: isoDate,
+                    },
+                }, {
+                    onSuccess: () => {
+                        // Optional: Silent success
+                    },
+                    onError: () => {
+                        message.error("Failed to update cycle");
+                    }
+                });
+            }
         }
     }, [mutateUpdate]);
 
@@ -97,14 +115,10 @@ export const CycleListTable: React.FC<CycleListTableProps> = ({ rowData, isLoadi
             sortable: true,
             filter: true,
             editable: true,
-            valueFormatter: (params) => params.value ? dayjs(params.value).format('YYYY-MM-DD HH:mm') : '',
-            cellEditor: 'agDateStringCellEditor',
-            // Note: ag-grid date editor might need config, but for now simple text or standard editor. 
-            // For better experience we might need custom cell editor but sticking to simple for now as requested like task (which uses selects).
-            // Task uses agSelectCellEditor. For date, standard text edit is prone to error.
-            // But let's stick to basic editable for now or just text.
-            // Actually, let's keep it simple text editable for now, user can input ISO or strict format.
-            // Or better, let's just make it editable text.
+            valueGetter: (params) => {
+                if (!params.data || !params.data.start_time) return '';
+                return dayjs(params.data.start_time).format('YYYY-MM-DD HH:mm');
+            },
         },
         {
             field: "end_time",
@@ -113,7 +127,10 @@ export const CycleListTable: React.FC<CycleListTableProps> = ({ rowData, isLoadi
             sortable: true,
             filter: true,
             editable: true,
-            valueFormatter: (params) => params.value ? dayjs(params.value).format('YYYY-MM-DD HH:mm') : '',
+            valueGetter: (params) => {
+                if (!params.data || !params.data.end_time) return '';
+                return dayjs(params.data.end_time).format('YYYY-MM-DD HH:mm');
+            },
         },
         {
             headerName: "Actions",

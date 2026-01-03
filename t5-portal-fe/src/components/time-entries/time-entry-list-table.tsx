@@ -151,10 +151,10 @@ export const TimeEntryListTable: React.FC<TimeEntryListTableProps> = ({ rowData,
             sortable: true,
             filter: true,
             editable: true,
-            cellRenderer: (params: any) => {
-                if (!params.value) return null;
-                return <DateField value={params.value} format="YYYY-MM-DD HH:mm:ss" />;
-            }
+            valueGetter: (params) => {
+                if (!params.data || !params.data.start_time) return '';
+                return dayjs(params.data.start_time).format('YYYY-MM-DD HH:mm:ss');
+            },
         },
         {
             field: "end_time",
@@ -163,10 +163,10 @@ export const TimeEntryListTable: React.FC<TimeEntryListTableProps> = ({ rowData,
             sortable: true,
             filter: true,
             editable: true,
-            cellRenderer: (params: any) => {
-                if (!params.value) return '-';
-                return <DateField value={params.value} format="YYYY-MM-DD HH:mm:ss" />;
-            }
+            valueGetter: (params) => {
+                if (!params.data || !params.data.end_time) return '';
+                return dayjs(params.data.end_time).format('YYYY-MM-DD HH:mm:ss');
+            },
         },
         {
             field: "tags",

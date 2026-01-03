@@ -43,6 +43,9 @@ export const FinancialStatistic = () => {
 
     const maximumExpenseAmount = financialStatistics?.[0].maximum_expense_amount ?? 0
     const maximumExpenseCurrency = financialStatistics?.[0]?.maximum_expense_currency ?? 'VND'
+    const totalCurrentCycleDebit = financialStatistics?.reduce((total, item) => total + item.current_cycle_debit, 0) ?? 0
+    const totalCurrentCycleCredit = financialStatistics?.reduce((total, item) => total + item.current_cycle_credit, 0) ?? 0
+
 
     return (
         <div style={{ padding: '24px' }}>
@@ -51,9 +54,7 @@ export const FinancialStatistic = () => {
                 {/* Left: Pie Chart */}
                 <Col xs={24} md={12}>
                     <Card title="Financial Composition" style={{ minHeight: '500px' }}>
-                        <div style={{ height: '400px' }}>
-                            <AgCharts options={chartOptions} />
-                        </div>
+                        <AgCharts options={chartOptions} />
                     </Card>
                 </Col>
 
@@ -65,7 +66,7 @@ export const FinancialStatistic = () => {
                             <span>{maximumExpenseAmount} {maximumExpenseCurrency}</span>
                         </div>
                     </div>}>
-                        {/* Empty for now */}
+                        <div>{totalCurrentCycleDebit}</div>
                     </Card>
                 </Col>
             </Row>

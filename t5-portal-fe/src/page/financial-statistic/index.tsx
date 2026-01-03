@@ -4,15 +4,18 @@ import { AgChartOptions } from 'ag-charts-enterprise';
 import { Card, Col, Row, Spin } from "antd";
 import { useMemo } from "react";
 import { formatCurrency, roundDecimal } from "utility/number";
+import { CycleTransactionTable } from "./components/cycle-transaction-table";
 
 export const FinancialStatistic = () => {
     const { financialStatistics, loading } = useFinancialStatistic();
 
-    const maximumExpenseAmount = financialStatistics?.[0].maximum_expense_amount ?? 0
+    const maximumExpenseAmount = financialStatistics?.[0]?.maximum_expense_amount ?? 0
     const maximumExpenseCurrency = financialStatistics?.[0]?.maximum_expense_currency ?? 'VND'
     const totalCurrentCycleDebit = financialStatistics?.reduce((total, item) => total + item.current_cycle_debit, 0) ?? 0
     const totalCurrentCycleCredit = financialStatistics?.reduce((total, item) => total + item.current_cycle_credit, 0) ?? 0
     const displayCurrency = financialStatistics?.[0]?.display_currency ?? 'VND'
+    const cycleStartTime = financialStatistics?.[0]?.cycle_start_time
+    const cycleEndTime = financialStatistics?.[0]?.cycle_end_time
 
     const chartOptions = useMemo<AgChartOptions>(() => {
         const data = financialStatistics.filter(item => item.current_balance > 0);
@@ -51,7 +54,7 @@ export const FinancialStatistic = () => {
             <Row gutter={[16, 16]}>
                 {/* Left: Pie Chart */}
                 <Col xs={24} md={8}>
-                    <Card title="Financial Breakdown">
+                    <Card title="Financial Breakdown" style={{ height: '100%' }}>
                         <AgCharts options={chartOptions} />
                     </Card>
                 </Col>
@@ -70,9 +73,11 @@ export const FinancialStatistic = () => {
                             </div>
                         </div>
                     }>
-                        <div>
-                            Table Placholder
-                        </div>
+                        <CycleTransactionTable
+                            cycleStartTime={cycleStartTime}
+                            cycleEndTime={cycleEndTime}
+                            displayCurrency={displayCurrency}
+                        />
                     </Card>
                 </Col>
             </Row>

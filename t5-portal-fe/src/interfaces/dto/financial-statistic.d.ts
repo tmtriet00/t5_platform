@@ -7,4 +7,6 @@ export interface FinancialStatisticDto {
     display_currency: string;
     maximum_expense_amount: number;
     maximum_expense_currency: string;
+    cycle_start_time: string;
+    cycle_end_time: string;
 }

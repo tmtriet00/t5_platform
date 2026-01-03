@@ -67,6 +67,7 @@ import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
 import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./page/configurations";
 import { CycleCreate, CycleEdit, CycleList } from "./page/cycles";
 import FileToVideoPage from "./page/file-to-video";
+import { DataManagementPage } from "./page/data-management";
 
 
 
@@ -219,6 +220,13 @@ function App() {
                     },
                   },
                   {
+                    name: "data_management",
+                    list: "/data-management",
+                    meta: {
+                      label: "Data Management",
+                    },
+                  },
+                  {
                     name: "transactions",
                     meta: {
                       hide: true,
@@ -306,6 +314,7 @@ function App() {
                           <Route path="/cycles/create" element={<CycleCreate />} />
                           <Route path="/cycles/edit/:id" element={<CycleEdit />} />
                           <Route path="/file-to-video" element={<FileToVideoPage />} />
+                          <Route path="/data-management" element={<DataManagementPage />} />
 
                         </Route>
                         <Route

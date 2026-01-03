@@ -5,6 +5,7 @@ import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
 import { useMemo, useCallback } from "react";
 import { FinanceCheckinRecord } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
+import dayjs from "dayjs";
 
 interface FinanceCheckinRecordListTableProps {
     rowData: FinanceCheckinRecord[];
@@ -73,6 +74,24 @@ export const FinanceCheckinRecordListTable: React.FC<FinanceCheckinRecordListTab
                     message.error("Failed to update record");
                 }
             });
+        } else if (colDef.field === 'created_at') {
+            if (newValue) {
+                const isoDate = dayjs(newValue).toISOString();
+                mutateUpdate({
+                    resource: "finance_checkin_records",
+                    id: data.id,
+                    values: {
+                        created_at: isoDate,
+                    },
+                }, {
+                    onSuccess: () => {
+                        // Optional: Silent success
+                    },
+                    onError: () => {
+                        message.error("Failed to update created_at");
+                    }
+                });
+            }
         } else if (colDef.field === 'ledger.name') {
             const newLedgerId = ledgerSelect.map.get(newValue) as number | undefined;
             if (newLedgerId !== undefined) {
@@ -104,10 +123,12 @@ export const FinanceCheckinRecordListTable: React.FC<FinanceCheckinRecordListTab
             headerName: "Created At",
             sortable: true,
             filter: true,
+            editable: true,
             width: 200,
-            valueFormatter: (params: any) => {
-                return params.value ? new Date(params.value).toLocaleString() : '';
-            }
+            valueGetter: (params) => {
+                if (!params.data || !params.data.created_at) return '';
+                return dayjs(params.data.created_at).format('YYYY-MM-DD HH:mm');
+            },
         },
         {
             field: "currency",

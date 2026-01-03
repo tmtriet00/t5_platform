@@ -29,7 +29,7 @@ export const LedgerDetail: React.FC<LedgerDetailProps> = ({ data }) => {
         },
         sorters: [
             {
-                field: "created_at",
+                field: "transaction_time",
                 order: "desc",
             },
         ]
@@ -116,6 +116,14 @@ export const LedgerDetail: React.FC<LedgerDetailProps> = ({ data }) => {
             headerName: "Description",
             editable: true,
             flex: 1,
+        },
+        {
+            field: "transaction_time",
+            headerName: "Transaction Time",
+            width: 180,
+            editable: true,
+            cellEditor: 'agDateStringCellEditor',
+            valueFormatter: (params) => params.value ? new Date(params.value).toLocaleString() : ''
         },
         {
             field: "created_at",

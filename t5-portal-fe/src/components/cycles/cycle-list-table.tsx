@@ -48,7 +48,7 @@ export const CycleListTable: React.FC<CycleListTableProps> = ({ rowData, isLoadi
     const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
         const { data, colDef, newValue } = event;
         // Fields that can be edited: name, description, start_time, end_time
-        if (['name', 'description'].includes(colDef.field || '')) {
+        if (['name', 'description', 'status'].includes(colDef.field || '')) {
             mutateUpdate({
                 resource: "cycles",
                 id: data.id,
@@ -101,9 +101,17 @@ export const CycleListTable: React.FC<CycleListTableProps> = ({ rowData, isLoadi
             filter: true
         },
         {
+            field: "status",
+            headerName: "Status",
+            flex: 1,
+            editable: true,
+            sortable: true,
+            filter: true
+        },
+        {
             field: "description",
             headerName: "Description",
-            flex: 3,
+            flex: 2,
             editable: true,
             sortable: true,
             filter: true

@@ -1,7 +1,8 @@
 
 import React, { useImperativeHandle, useState } from 'react'
-import { Form, Modal, InputNumber, Button, message, Input, Select } from 'antd';
+import { Form, Modal, InputNumber, Button, message, Input, Select, DatePicker } from 'antd';
 import { useCreate, useInvalidate } from "@refinedev/core";
+import dayjs from 'dayjs';
 
 export interface AddTransactionModalRef {
     open: (ledgerId: number) => void;
@@ -38,7 +39,7 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
     const [isLoading, setIsLoading] = useState(false);
     const { mutate: createTransaction } = useCreate();
 
-    const handleSubmit = async (values: { amount: number; currency: string; type: string; category: string; description: string }) => {
+    const handleSubmit = async (values: { amount: number; currency: string; type: string; category: string; description: string; transaction_time: any }) => {
         if (!ledgerId) return;
         setIsLoading(true);
 
@@ -51,6 +52,7 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
                 type: values.type,
                 category: values.category,
                 description: values.description,
+                transaction_time: values.transaction_time ? values.transaction_time.toISOString() : null,
             },
         }, {
             onSuccess: () => {
@@ -80,7 +82,7 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
-                initialValues={{ currency: 'VND', type: 'debit', category: 'default' }}
+                initialValues={{ currency: 'VND', type: 'debit', category: 'default', transaction_time: dayjs() }}
             >
                 <Form.Item
                     name="amount"
@@ -118,6 +120,18 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
                         <Select.Option value="default">Default</Select.Option>
                         <Select.Option value="transfer_only">Transfer Only</Select.Option>
                     </Select>
+                </Form.Item>
+
+                <Form.Item
+                    name="transaction_time"
+                    label="Transaction Time"
+                    rules={[{ required: true, message: "Please select transaction time" }]}
+                >
+                    <DatePicker
+                        showTime
+                        format="YYYY-MM-DD HH:mm:ss"
+                        style={{ width: '100%' }}
+                    />
                 </Form.Item>
 
                 <Form.Item

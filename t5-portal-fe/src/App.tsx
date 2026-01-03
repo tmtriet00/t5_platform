@@ -66,6 +66,7 @@ dayjs.extend(timezone);
 import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
 import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./page/configurations";
 import { CycleCreate, CycleEdit, CycleList } from "./page/cycles";
+import FileToVideoPage from "./page/file-to-video";
 
 
 
@@ -211,6 +212,13 @@ function App() {
                     },
                   },
                   {
+                    name: "file_to_video",
+                    list: "/file-to-video",
+                    meta: {
+                      label: "File to Video",
+                    },
+                  },
+                  {
                     name: "transactions",
                     meta: {
                       hide: true,
@@ -297,6 +305,7 @@ function App() {
                           <Route path="/cycles" element={<CycleList />} />
                           <Route path="/cycles/create" element={<CycleCreate />} />
                           <Route path="/cycles/edit/:id" element={<CycleEdit />} />
+                          <Route path="/file-to-video" element={<FileToVideoPage />} />
 
                         </Route>
                         <Route

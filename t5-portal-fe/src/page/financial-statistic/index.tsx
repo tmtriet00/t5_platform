@@ -16,6 +16,8 @@ export const FinancialStatistic = () => {
     const displayCurrency = financialStatistics?.[0]?.display_currency ?? 'VND'
     const cycleStartTime = financialStatistics?.[0]?.cycle_start_time
     const cycleEndTime = financialStatistics?.[0]?.cycle_end_time
+    const wishListTotalCost = financialStatistics?.[0]?.wish_list_total_cost ?? 0
+    const actualDebit = totalCurrentCycleDebit + wishListTotalCost
 
     const chartOptions = useMemo<AgChartOptions>(() => {
         const data = financialStatistics.filter(item => item.current_balance > 0);
@@ -71,6 +73,10 @@ export const FinancialStatistic = () => {
                                 <span>Current Cycle Debit:</span>
                                 <span>{formatCurrency({ amount: totalCurrentCycleDebit, currency: displayCurrency })} ({roundDecimal(totalCurrentCycleDebit / maximumExpenseAmount * 100, 2)}%)</span>
                             </div>
+                            <div>
+                                <span>Actual Debit:</span>
+                                <span>{formatCurrency({ amount: actualDebit, currency: displayCurrency })} ({roundDecimal(actualDebit / maximumExpenseAmount * 100, 2)}%)</span>
+                            </div>
                         </div>
                     }>
                         <CycleTransactionTable
@@ -86,7 +92,7 @@ export const FinancialStatistic = () => {
             <div style={{ marginTop: '24px' }}>
                 <Card title="Trend Analysis">
                     <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' }}>
-                        Line Chart Placeholder
+                        Line Chart Placeholder (Coming Soon)
                     </div>
                 </Card>
             </div>

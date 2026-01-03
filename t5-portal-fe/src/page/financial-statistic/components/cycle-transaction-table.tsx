@@ -7,6 +7,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
 import { formatCurrency } from "utility/number";
 import { useCycleTransactions } from "../hooks/use-cycle-transactions";
+import dayjs from "dayjs";
 
 interface CycleTransactionTableProps {
     cycleStartTime?: string;
@@ -50,7 +51,22 @@ export const CycleTransactionTable: React.FC<CycleTransactionTableProps> = ({
         const { data: rowData, colDef, newValue } = event;
         const field = colDef.field;
 
-        if (field) {
+        if (field === 'transaction_time') {
+            if (newValue) {
+                const isoDate = dayjs(newValue).toISOString();
+                mutateUpdate({
+                    resource: "transactions",
+                    id: rowData.id,
+                    values: {
+                        [field]: isoDate,
+                    },
+                }, {
+                    onError: () => {
+                        message.error("Failed to update transaction");
+                    }
+                });
+            }
+        } else if (field) {
             mutateUpdate({
                 resource: "transactions",
                 id: rowData.id,
@@ -77,8 +93,10 @@ export const CycleTransactionTable: React.FC<CycleTransactionTableProps> = ({
             width: 180,
             editable: true,
             sortable: true,
-            cellEditor: 'agDateStringCellEditor',
-            valueFormatter: (params) => params.value ? new Date(params.value).toLocaleString() : ''
+            valueGetter: (params) => {
+                if (!params.data || !params.data.transaction_time) return '';
+                return dayjs(params.data.transaction_time).format('YYYY-MM-DD HH:mm');
+            },
         },
         {
             field: "description",

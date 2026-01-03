@@ -1,6 +1,6 @@
 
 import React, { useImperativeHandle, useState } from 'react'
-import { Form, Modal, InputNumber, Button, message } from 'antd';
+import { Form, Modal, InputNumber, Input, Button, message } from 'antd';
 import { useCreate, useInvalidate } from "@refinedev/core";
 
 export interface AddTrackModalRef {
@@ -38,7 +38,7 @@ export const AddTrackModal = React.forwardRef<AddTrackModalRef, AddTrackModalPro
     const [isLoading, setIsLoading] = useState(false);
     const { mutate: createTrack } = useCreate();
 
-    const handleSubmit = async (values: { point: number }) => {
+    const handleSubmit = async (values: { point: number; currency: string }) => {
         if (!wishListItemId) return;
         setIsLoading(true);
 
@@ -47,6 +47,7 @@ export const AddTrackModal = React.forwardRef<AddTrackModalRef, AddTrackModalPro
             values: {
                 wish_list_item_id: wishListItemId,
                 point: values.point,
+                currency: values.currency,
             },
         }, {
             onSuccess: () => {
@@ -83,6 +84,15 @@ export const AddTrackModal = React.forwardRef<AddTrackModalRef, AddTrackModalPro
                     rules={[{ required: true, message: "Please enter point" }]}
                 >
                     <InputNumber style={{ width: '100%' }} min={0} autoFocus />
+                </Form.Item>
+
+                <Form.Item
+                    name="currency"
+                    label="Currency"
+                    initialValue="VND"
+                    rules={[{ required: true, message: "Please enter currency" }]}
+                >
+                    <Input style={{ width: '100%' }} placeholder="e.g., VND, USD" />
                 </Form.Item>
 
                 <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>

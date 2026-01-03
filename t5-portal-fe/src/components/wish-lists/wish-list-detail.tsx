@@ -48,6 +48,12 @@ export const WishListDetail: React.FC<WishListDetailProps> = ({ data }) => {
             key: 'point',
         },
         {
+            title: 'Currency',
+            dataIndex: 'currency',
+            key: 'currency',
+            width: 100,
+        },
+        {
             title: 'Created At',
             dataIndex: 'created_at',
             key: 'created_at',

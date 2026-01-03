@@ -52,6 +52,18 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
                     message.error("Failed to update item");
                 }
             });
+        } else if (colDef.field === 'status') {
+            mutateUpdate({
+                resource: "wish_list_items",
+                id: data.id,
+                values: {
+                    status: newValue,
+                },
+            }, {
+                onError: () => {
+                    message.error("Failed to update status");
+                }
+            });
         }
     }, [mutateUpdate]);
 
@@ -71,6 +83,22 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
             editable: true,
             sortable: true,
             filter: true
+        },
+        {
+            field: "status",
+            headerName: "Status",
+            width: 150,
+            editable: true,
+            sortable: true,
+            filter: true,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['not_started', 'in_progress', 'completed', 'canceled']
+            },
+            valueFormatter: (params) => {
+                if (!params.value) return '';
+                return params.value.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+            }
         },
         {
             field: "created_at",

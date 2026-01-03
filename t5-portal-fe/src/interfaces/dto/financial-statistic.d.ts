@@ -9,4 +9,5 @@ export interface FinancialStatisticDto {
     maximum_expense_currency: string;
     cycle_start_time: string;
     cycle_end_time: string;
+    wish_list_total_cost: number;
 }

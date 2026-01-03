@@ -1,26 +1,27 @@
-import { TaskSummaryDto } from "interfaces/dto/task";
+import { useQuery } from '@tanstack/react-query';
+import { supabaseClient } from 'utility';
+import { FinancialStatisticDto } from 'interfaces/dto/financial-statistic';
 
-// export const useFinancialStatistic = () => {
-//     const { data: tasks, isLoading, error } = useQuery<TaskSummaryDto[], Error>({
-//         queryKey: ['list_task_tracked_by_date', props.date],
-//         queryFn: async () => {
-//             const { data, error } = await supabaseClient.rpc("list_task_tracked_by_date", {
-//                 input_date: props.date,
-//                 timezone: "+07:00"
-//             });
+export const useFinancialStatistic = () => {
+    const { data: financialStatistics, isLoading, error } = useQuery<FinancialStatisticDto[], Error>({
+        queryKey: ['get_financial_stats'],
+        queryFn: async () => {
+            const { data, error } = await supabaseClient.rpc("get_financial_stats", {
+                in_timezone: "+07:00",
+                in_display_currency: "VND"
+            });
 
-//             if (error) {
-//                 throw error;
-//             }
-//             return data as TaskSummaryDto[];
-//         },
-//         enabled: !!props.date,
-//         refetchInterval: 1000
-//     });
+            if (error) {
+                throw error;
+            }
+            return data as FinancialStatisticDto[];
+        },
+        refetchInterval: 1000
+    });
 
-//     return {
-//         tasks: tasks || [],
-//         loading: isLoading,
-//         error: error as Error | null
-//     };
-// };
+    return {
+        financialStatistics: financialStatistics || [],
+        loading: isLoading,
+        error: error as Error | null
+    };
+};

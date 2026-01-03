@@ -3,9 +3,16 @@ import { AgCharts } from 'ag-charts-react';
 import { AgChartOptions } from 'ag-charts-enterprise';
 import { Card, Col, Row, Spin } from "antd";
 import { useMemo } from "react";
+import { formatCurrency, roundDecimal } from "utility/number";
 
 export const FinancialStatistic = () => {
     const { financialStatistics, loading } = useFinancialStatistic();
+
+    const maximumExpenseAmount = financialStatistics?.[0].maximum_expense_amount ?? 0
+    const maximumExpenseCurrency = financialStatistics?.[0]?.maximum_expense_currency ?? 'VND'
+    const totalCurrentCycleDebit = financialStatistics?.reduce((total, item) => total + item.current_cycle_debit, 0) ?? 0
+    const totalCurrentCycleCredit = financialStatistics?.reduce((total, item) => total + item.current_cycle_credit, 0) ?? 0
+    const displayCurrency = financialStatistics?.[0]?.display_currency ?? 'VND'
 
     const chartOptions = useMemo<AgChartOptions>(() => {
         const data = financialStatistics.filter(item => item.current_balance > 0);
@@ -20,10 +27,7 @@ export const FinancialStatistic = () => {
                     sectorLabelKey: 'current_balance',
                     sectorLabel: {
                         formatter: ({ value }) => {
-                            if (!financialStatistics.length) return '';
-                            // Assuming all items have the same currency for display, picking the first one or default
-                            const currency = financialStatistics[0]?.display_currency || '';
-                            return `${value.toLocaleString()} ${currency}`;
+                            return formatCurrency({ amount: value, currency: displayCurrency });
                         }
                     }
                 },
@@ -41,32 +45,34 @@ export const FinancialStatistic = () => {
         return <Spin size="large" />;
     }
 
-    const maximumExpenseAmount = financialStatistics?.[0].maximum_expense_amount ?? 0
-    const maximumExpenseCurrency = financialStatistics?.[0]?.maximum_expense_currency ?? 'VND'
-    const totalCurrentCycleDebit = financialStatistics?.reduce((total, item) => total + item.current_cycle_debit, 0) ?? 0
-    const totalCurrentCycleCredit = financialStatistics?.reduce((total, item) => total + item.current_cycle_credit, 0) ?? 0
-
-
     return (
         <div style={{ padding: '24px' }}>
             {/* Top Section */}
             <Row gutter={[16, 16]}>
                 {/* Left: Pie Chart */}
-                <Col xs={24} md={12}>
-                    <Card title="Financial Composition" style={{ minHeight: '500px' }}>
+                <Col xs={24} md={8}>
+                    <Card title="Financial Breakdown">
                         <AgCharts options={chartOptions} />
                     </Card>
                 </Col>
 
                 {/* Right: Empty Card */}
-                <Col xs={24} md={12}>
-                    <Card title="Future Statistic" style={{ height: '100%', minHeight: '500px' }} extra={<div>
-                        <div>
-                            <span>Maximum Expense Amount:</span>
-                            <span>{maximumExpenseAmount} {maximumExpenseCurrency}</span>
+                <Col xs={24} md={16}>
+                    <Card title="Cycle Statistic" style={{ height: '100%' }} extra={
+                        <div className="flex flex-row gap-2">
+                            <div>
+                                <span>Maximum Expense:</span>
+                                <span>{formatCurrency({ amount: maximumExpenseAmount, currency: maximumExpenseCurrency })}</span>
+                            </div>
+                            <div>
+                                <span>Current Cycle Debit:</span>
+                                <span>{formatCurrency({ amount: totalCurrentCycleDebit, currency: displayCurrency })} ({roundDecimal(totalCurrentCycleDebit / maximumExpenseAmount * 100, 2)}%)</span>
+                            </div>
                         </div>
-                    </div>}>
-                        <div>{totalCurrentCycleDebit}</div>
+                    }>
+                        <div>
+                            Table Placholder
+                        </div>
                     </Card>
                 </Col>
             </Row>
@@ -79,6 +85,6 @@ export const FinancialStatistic = () => {
                     </div>
                 </Card>
             </div>
-        </div>
+        </div >
     )
 }

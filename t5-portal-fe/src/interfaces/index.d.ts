@@ -13,3 +13,4 @@ export * from "./dto/home";
 export * from "./model/note";
 export * from "./model/finance";
 export * from "./model/configuration";
+export * from "./model/cycle";

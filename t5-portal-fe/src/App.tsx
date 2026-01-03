@@ -63,6 +63,8 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
 import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./page/configurations";
+import { CycleCreate, CycleEdit, CycleList } from "./page/cycles";
+
 
 
 
@@ -198,6 +200,15 @@ function App() {
                     },
                   },
                   {
+                    name: "cycles",
+                    list: "/cycles",
+                    create: "/cycles/create",
+                    edit: "/cycles/edit/:id",
+                    meta: {
+                      label: "Cycles",
+                    },
+                  },
+                  {
                     name: "transactions",
                     meta: {
                       hide: true,
@@ -274,6 +285,9 @@ function App() {
                         <Route path="/configurations" element={<ConfigurationList />} />
                         <Route path="/configurations/create" element={<ConfigurationCreate />} />
                         <Route path="/configurations/edit/:id" element={<ConfigurationEdit />} />
+                        <Route path="/cycles" element={<CycleList />} />
+                        <Route path="/cycles/create" element={<CycleCreate />} />
+                        <Route path="/cycles/edit/:id" element={<CycleEdit />} />
 
                       </Route>
                       <Route

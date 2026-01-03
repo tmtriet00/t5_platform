@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useMenu, useLink } from "@refinedev/core";
+import { useMenu, useLink, useList, useCreate, useUpdate } from "@refinedev/core";
+import { Configuration } from "../../interfaces/model/configuration";
 import { Layout, Menu, Grid, theme, Button, Drawer } from "antd";
 import {
     MenuUnfoldOutlined,
@@ -23,29 +24,77 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
     const Link = useLink();
     const Title = TitleFromProps;
 
-    // State for favorites
-    const [favorites, setFavorites] = useState<string[]>(() => {
-        const stored = localStorage.getItem("t5-portal-favorites");
-        return stored ? JSON.parse(stored) : [];
-    });
-
     const [collapsed, setCollapsed] = useState<boolean>(false);
     const [mobileSiderOpen, setMobileSiderOpen] = useState<boolean>(false);
     const isMobile = typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
+    const [favorites, setFavorites] = useState<string[]>([]);
+    const { mutate: mutateCreate } = useCreate();
+    const { mutate: mutateUpdate } = useUpdate();
+
+    const { query } = useList<Configuration>({
+        resource: "configurations",
+        filters: [
+            {
+                field: "config_key",
+                operator: "eq",
+                value: "favorite_menu",
+            },
+        ],
+    });
+
+    const configData = query?.data;
+    const isConfigRefLoading = query?.isLoading;
+    const configItem = configData?.data?.[0];
+
     useEffect(() => {
-        localStorage.setItem("t5-portal-favorites", JSON.stringify(favorites));
-    }, [favorites]);
+        if (configItem && configItem.config_value) {
+            try {
+                const parsedFavorites = JSON.parse(configItem.config_value);
+                if (Array.isArray(parsedFavorites)) {
+                    setFavorites(parsedFavorites);
+                }
+            } catch (e) {
+                console.error("Failed to parse favorites configuration", e);
+            }
+        }
+    }, [configItem]);
+
 
     const toggleFavorite = (e: React.MouseEvent, key: string) => {
         e.preventDefault();
         e.stopPropagation();
-        setFavorites((prev) => {
-            if (prev.includes(key)) {
-                return prev.filter((k) => k !== key);
-            }
-            return [...prev, key];
-        });
+
+        let newFavorites: string[] = [];
+        if (favorites.includes(key)) {
+            newFavorites = favorites.filter((k) => k !== key);
+        } else {
+            newFavorites = [...favorites, key];
+        }
+
+        setFavorites(newFavorites);
+
+        const configValue = JSON.stringify(newFavorites);
+
+        if (configItem) {
+            mutateUpdate({
+                resource: "configurations",
+                id: configItem.id,
+                values: {
+                    config_value: configValue,
+                },
+            });
+        } else {
+            mutateCreate({
+                resource: "configurations",
+                values: {
+                    config_key: "favorite_menu",
+                    config_value: configValue,
+                    config_category: "system",
+                    description: "User favorites menu items",
+                },
+            });
+        }
     };
 
     const createAntdMenuItem = (item: any) => {

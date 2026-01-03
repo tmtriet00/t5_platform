@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useMenu, useLink } from "@refinedev/core";
-import { Layout, Menu, Grid, theme, Button } from "antd";
+import { Layout, Menu, Grid, theme, Button, Drawer } from "antd";
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     StarOutlined,
     StarFilled,
+    BarsOutlined,
 } from "@ant-design/icons";
 import type { RefineThemedLayoutSiderProps } from "@refinedev/antd";
-
 
 const { Sider } = Layout;
 const { useToken } = theme;
@@ -30,6 +30,7 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
     });
 
     const [collapsed, setCollapsed] = useState<boolean>(false);
+    const [mobileSiderOpen, setMobileSiderOpen] = useState<boolean>(false);
     const isMobile = typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
     useEffect(() => {
@@ -54,7 +55,7 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
             icon: item.icon,
             label: (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                    <Link to={item.route ?? ""} style={{ flex: 1, color: "inherit", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <Link to={item.route ?? ""} style={{ flex: 1, color: "inherit", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} onClick={() => isMobile && setMobileSiderOpen(false)}>
                         {item.label}
                     </Link>
                     <Button
@@ -111,7 +112,62 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
             : []),
     ];
 
+    const renderMenu = () => (
+        <Menu
+            selectedKeys={[selectedKey]}
+            defaultOpenKeys={defaultOpenKeys}
+            mode="inline"
+            style={{ borderRight: 0 }}
+            items={antdMenuItems as any} // Type assertion due to complex item structure
+        />
+    );
+
     const renderSider = () => {
+        if (isMobile) {
+            return (
+                <>
+                    {!mobileSiderOpen && (
+                        <Button
+                            type="text"
+                            icon={<BarsOutlined />}
+                            onClick={() => setMobileSiderOpen(true)}
+                            style={{
+                                position: "fixed",
+                                top: 16,
+                                left: 16,
+                                zIndex: 1001,
+                                backgroundColor: token.colorBgContainer,
+                            }}
+                        />
+                    )}
+                    <Drawer
+                        placement="left"
+                        closable={false}
+                        onClose={() => setMobileSiderOpen(false)}
+                        open={mobileSiderOpen}
+                        width={200}
+                        styles={{ body: { padding: 0 } }}
+                        zIndex={1002}
+                    >
+                        <div
+                            style={{
+                                height: "64px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                                borderBottom: `1px solid ${token.colorBorderBg}`,
+                            }}
+                        >
+                            {Title && <Title collapsed={false} />}
+                        </div>
+                        {renderMenu()}
+                    </Drawer>
+                </>
+            );
+        }
+
         return (
             <Sider
                 collapsible
@@ -143,17 +199,10 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
                         borderBottom: `1px solid ${token.colorBorderBg}`,
                     }}
                 >
-                    {/* Simple logo/title placeholder - relying on props or fallback */}
                     {Title && <Title collapsed={collapsed} />}
                 </div>
 
-                <Menu
-                    selectedKeys={[selectedKey]}
-                    defaultOpenKeys={defaultOpenKeys}
-                    mode="inline"
-                    style={{ borderRight: 0 }}
-                    items={antdMenuItems as any} // Type assertion due to complex item structure
-                />
+                {renderMenu()}
                 <Button
                     type="text"
                     icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -172,10 +221,9 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
 
     return (
         <>
-            {/* Mobile Drawer/Sider handling could be improved, but sticking to basic Sider for now */}
             {renderSider()}
             {/* Spacer to push content */}
-            <div style={{ width: collapsed ? 80 : 200, transition: "width 0.2s" }} />
+            <div style={{ width: isMobile ? 0 : (collapsed ? 80 : 200), transition: "width 0.2s" }} />
         </>
     );
 };

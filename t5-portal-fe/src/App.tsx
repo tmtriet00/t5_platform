@@ -24,6 +24,8 @@ import authProvider from "./authProvider";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { supabaseClient } from "./utility";
+import { tenantDataProvider } from "./utility/tenant-data-provider";
+import { TenantProvider } from "./contexts/tenant";
 import { PostCreate, PostEdit, PostList } from "./page/posts";
 import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
 import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
@@ -78,7 +80,7 @@ function App() {
             <DevtoolsProvider>
               <Refine
                 notificationProvider={useNotificationProvider}
-                dataProvider={dataProvider(supabaseClient)}
+                dataProvider={tenantDataProvider(supabaseClient)}
                 resources={[
                   {
                     name: "home",
@@ -214,6 +216,12 @@ function App() {
                       hide: true,
                     },
                   },
+                  {
+                    name: "tenants",
+                    meta: {
+                      hide: true,
+                    },
+                  },
                 ]}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
@@ -223,94 +231,96 @@ function App() {
                   warnWhenUnsavedChanges: true,
                 }}
               >
-                <KBarProviderWrapper>
-                  <ModalProviderWrapper>
-                    <Routes>
-                      <Route
-                        element={
-                          <Authenticated
-                            key="authenticated-mfa"
-                            fallback={<CatchAllNavigate to="/login" />}
-                          >
-                            <Outlet />
-                          </Authenticated>
-                        }
-                      >
-                        <Route path="/mfa-verify" element={<MfaVerifyPage />} />
-                      </Route>
-                      <Route
-                        element={
-                          <Authenticated
-                            key="authenticated-inner"
-                            fallback={<CatchAllNavigate to="/login" />}
-                          >
-                            <ThemedLayout Header={Header} Sider={CustomSider}>
+                <TenantProvider>
+                  <KBarProviderWrapper>
+                    <ModalProviderWrapper>
+                      <Routes>
+                        <Route
+                          element={
+                            <Authenticated
+                              key="authenticated-mfa"
+                              fallback={<CatchAllNavigate to="/login" />}
+                            >
                               <Outlet />
-                            </ThemedLayout>
-                          </Authenticated>
-                        }
-                      >
-                        <Route index element={<Navigate to="/home" replace />} />
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/financial-statistic" element={<FinancialStatistic />} />
-                        <Route path="/daily-notes" element={<DailyNotePage />} />
-                        <Route path="/posts" element={<PostList />} />
-                        <Route path="/posts/create" element={<PostCreate />} />
-                        <Route path="/posts/edit/:id" element={<PostEdit />} />
-                        <Route path="/tasks" element={<TaskList />} />
-                        <Route path="/tasks/create" element={<TaskCreate />} />
-                        <Route path="/tasks/edit/:id" element={<TaskEdit />} />
-                        <Route path="/projects" element={<ProjectList />} />
-                        <Route path="/projects/create" element={<ProjectCreate />} />
-                        <Route path="/projects/:id" element={<ProjectDetail />} />
-                        <Route path="/projects/edit/:id" element={<ProjectEdit />} />
-                        <Route path="/time-entries" element={<TimeEntryList />} />
-                        <Route path="/time-entries/create" element={<TimeEntryCreate />} />
-                        <Route path="/time-entries/edit/:id" element={<TimeEntryEdit />} />
-                        <Route path="/task-estimations" element={<TaskEstimationList />} />
-                        <Route path="/task-estimations/create" element={<TaskEstimationCreate />} />
-                        <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
-                        <Route path="/emergency-tickets" element={<EmergencyKitList />} />
-                        <Route path="/emergency-tickets/create" element={<EmergencyKitCreate />} />
-                        <Route path="/emergency-tickets/edit/:id" element={<EmergencyKitEdit />} />
-                        <Route path="/notion" element={<NotionPage />} />
-                        <Route path="/remote-browser" element={<RemoteBrowser />} />
-                        <Route path="/notes" element={<NoteList />} />
-                        <Route path="/notes/create" element={<NoteCreate />} />
-                        <Route path="/notes/edit/:id" element={<NoteEdit />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/wish-lists" element={<WishListList />} />
-                        <Route path="/ledgers" element={<LedgerList />} />
-                        <Route path="/finance-checkin-records" element={<FinanceCheckinRecordList />} />
-                        <Route path="/configurations" element={<ConfigurationList />} />
-                        <Route path="/configurations/create" element={<ConfigurationCreate />} />
-                        <Route path="/configurations/edit/:id" element={<ConfigurationEdit />} />
-                        <Route path="/cycles" element={<CycleList />} />
-                        <Route path="/cycles/create" element={<CycleCreate />} />
-                        <Route path="/cycles/edit/:id" element={<CycleEdit />} />
+                            </Authenticated>
+                          }
+                        >
+                          <Route path="/mfa-verify" element={<MfaVerifyPage />} />
+                        </Route>
+                        <Route
+                          element={
+                            <Authenticated
+                              key="authenticated-inner"
+                              fallback={<CatchAllNavigate to="/login" />}
+                            >
+                              <ThemedLayout Header={Header} Sider={CustomSider}>
+                                <Outlet />
+                              </ThemedLayout>
+                            </Authenticated>
+                          }
+                        >
+                          <Route index element={<Navigate to="/home" replace />} />
+                          <Route path="/home" element={<Home />} />
+                          <Route path="/financial-statistic" element={<FinancialStatistic />} />
+                          <Route path="/daily-notes" element={<DailyNotePage />} />
+                          <Route path="/posts" element={<PostList />} />
+                          <Route path="/posts/create" element={<PostCreate />} />
+                          <Route path="/posts/edit/:id" element={<PostEdit />} />
+                          <Route path="/tasks" element={<TaskList />} />
+                          <Route path="/tasks/create" element={<TaskCreate />} />
+                          <Route path="/tasks/edit/:id" element={<TaskEdit />} />
+                          <Route path="/projects" element={<ProjectList />} />
+                          <Route path="/projects/create" element={<ProjectCreate />} />
+                          <Route path="/projects/:id" element={<ProjectDetail />} />
+                          <Route path="/projects/edit/:id" element={<ProjectEdit />} />
+                          <Route path="/time-entries" element={<TimeEntryList />} />
+                          <Route path="/time-entries/create" element={<TimeEntryCreate />} />
+                          <Route path="/time-entries/edit/:id" element={<TimeEntryEdit />} />
+                          <Route path="/task-estimations" element={<TaskEstimationList />} />
+                          <Route path="/task-estimations/create" element={<TaskEstimationCreate />} />
+                          <Route path="/task-estimations/edit/:id" element={<TaskEstimationEdit />} />
+                          <Route path="/emergency-tickets" element={<EmergencyKitList />} />
+                          <Route path="/emergency-tickets/create" element={<EmergencyKitCreate />} />
+                          <Route path="/emergency-tickets/edit/:id" element={<EmergencyKitEdit />} />
+                          <Route path="/notion" element={<NotionPage />} />
+                          <Route path="/remote-browser" element={<RemoteBrowser />} />
+                          <Route path="/notes" element={<NoteList />} />
+                          <Route path="/notes/create" element={<NoteCreate />} />
+                          <Route path="/notes/edit/:id" element={<NoteEdit />} />
+                          <Route path="/profile" element={<ProfilePage />} />
+                          <Route path="/wish-lists" element={<WishListList />} />
+                          <Route path="/ledgers" element={<LedgerList />} />
+                          <Route path="/finance-checkin-records" element={<FinanceCheckinRecordList />} />
+                          <Route path="/configurations" element={<ConfigurationList />} />
+                          <Route path="/configurations/create" element={<ConfigurationCreate />} />
+                          <Route path="/configurations/edit/:id" element={<ConfigurationEdit />} />
+                          <Route path="/cycles" element={<CycleList />} />
+                          <Route path="/cycles/create" element={<CycleCreate />} />
+                          <Route path="/cycles/edit/:id" element={<CycleEdit />} />
 
-                      </Route>
-                      <Route
-                        element={
-                          <Authenticated
-                            key="authenticated-outer"
-                            fallback={<Outlet />}
-                          >
-                            <NavigateToResource />
-                          </Authenticated>
-                        }
-                      >
-                        <Route path="/login" element={<AuthPage type="login" />} />
-                        <Route path="/register" element={<AuthPage type="register" />} />
-                        <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
-                        <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
-                      </Route>
-                    </Routes>
-                    <RefineKbar />
-                    <UnsavedChangesNotifier />
-                    <DocumentTitleHandler />
-                  </ModalProviderWrapper>
-                </KBarProviderWrapper>
+                        </Route>
+                        <Route
+                          element={
+                            <Authenticated
+                              key="authenticated-outer"
+                              fallback={<Outlet />}
+                            >
+                              <NavigateToResource />
+                            </Authenticated>
+                          }
+                        >
+                          <Route path="/login" element={<AuthPage type="login" />} />
+                          <Route path="/register" element={<AuthPage type="register" />} />
+                          <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
+                          <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
+                        </Route>
+                      </Routes>
+                      <RefineKbar />
+                      <UnsavedChangesNotifier />
+                      <DocumentTitleHandler />
+                    </ModalProviderWrapper>
+                  </KBarProviderWrapper>
+                </TenantProvider>
               </Refine>
               <DevtoolsPanel />
             </DevtoolsProvider>

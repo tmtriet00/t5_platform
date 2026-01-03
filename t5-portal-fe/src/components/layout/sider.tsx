@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { TenantSwitcher } from "./tenant-switcher";
 import { useMenu, useLink, useList, useCreate, useUpdate } from "@refinedev/core";
 import { Configuration } from "../../interfaces/model/configuration";
 import { Layout, Menu, Grid, theme, Button, Drawer } from "antd";
@@ -150,14 +151,15 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
             : []
         ),
         ...(otherItems.length > 0
-            ? [
-                {
-                    key: "others-group",
-                    type: "group",
-                    label: favoriteItems.length > 0 ? "Others" : undefined,
-                    children: otherItems.map(createAntdMenuItem),
-                },
-            ]
+            ? (favoriteItems.length > 0
+                ? [
+                    {
+                        key: "others-submenu",
+                        label: "Others",
+                        children: otherItems.map(createAntdMenuItem),
+                    },
+                ]
+                : otherItems.map(createAntdMenuItem))
             : []),
     ];
 
@@ -200,16 +202,22 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
                     >
                         <div
                             style={{
-                                height: "64px",
+                                height: "auto",
+                                minHeight: "64px",
                                 display: "flex",
+                                flexDirection: "column",
                                 alignItems: "center",
                                 justifyContent: "center",
                                 fontSize: "14px",
                                 fontWeight: "bold",
                                 borderBottom: `1px solid ${token.colorBorderBg}`,
+                                padding: "12px"
                             }}
                         >
                             {Title && <Title collapsed={false} />}
+                            <div style={{ width: "100%", marginTop: 8 }}>
+                                <TenantSwitcher />
+                            </div>
                         </div>
                         {renderMenu()}
                     </Drawer>
@@ -238,17 +246,22 @@ export const CustomSider: React.FC<RefineThemedLayoutSiderProps> = ({
             >
                 <div
                     style={{
-                        height: "64px",
+                        height: "auto",
+                        minHeight: "64px",
                         display: "flex",
+                        flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
                         fontSize: "14px",
                         fontWeight: "bold",
-                        padding: collapsed ? "0" : "0 12px",
+                        padding: collapsed ? "12px 0" : "12px",
                         borderBottom: `1px solid ${token.colorBorderBg}`,
                     }}
                 >
                     {Title && <Title collapsed={collapsed} />}
+                    <div style={{ width: "100%", marginTop: 8, display: collapsed ? 'none' : 'block' }}>
+                        <TenantSwitcher />
+                    </div>
                 </div>
 
                 {renderMenu()}

@@ -1,26 +1,26 @@
 import { TaskSummaryDto } from "interfaces/dto/task";
 
-export const useFinancialStatistic = () => {
-    const { data: tasks, isLoading, error } = useQuery<TaskSummaryDto[], Error>({
-        queryKey: ['list_task_tracked_by_date', props.date],
-        queryFn: async () => {
-            const { data, error } = await supabaseClient.rpc("list_task_tracked_by_date", {
-                input_date: props.date,
-                timezone: "+07:00"
-            });
+// export const useFinancialStatistic = () => {
+//     const { data: tasks, isLoading, error } = useQuery<TaskSummaryDto[], Error>({
+//         queryKey: ['list_task_tracked_by_date', props.date],
+//         queryFn: async () => {
+//             const { data, error } = await supabaseClient.rpc("list_task_tracked_by_date", {
+//                 input_date: props.date,
+//                 timezone: "+07:00"
+//             });
 
-            if (error) {
-                throw error;
-            }
-            return data as TaskSummaryDto[];
-        },
-        enabled: !!props.date,
-        refetchInterval: 1000
-    });
+//             if (error) {
+//                 throw error;
+//             }
+//             return data as TaskSummaryDto[];
+//         },
+//         enabled: !!props.date,
+//         refetchInterval: 1000
+//     });
 
-    return {
-        tasks: tasks || [],
-        loading: isLoading,
-        error: error as Error | null
-    };
-};
+//     return {
+//         tasks: tasks || [],
+//         loading: isLoading,
+//         error: error as Error | null
+//     };
+// };

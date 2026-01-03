@@ -41,6 +41,9 @@ export const FinancialStatistic = () => {
         return <Spin size="large" />;
     }
 
+    const maximumExpenseAmount = financialStatistics?.[0].maximum_expense_amount ?? 0
+    const maximumExpenseCurrency = financialStatistics?.[0]?.maximum_expense_currency ?? 'VND'
+
     return (
         <div style={{ padding: '24px' }}>
             {/* Top Section */}
@@ -56,7 +59,12 @@ export const FinancialStatistic = () => {
 
                 {/* Right: Empty Card */}
                 <Col xs={24} md={12}>
-                    <Card title="Future Statistic" style={{ height: '100%', minHeight: '500px' }}>
+                    <Card title="Future Statistic" style={{ height: '100%', minHeight: '500px' }} extra={<div>
+                        <div>
+                            <span>Maximum Expense Amount:</span>
+                            <span>{maximumExpenseAmount} {maximumExpenseCurrency}</span>
+                        </div>
+                    </div>}>
                         {/* Empty for now */}
                     </Card>
                 </Col>

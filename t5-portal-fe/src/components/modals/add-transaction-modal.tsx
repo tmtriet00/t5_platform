@@ -38,7 +38,7 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
     const [isLoading, setIsLoading] = useState(false);
     const { mutate: createTransaction } = useCreate();
 
-    const handleSubmit = async (values: { amount: number; currency: string; type: string; description: string }) => {
+    const handleSubmit = async (values: { amount: number; currency: string; type: string; category: string; description: string }) => {
         if (!ledgerId) return;
         setIsLoading(true);
 
@@ -49,6 +49,7 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
                 amount: values.amount,
                 currency: values.currency,
                 type: values.type,
+                category: values.category,
                 description: values.description,
             },
         }, {
@@ -79,7 +80,7 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
-                initialValues={{ currency: 'VND', type: 'debit' }}
+                initialValues={{ currency: 'VND', type: 'debit', category: 'default' }}
             >
                 <Form.Item
                     name="amount"
@@ -105,6 +106,17 @@ export const AddTransactionModal = React.forwardRef<AddTransactionModalRef, AddT
                     <Select>
                         <Select.Option value="credit">Credit</Select.Option>
                         <Select.Option value="debit">Debit</Select.Option>
+                    </Select>
+                </Form.Item>
+
+                <Form.Item
+                    name="category"
+                    label="Category"
+                    rules={[{ required: true, message: "Please select category" }]}
+                >
+                    <Select>
+                        <Select.Option value="default">Default</Select.Option>
+                        <Select.Option value="transfer_only">Transfer Only</Select.Option>
                     </Select>
                 </Form.Item>
 

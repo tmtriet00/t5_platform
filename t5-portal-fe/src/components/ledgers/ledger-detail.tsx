@@ -102,6 +102,16 @@ export const LedgerDetail: React.FC<LedgerDetailProps> = ({ data }) => {
             }
         },
         {
+            field: "category",
+            headerName: "Category",
+            editable: true,
+            width: 120,
+            cellEditor: 'agSelectCellEditor',
+            cellEditorParams: {
+                values: ['default', 'transfer_only']
+            },
+        },
+        {
             field: "description",
             headerName: "Description",
             editable: true,

@@ -23,7 +23,28 @@ const CreateButton = (props: any) => {
 export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading, projectId }) => {
     const { mutate: mutateCreate } = useCreate();
     const { mutate: mutateUpdate } = useUpdate();
-    const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list');
+    const [filterType, setFilterType] = useState<string>('high_risk');
+
+    const filteredData = useMemo(() => {
+        if (!rowData) return [];
+
+        return rowData.filter((task) => {
+            if (filterType === 'all') return true;
+
+            const isCompleted = task.status === 'completed';
+
+            // Risk filters (High, Medium, Low) - exclude completed tasks
+            if (filterType === 'high_risk') return task.risk_type === 'high' && !isCompleted;
+            if (filterType === 'medium_risk') return task.risk_type === 'medium' && !isCompleted;
+            if (filterType === 'low_risk') return task.risk_type === 'low' && !isCompleted;
+
+            // Status filters
+            if (filterType === 'in_progress') return task.status === 'in_progress';
+            if (filterType === 'completed') return task.status === 'completed';
+
+            return true;
+        });
+    }, [rowData, filterType]);
 
     const { options } = useSelect({
         resource: "projects",
@@ -178,6 +199,9 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     case "blocked":
                         color = "red";
                         break;
+                    case "canceled":
+                        color = "default";
+                        break;
                 }
 
                 return <Tag color={color}>{params.value}</Tag>;
@@ -220,14 +244,18 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         <div style={{ height: 600, width: '100%' }}>
             <Segmented
                 options={[
-                    { label: 'List', value: 'list', icon: <FilterOutlined /> },
-                    { label: 'Timeline', value: 'timeline', icon: <FilterOutlined /> },
+                    { label: 'High Risk', value: 'high_risk' },
+                    { label: 'Medium Risk', value: 'medium_risk' },
+                    { label: 'Low Risk', value: 'low_risk' },
+                    { label: 'In Progress Task', value: 'in_progress' },
+                    { label: 'Completed Task', value: 'completed' },
+                    { label: 'All Task', value: 'all' },
                 ]}
-                value={viewMode}
-                onChange={(value) => setViewMode(value as 'list' | 'timeline')}
+                value={filterType}
+                onChange={(value) => setFilterType(value as string)}
             />
             <AgGridReact
-                rowData={rowData}
+                rowData={filteredData}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
                 pagination={true}

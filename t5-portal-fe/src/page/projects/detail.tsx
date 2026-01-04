@@ -5,6 +5,7 @@ import { useOne, useList, HttpError } from "@refinedev/core";
 import { useState } from "react";
 import { TaskListTable } from "../../components/tasks/task-list-table";
 import { ProjectTimeline } from "../../components/projects/project-timeline";
+import { LinkOutlined } from "@ant-design/icons";
 
 const { useToken } = theme;
 
@@ -77,8 +78,13 @@ export const ProjectDetail = () => {
         <div>
             <Card
                 title={
-                    <div>
+                    <div className="flex gap-1">
                         <span>Project: <span style={{ color: token.colorPrimary }}>{project?.name}</span></span>
+                        {
+                            project?.reference_link && (
+                                <LinkOutlined style={{ color: token.colorPrimary }} onClick={() => window.open(project?.reference_link, "_blank")} />
+                            )
+                        }
                     </div>
                 }
                 tabList={items}

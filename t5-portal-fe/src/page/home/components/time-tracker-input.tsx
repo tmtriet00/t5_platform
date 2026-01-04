@@ -52,6 +52,12 @@ export const TimeTrackerInput: React.FC = () => {
           options={(() => {
             const filteredTasks = query.data?.data.filter(task => {
               if (activeTab === 'all') return true;
+              if (activeTab === 'in_progress') return task.status === 'in_progress';
+              if (activeTab === 'completed') return task.status === 'completed';
+              // For risk tabs, filter out completed tasks
+              if (activeTab === 'high' || activeTab === 'medium' || activeTab === 'low') {
+                return task.risk_type === activeTab && task.status !== 'completed';
+              }
               return task.risk_type === activeTab;
             }) || [];
 
@@ -98,6 +104,8 @@ export const TimeTrackerInput: React.FC = () => {
                   { key: 'high', label: 'High risk' },
                   { key: 'medium', label: 'Medium risk' },
                   { key: 'low', label: 'Low risk' },
+                  { key: 'in_progress', label: 'In Progress' },
+                  { key: 'completed', label: 'Completed' },
                   { key: 'all', label: 'All task' },
                 ]}
                 onTabClick={(_key, e) => {

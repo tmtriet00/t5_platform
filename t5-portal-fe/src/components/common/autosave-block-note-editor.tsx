@@ -113,6 +113,17 @@ export const AutosaveBlockNoteEditor: React.FC<AutosaveBlockNoteEditorProps> = (
         unsaved: '#faad14',
     };
 
+    // Bind to editor changes directly for more reliable updates
+    useEffect(() => {
+        if (editor) {
+            // Subscribe to document updates
+            const unsubscribe = editor.onChange(() => {
+                handleEditorChange();
+            });
+            return unsubscribe; // Cleanup subscription
+        }
+    }, [editor, handleEditorChange]);
+
     return (
         <div>
             {autosave && (
@@ -133,7 +144,6 @@ export const AutosaveBlockNoteEditor: React.FC<AutosaveBlockNoteEditorProps> = (
             <BlockNoteView
                 theme="dark"
                 editor={editor}
-                onChange={handleEditorChange}
                 style={{ minHeight: 150, backgroundColor: '#1a1a1a' }}
             />
         </div>

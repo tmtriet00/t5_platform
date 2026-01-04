@@ -91,6 +91,16 @@ export const TimeTrackerInput: React.FC = () => {
               ]
             }
 
+            if (taskOptions.length === 0) {
+              return [
+                {
+                  value: 'NO_TASK_FOUND',
+                  label: <div className="text-gray-400 p-2 text-center">No tasks found</div>,
+                  disabled: true
+                }
+              ]
+            }
+
             return taskOptions;
           })()}
           dropdownRender={(menu) => (

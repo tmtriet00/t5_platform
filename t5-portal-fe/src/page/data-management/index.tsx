@@ -8,21 +8,24 @@ const { Title, Text, Paragraph } = Typography;
 const { Dragger } = Upload;
 
 export const DataManagementPage: React.FC = () => {
-    const { tenant } = useTenant();
+    const { selectedTenants } = useTenant();
     const [exportLoading, setExportLoading] = useState(false);
     const [importLoading, setImportLoading] = useState(false);
     const [modal, contextHolder] = Modal.useModal();
 
+    const isSingleTenant = selectedTenants.length === 1;
+    const currentTenant = isSingleTenant ? selectedTenants[0] : null;
+
     const handleExport = async () => {
-        if (!tenant) {
-            message.error("No tenant selected");
+        if (!currentTenant) {
+            message.error("Please select exactly one tenant for export");
             return;
         }
 
         try {
             setExportLoading(true);
             const { data, error } = await supabaseClient.rpc("export_tenant_data", {
-                target_tenant_code: tenant.code,
+                target_tenant_code: currentTenant.code,
             });
 
             if (error) throw error;
@@ -31,7 +34,7 @@ export const DataManagementPage: React.FC = () => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `tenant_data_backup_${tenant.code}_${new Date().toISOString()}.json`;
+            a.download = `tenant_data_backup_${currentTenant.code}_${new Date().toISOString()}.json`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -46,30 +49,24 @@ export const DataManagementPage: React.FC = () => {
     };
 
     const handleImport = (file: File) => {
-        console.log("HELLO>>>")
-        if (!tenant) {
-            message.error("No tenant selected");
+        if (!currentTenant) {
+            message.error("Please select exactly one tenant for import");
             return false;
         }
-        console.log("HELLO 1>>>")
 
         const hide = message.loading("Reading file...", 0);
         const reader = new FileReader();
 
-        console.log("HELLO 2>>>")
-
         reader.onload = async (e) => {
-            console.log("HELLO 3>>>")
             hide();
             try {
                 const jsonContent = JSON.parse(e.target?.result as string);
-                console.log("HELLO 4>>>", jsonContent)
                 modal.confirm({
                     title: "Are you sure you want to overwrite ALL data?",
                     icon: <WarningOutlined style={{ color: "red" }} />,
                     content: (
                         <div>
-                            <p>This action will <b>PERMANENTLY DELETE</b> all existing data for tenant <b>{tenant.code}</b> and replace it with the data from the file.</p>
+                            <p>This action will <b>PERMANENTLY DELETE</b> all existing data for tenant <b>{currentTenant.code}</b> and replace it with the data from the file.</p>
                             <p>This action cannot be undone.</p>
                         </div>
                     ),
@@ -80,7 +77,7 @@ export const DataManagementPage: React.FC = () => {
                         try {
                             setImportLoading(true);
                             const { error } = await supabaseClient.rpc("import_tenant_data", {
-                                target_tenant_code: tenant.code,
+                                target_tenant_code: currentTenant.code,
                                 data: jsonContent,
                             });
 
@@ -110,6 +107,20 @@ export const DataManagementPage: React.FC = () => {
         return false; // Prevent default upload behavior immediately
     };
 
+    if (!isSingleTenant) {
+        return (
+            <div style={{ padding: "24px" }}>
+                <Title level={2}>Data Management</Title>
+                <Alert
+                    message="Multiple Tenants Selected"
+                    description="Data management operations (Export/Import) require exactly one tenant to be selected. Please select a single tenant from the switcher."
+                    type="warning"
+                    showIcon
+                />
+            </div>
+        );
+    }
+
     return (
         <div style={{ padding: "24px" }}>
             {contextHolder}
@@ -121,7 +132,7 @@ export const DataManagementPage: React.FC = () => {
             <Space direction="vertical" size="large" style={{ width: "100%" }}>
                 <Card title="Export Data" bordered={false}>
                     <Space direction="vertical">
-                        <Text>Download a JSON file containing all data for the current tenant ({tenant?.code}).</Text>
+                        <Text>Download a JSON file containing all data for the current tenant ({currentTenant?.code}).</Text>
                         <Button
                             type="primary"
                             icon={<DownloadOutlined />}

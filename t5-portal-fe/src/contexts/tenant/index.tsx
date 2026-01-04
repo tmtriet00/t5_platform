@@ -13,8 +13,8 @@ export interface Tenant {
 }
 
 interface TenantContextType {
-    tenant: Tenant | null;
-    setTenant: (tenant: Tenant) => void;
+    selectedTenants: Tenant[];
+    setSelectedTenants: (tenants: Tenant[]) => void;
     tenants: Tenant[];
     loading: boolean;
 }
@@ -24,11 +24,27 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 export const TenantProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
-    const [tenant, setTenantState] = useState<Tenant | null>(() => {
-        const saved = localStorage.getItem("current_tenant_code");
-        return saved ? { code: saved, name: saved } : null;
-        // We only have code initally, will update name when tenants are loaded if needed
-        // But for now, simple object is enough to start.
+    const [selectedTenants, setSelectedTenantsState] = useState<Tenant[]>(() => {
+        const saved = localStorage.getItem("selected_tenant_codes");
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed)) {
+                    return parsed.map((code: string) => ({ code, name: code }));
+                }
+            } catch (e) {
+                // Fallback to legacy single tenant if JSON parse fails
+                return [{ code: saved, name: saved }];
+            }
+        }
+
+        // Fallback for migration from single tenant key
+        const singleSaved = localStorage.getItem("current_tenant_code");
+        if (singleSaved) {
+            return [{ code: singleSaved, name: singleSaved }];
+        }
+
+        return [];
     });
 
     const { query } = useList<Tenant>({
@@ -42,37 +58,40 @@ export const TenantProvider: React.FC<{ children: ReactNode }> = ({
     const tenants = data?.data || [];
 
     useEffect(() => {
-        if (tenant && tenants.length > 0) {
-            // Validation: ensure current tenant actually exists in the list
-            const found = tenants.find(t => t.code === tenant.code);
-            if (found) {
-                if (found.name !== tenant.name) {
-                    setTenantState(found);
-                }
-            } else {
-                // If stored tenant not found, maybe reset? or keep it (maybe user has access to hidden tenant?)
-                // For safety, let's keep it but maybe warn? 
-                // Better behavior: if not found, don't change anything, wait for user to switch.
+        if (selectedTenants.length > 0 && tenants.length > 0) {
+            // Update names of selected tenants from the loaded list
+            const updatedSelection = selectedTenants.map(selected => {
+                const found = tenants.find(t => t.code === selected.code);
+                return found ? found : selected;
+            });
+
+            // Only update if names changed
+            const hasChanges = updatedSelection.some((u, i) => u.name !== selectedTenants[i].name);
+            if (hasChanges) {
+                setSelectedTenantsState(updatedSelection);
             }
-        } else if (!tenant && tenants.length > 0) {
+        } else if (selectedTenants.length === 0 && tenants.length > 0) {
             // Auto select first tenant if none selected
             const first = tenants[0];
-            setTenantState(first);
-            localStorage.setItem("current_tenant_code", first.code);
+            setSelectedTenantsState([first]);
+            localStorage.setItem("selected_tenant_codes", JSON.stringify([first.code]));
         }
-    }, [tenants, tenant]); // Check dependencies carefully
+    }, [tenants, selectedTenants]);
 
-    const setTenant = (t: Tenant) => {
-        setTenantState(t);
-        localStorage.setItem("current_tenant_code", t.code);
-        window.location.reload(); // Force reload to ensure data provider picks up new tenant
+    const setSelectedTenants = (t: Tenant[]) => {
+        setSelectedTenantsState(t);
+        const codes = t.map(tenant => tenant.code);
+        localStorage.setItem("selected_tenant_codes", JSON.stringify(codes));
+        // Remove legacy key to avoid confusion
+        localStorage.removeItem("current_tenant_code");
+        window.location.reload();
     };
 
     return (
         <TenantContext.Provider
             value={{
-                tenant,
-                setTenant,
+                selectedTenants,
+                setSelectedTenants,
                 tenants,
                 loading: isLoading,
             }}

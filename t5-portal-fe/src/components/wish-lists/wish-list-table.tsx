@@ -183,6 +183,7 @@ export const WishListTable: React.FC<WishListTableProps> = ({ rowData, isLoading
     return (
         <div style={{ height: 600, width: '100%' }}>
             <AgGridReact
+                key="wish-list-table"
                 rowData={rowData}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}

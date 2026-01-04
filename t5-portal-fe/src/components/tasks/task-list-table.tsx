@@ -255,6 +255,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 onChange={(value) => setFilterType(value as string)}
             />
             <AgGridReact
+                key="task-list-table"
                 rowData={filteredData}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}

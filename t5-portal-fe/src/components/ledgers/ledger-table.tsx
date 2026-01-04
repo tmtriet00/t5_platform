@@ -125,6 +125,7 @@ export const LedgerTable: React.FC<LedgerTableProps> = ({ rowData, isLoading }) 
     return (
         <div style={{ height: 600, width: '100%' }}>
             <AgGridReact
+                key="ledger-table"
                 rowData={rowData}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}

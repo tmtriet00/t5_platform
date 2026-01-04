@@ -68,6 +68,7 @@ import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./pag
 import { CycleCreate, CycleEdit, CycleList } from "./page/cycles";
 import FileToVideoPage from "./page/file-to-video";
 import { DataManagementPage } from "./page/data-management";
+import { GlobalTableTenantInjector } from "./components/common/global-table-tenant-injector";
 
 
 
@@ -248,6 +249,7 @@ function App() {
                 }}
               >
                 <TenantProvider>
+                  <GlobalTableTenantInjector />
                   <KBarProviderWrapper>
                     <ModalProviderWrapper>
                       <Routes>

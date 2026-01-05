@@ -4,7 +4,7 @@ import { useCallback, useState, useEffect } from "react";
 import { Button, Select, message } from "antd";
 import { useList, useOne } from "@refinedev/core";
 import { Project } from "../../interfaces/model/project";
-import { correctParentDates } from "../../utility/gantt";
+import { extendTask } from "../../utility/gantt";
 import "./willow-custom.css";
 import { supabaseClient } from "../../utility/supabaseClient";
 
@@ -124,7 +124,7 @@ export const GanttChart = () => {
 
         if (Array.isArray(currentTasks)) {
             const tasksCopy = JSON.parse(JSON.stringify(currentTasks));
-            const newTasks = correctParentDates(tasksCopy);
+            const newTasks = extendTask(tasksCopy);
 
             setTasks(newTasks);
             // Updating tasks triggers re-render of Gantt, good.

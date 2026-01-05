@@ -1,6 +1,6 @@
 import { ITask } from "@svar-ui/react-gantt";
 
-export const correctParentDates = (tasks: ITask[]) => {
+export const extendTask = (tasks: ITask[]) => {
     const taskMap = new Map<string | number, ITask>();
     tasks.forEach(t => {
         if (t.id) taskMap.set(t.id, t);
@@ -57,20 +57,30 @@ export const correctParentDates = (tasks: ITask[]) => {
         });
 
         if (minStart !== null) {
-            task.start = new Date(minStart);
+            const currentStart = getDate(task.start)?.getTime();
+            // Only extend if child starts earlier than parent
+            if (currentStart === undefined || currentStart === null || isNaN(currentStart) || minStart < currentStart) {
+                task.start = new Date(minStart);
+            }
         }
         if (maxEnd !== null) {
-            task.end = new Date(maxEnd);
+            const currentEnd = getDate(task.end)?.getTime();
+            // Only extend if child ends later than parent
+            if (currentEnd === undefined || currentEnd === null || isNaN(currentEnd) || maxEnd > currentEnd) {
+                task.end = new Date(maxEnd);
+            }
         }
 
-        if (minStart !== null && maxEnd !== null) {
-            const diffTime = Math.abs(maxEnd - minStart);
+        // Recalculate duration based on new (or existing) start/end
+        const finalStart = getDate(task.start)?.getTime();
+        const finalEnd = getDate(task.end)?.getTime();
+
+        if (finalStart !== undefined && finalStart !== null && !isNaN(finalStart) &&
+            finalEnd !== undefined && finalEnd !== null && !isNaN(finalEnd)) {
+            const diffTime = Math.abs(finalEnd - finalStart);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             task.duration = diffDays;
         }
-
-        // Also ensure duration is consistent if needed, but standard usually computes it or allows mismatch.
-        // We just leave it as requested.
 
         processed.add(taskId);
     };

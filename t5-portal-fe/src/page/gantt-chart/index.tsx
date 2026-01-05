@@ -88,7 +88,8 @@ export const GanttChart = () => {
         const { error } = await supabaseClient
             .from("projects")
             .update({ plan: planData })
-            .eq("id", selectedProjectId);
+            .eq("id", selectedProjectId)
+            .select();
 
         if (error) {
             console.error("Error saving Gantt data:", error);
@@ -101,15 +102,17 @@ export const GanttChart = () => {
     useEffect(() => {
         if (api && selectedProjectId) {
             const interval = setInterval(() => {
-                const store = api.getStores();
+                setTimeout(() => {
+                    const store = api.getStores();
 
-                const t = store?.data?._values?._tasks;
-                const l = store?.data?._values?._links;
+                    const t = store?.data?._values?._tasks;
+                    const l = store?.data?._values?._links;
 
-                if (t || l) {
-                    saveToProject(t, l);
-                }
-            }, 1000); // Check every second
+                    if (t || l) {
+                        saveToProject(t, l);
+                    }
+                }, 500);
+            }, 500); // Check every second
 
             return () => clearInterval(interval);
         }

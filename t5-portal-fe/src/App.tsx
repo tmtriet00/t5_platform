@@ -46,12 +46,15 @@ import { LedgerList } from "./page/ledgers/list";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
+import { GanttChart } from "./page/gantt-chart";
 
 import { AllEnterpriseModule as AgChartsAllEnterpriseModule, ModuleRegistry as AgChartsModuleRegistry } from 'ag-charts-enterprise';
 
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
+import "@svar-ui/react-gantt/all.css";
+
 
 ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 AgChartsModuleRegistry.registerModules([AgChartsAllEnterpriseModule]);
@@ -68,8 +71,10 @@ import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./pag
 import { CycleCreate, CycleEdit, CycleList } from "./page/cycles";
 import FileToVideoPage from "./page/file-to-video";
 import { DataManagementPage } from "./page/data-management";
-
-
+import { ContextMenu, Editor, Gantt, Willow, WillowDark } from "@svar-ui/react-gantt";
+import { useCallback, useState } from "react";
+import { HashRouter, NavLink, Router, useNavigate } from 'react-router-dom';
+import { Globals, Button, Segmented } from '@svar-ui/react-core';
 
 
 function App() {
@@ -87,6 +92,10 @@ function App() {
                   {
                     name: "home",
                     list: "/home",
+                  },
+                  {
+                    name: "gantt-chart",
+                    list: "/gantt-chart",
                   },
                   {
                     name: "financial-statistic",
@@ -277,6 +286,7 @@ function App() {
                         >
                           <Route index element={<Navigate to="/home" replace />} />
                           <Route path="/home" element={<Home />} />
+                          <Route path="/gantt-chart" element={<GanttChart />} />
                           <Route path="/financial-statistic" element={<FinancialStatistic />} />
                           <Route path="/daily-notes" element={<DailyNotePage />} />
                           <Route path="/posts" element={<PostList />} />
@@ -347,6 +357,7 @@ function App() {
       </RefineKbarProvider>
     </BrowserRouter>
   );
+
 }
 
 export default App;

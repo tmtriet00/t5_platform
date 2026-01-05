@@ -3,4 +3,5 @@ export interface Project {
     name: string;
     color: string;
     reference_link?: string;
+    plan?: any;
 }

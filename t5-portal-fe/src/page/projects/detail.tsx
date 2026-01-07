@@ -6,6 +6,7 @@ import { useState } from "react";
 import { TaskListTable } from "../../components/tasks/task-list-table";
 import { ProjectTimeline } from "../../components/projects/project-timeline";
 import { LinkOutlined } from "@ant-design/icons";
+import { ProjectNote } from "../../components/projects/project-note";
 
 const { useToken } = theme;
 
@@ -49,8 +50,8 @@ export const ProjectDetail = () => {
             tab: "Overview",
         },
         {
-            key: "brainstorm",
-            tab: "Brainstorm",
+            key: "note",
+            tab: "Note",
         },
     ]
 
@@ -71,7 +72,7 @@ export const ProjectDetail = () => {
                 </div>
             );
         }
-        return <div>Brainstorm Content</div>;
+        return <ProjectNote projectId={project?.id} noteId={project?.note_id} />;
     };
 
     return (

@@ -3,5 +3,6 @@ export interface Project {
     name: string;
     color: string;
     reference_link?: string;
+    note_id?: string;
     plan?: any;
 }

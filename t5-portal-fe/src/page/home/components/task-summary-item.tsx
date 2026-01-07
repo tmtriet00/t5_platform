@@ -22,6 +22,7 @@ import { TaskDetail } from './task-detail';
 import { ModalProviderService } from 'components/modals/modal-provider-wrapper';
 import { roundDecimal } from 'utility/number';
 import { TaskTags } from './task-tags';
+import { useStartTrackingTask } from '../hooks/use-start-tracking';
 
 const { Text } = Typography;
 
@@ -32,6 +33,7 @@ interface TaskSummaryItemProps {
 export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
   const [expanded, setExpanded] = useState(false);
   const [riskTypeModalOpen, setRiskTypeModalOpen] = useState(false);
+  const useStartTrackingReturn = useStartTrackingTask();
   const useStopTrackingReturn = useStopTrackingTask();
   const { mutate: updateTask } = useUpdate();
   const invalidate = useInvalidate();
@@ -260,7 +262,13 @@ export const TaskSummaryItem: React.FC<TaskSummaryItemProps> = ({ task }) => {
                 ) : (
                   <CaretRightOutlined className="text-gray-400 text-xl hover:text-blue-500 transition-colors" />
                 )}
-                onClick={() => useStopTrackingReturn.mutate({ task })}
+                onClick={() => {
+                  if (task.tags?.includes('active')) {
+                    useStopTrackingReturn.mutate({ task });
+                  } else {
+                    useStartTrackingReturn.mutate({ task });
+                  }
+                }}
               />
             </div>
 

@@ -1,0 +1,1 @@
+alter table projects add column note_id uuid references notes;

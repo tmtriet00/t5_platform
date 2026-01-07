@@ -2,6 +2,7 @@ import { Tabs, Spin } from 'antd';
 import { TabsProps } from 'antd';
 import { TaskDetailEditor } from './task-detail-editor';
 import { TrackingList } from './tracking-list';
+import { TaskEstimationHistory } from './task-estimation-history';
 import { useOne } from '@refinedev/core';
 import { Task } from 'interfaces';
 
@@ -38,8 +39,8 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId }) => {
         },
         {
             key: '3',
-            label: 'Tab 3',
-            children: 'Content of Tab Pane 3',
+            label: 'Estimation History',
+            children: <TaskEstimationHistory taskId={taskId} />,
         },
     ];
 

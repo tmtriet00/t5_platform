@@ -61,13 +61,22 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     }, [options]);
 
     const handleCreate = useCallback(() => {
+        let defaultRisk = "low";
+        let defaultStatus = "new";
+
+        if (filterType === 'high_risk') defaultRisk = "high";
+        else if (filterType === 'medium_risk') defaultRisk = "medium";
+        else if (filterType === 'low_risk') defaultRisk = "low";
+
+        if (filterType === 'in_progress') defaultStatus = "in_progress";
+
         mutateCreate({
             resource: "tasks",
             values: {
                 name: "New Task",
                 project_id: projectId ?? null,
-                status: "new",
-                risk_type: "low"
+                status: defaultStatus,
+                risk_type: defaultRisk
             },
             successNotification: () => {
                 return {
@@ -77,7 +86,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 };
             },
         });
-    }, [mutateCreate, projectId]);
+    }, [mutateCreate, projectId, filterType]);
 
     const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
         const { data, colDef, newValue } = event;

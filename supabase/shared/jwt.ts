@@ -1,6 +1,4 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import { createClient } from 'npm:@supabase/supabase-js@2'
-
 /**
  * Extracts the client IP address from the request headers
  * Checks x-forwarded-for first (standard for Supabase Edge Functions), then x-real-ip
@@ -56,9 +54,12 @@ export async function AuthMiddleware(
     try {
         // Check IP restriction
         const clientIP = getClientIP(req);
+        const edgeFunctionAuth = req.headers.get('x-edge-function-auth');
 
-        if (!isIPAllowed(clientIP)) {
-            console.warn("IP Restriction: Blocked request from IP:", clientIP || "unknown");
+        if (!isIPAllowed(clientIP) && edgeFunctionAuth !== Deno.env.get('EDGE_FUNCTION_AUTH')) {
+            console.warn("Blocked request from IP:", clientIP);
+            console.warn("IP allow status: " + isIPAllowed(clientIP));
+            console.warn("Edge function auth allow status: " + edgeFunctionAuth === Deno.env.get('EDGE_FUNCTION_AUTH'));
 
             return Response.json({
                 error: "Access denied",
@@ -70,14 +71,9 @@ export async function AuthMiddleware(
 
         return await next(req)
     } catch (e) {
-        console.error("JWT Validation Error:", e);
-        console.error("Error name:", e?.name);
-        console.error("Error message:", e?.message);
-
         return Response.json({
             msg: e?.toString(),
-            error: e?.message,
-            name: e?.name
+            error: e,
         }, {
             status: 401,
         });

@@ -1,15 +1,14 @@
-import { Authenticated, GitHubBanner, Refine, WelcomePage } from "@refinedev/core";
+import { Authenticated, Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
 import {
-  useNotificationProvider,
-  ThemedLayout,
-  ThemedSider,
   AuthPage,
+  ThemedLayout,
+  useNotificationProvider
 } from "@refinedev/antd";
-import { CustomSider } from "./components/layout/sider";
 import "@refinedev/antd/dist/reset.css";
+import { CustomSider } from "./components/layout/sider";
 
 import routerProvider, {
   CatchAllNavigate,
@@ -17,36 +16,36 @@ import routerProvider, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import { dataProvider, liveProvider } from "@refinedev/supabase";
-import { App as AntdApp } from "antd";
-import { BrowserRouter, Route, Routes, Outlet, Navigate } from "react-router";
-import authProvider from "./authProvider";
-import { Header } from "./components/header";
-import { ColorModeContextProvider } from "./contexts/color-mode";
-import { supabaseClient } from "./utility";
-import { tenantDataProvider } from "./utility/tenant-data-provider";
-import { TenantProvider } from "./contexts/tenant";
-import { PostCreate, PostEdit, PostList } from "./page/posts";
-import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
-import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
-import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entries";
-import { TaskEstimationCreate, TaskEstimationEdit, TaskEstimationList } from "./page/task_estimations";
-import { EmergencyKitCreate, EmergencyKitEdit, EmergencyKitList } from "./page/emergency-tickets";
-import Home from "./page/home";
-import { NotionPage } from "./page/notion";
-import { RemoteBrowser } from "./page/remote-browser";
-import { KBarProviderWrapper } from "./components/kbar";
-import { ProjectDetail } from "./page/projects/detail";
-import { ProfilePage } from "./page/profile";
-import { MfaVerifyPage } from "./page/mfa-verify";
-import { NoteCreate, NoteEdit, NoteList } from "./page/notes";
-import { DailyNotePage } from "./page/daily-notes";
-import { WishListList } from "./page/wish-lists/list";
-import { LedgerList } from "./page/ledgers/list";
+import { liveProvider } from "@refinedev/supabase";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
+import { App as AntdApp } from "antd";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router";
+import authProvider from "./authProvider";
+import { Header } from "./components/header";
+import { KBarProviderWrapper } from "./components/kbar";
 import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
+import { ColorModeContextProvider } from "./contexts/color-mode";
+import { TenantProvider } from "./contexts/tenant";
+import { DailyNotePage } from "./page/daily-notes";
+import { EmergencyKitCreate, EmergencyKitEdit, EmergencyKitList } from "./page/emergency-tickets";
 import { GanttChart } from "./page/gantt-chart";
+import Home from "./page/home";
+import { LedgerList } from "./page/ledgers/list";
+import { MfaVerifyPage } from "./page/mfa-verify";
+import { NoteCreate, NoteEdit, NoteList } from "./page/notes";
+import { NotionPage } from "./page/notion";
+import { PostCreate, PostEdit, PostList } from "./page/posts";
+import { ProfilePage } from "./page/profile";
+import { ProjectCreate, ProjectEdit, ProjectList } from "./page/projects";
+import { ProjectDetail } from "./page/projects/detail";
+import { RemoteBrowser } from "./page/remote-browser";
+import { TaskEstimationCreate, TaskEstimationEdit, TaskEstimationList } from "./page/task_estimations";
+import { TaskCreate, TaskEdit, TaskList } from "./page/tasks";
+import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entries";
+import { WishListList } from "./page/wish-lists/list";
+import { supabaseClient } from "./utility";
+import { tenantDataProvider } from "./utility/tenant-data-provider";
 
 import { AllEnterpriseModule as AgChartsAllEnterpriseModule, ModuleRegistry as AgChartsModuleRegistry } from 'ag-charts-enterprise';
 
@@ -60,21 +59,18 @@ ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 AgChartsModuleRegistry.registerModules([AgChartsAllEnterpriseModule]);
 
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { FinancialStatistic } from "page/financial-statistic";
+import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./page/configurations";
+import { CycleCreate, CycleEdit, CycleList } from "./page/cycles";
+import { DataManagementPage } from "./page/data-management";
+import FileToVideoPage from "./page/file-to-video";
+import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
+import { CalendarPage } from "page/calendar";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
-import { ConfigurationCreate, ConfigurationEdit, ConfigurationList } from "./page/configurations";
-import { CycleCreate, CycleEdit, CycleList } from "./page/cycles";
-import FileToVideoPage from "./page/file-to-video";
-import { DataManagementPage } from "./page/data-management";
-import { ContextMenu, Editor, Gantt, Willow, WillowDark } from "@svar-ui/react-gantt";
-import { useCallback, useState } from "react";
-import { HashRouter, NavLink, Router, useNavigate } from 'react-router-dom';
-import { Globals, Button, Segmented } from '@svar-ui/react-core';
 
 
 function App() {
@@ -96,6 +92,10 @@ function App() {
                   {
                     name: "gantt-chart",
                     list: "/gantt-chart",
+                  },
+                  {
+                    name: "calendar",
+                    list: "/calendar",
                   },
                   {
                     name: "financial-statistic",
@@ -286,6 +286,7 @@ function App() {
                         >
                           <Route index element={<Navigate to="/home" replace />} />
                           <Route path="/home" element={<Home />} />
+                          <Route path="/calendar" element={<CalendarPage />} />
                           <Route path="/gantt-chart" element={<GanttChart />} />
                           <Route path="/financial-statistic" element={<FinancialStatistic />} />
                           <Route path="/daily-notes" element={<DailyNotePage />} />

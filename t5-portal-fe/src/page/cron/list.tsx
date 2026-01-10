@@ -1,13 +1,14 @@
 import {
     List,
-    useTable,
-    BooleanField,
 } from "@refinedev/antd";
-import { Table, Switch, Button, Modal, Input, message } from "antd";
+import { useList } from "@refinedev/core";
+import { Switch, Button, Modal, Input, message, Tag } from "antd";
 import { EditOutlined } from "@ant-design/icons";
+import { AgGridReact } from 'ag-grid-react';
+import { ColDef } from 'ag-grid-community';
+import { useMemo, useState } from "react";
 import { Cron } from "interfaces";
 import { supabaseClient } from "../../utility";
-import { useState } from "react";
 
 export const CronList: React.FC = () => {
     const [editModalVisible, setEditModalVisible] = useState(false);
@@ -15,16 +16,18 @@ export const CronList: React.FC = () => {
     const [newSchedule, setNewSchedule] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const { tableProps, tableQuery } = useTable<Cron>({
+    const { query } = useList<Cron>({
         resource: "cron",
-        pagination: {
-            mode: "off",
-        },
-        sorters: {
-
-        },
+        sorters: [
+            {
+                field: "jobid",
+                order: "desc",
+            },
+        ],
     });
 
+    const { data: listData, isLoading, refetch } = query;
+    const rowData = listData?.data || [];
 
     const handleToggleActive = async (jobid: number, currentActive: boolean) => {
         try {
@@ -38,7 +41,7 @@ export const CronList: React.FC = () => {
                 message.error(`Failed to toggle cron: ${error.message}`);
             } else {
                 message.success("Cron status updated successfully");
-                tableQuery.refetch();
+                refetch();
             }
         } catch (err) {
             message.error("Failed to toggle cron");
@@ -66,7 +69,7 @@ export const CronList: React.FC = () => {
             } else {
                 message.success("Schedule updated successfully");
                 setEditModalVisible(false);
-                tableQuery.refetch();
+                refetch();
             }
         } catch (err) {
             message.error("Failed to update schedule");
@@ -75,55 +78,85 @@ export const CronList: React.FC = () => {
         }
     };
 
+    const columnDefs = useMemo<ColDef<Cron>[]>(() => [
+        {
+            field: "jobid",
+            headerName: "ID",
+            sortable: true,
+            filter: true,
+            width: 80,
+        },
+        {
+            field: "jobname",
+            headerName: "Name",
+            sortable: true,
+            filter: true,
+            flex: 1,
+        },
+        {
+            field: "schedule",
+            headerName: "Schedule",
+            sortable: true,
+            filter: true,
+            width: 150,
+        },
+        {
+            field: "command",
+            headerName: "Command",
+            filter: true,
+            flex: 2,
+        },
+        {
+            field: "active",
+            headerName: "Active",
+            width: 100,
+            cellRenderer: (params: any) => (
+                <Switch
+                    checked={params.value}
+                    onChange={() => handleToggleActive(params.data.jobid, params.value)}
+                />
+            )
+        },
+        {
+            field: "username",
+            headerName: "Run As",
+            sortable: true,
+            filter: true,
+            width: 120,
+        },
+        {
+            headerName: "Actions",
+            field: "jobid",
+            width: 150,
+            cellRenderer: (params: any) => (
+                <Button
+                    type="link"
+                    icon={<EditOutlined />}
+                    onClick={() => handleEditSchedule(params.data)}
+                >
+                    Edit Schedule
+                </Button>
+            )
+        }
+    ], []);
+
+    const defaultColDef = useMemo(() => ({
+        resizable: true,
+    }), []);
+
     return (
         <>
             <List>
-                <Table {...tableProps} rowKey="jobid">
-                    <Table.Column
-                        dataIndex="jobid"
-                        title="ID"
-                        sorter
+                <div className="ag-theme-alpine" style={{ height: 600, width: '100%' }}>
+                    <AgGridReact
+                        rowData={rowData}
+                        columnDefs={columnDefs}
+                        defaultColDef={defaultColDef}
+                        pagination={true}
+                        paginationPageSize={10}
+                        loading={isLoading}
                     />
-                    <Table.Column
-                        dataIndex="jobname"
-                        title="Name"
-                        sorter
-                    />
-                    <Table.Column
-                        dataIndex="schedule"
-                        title="Schedule"
-                    />
-                    <Table.Column
-                        dataIndex="command"
-                        title="Command"
-                    />
-                    <Table.Column
-                        dataIndex="active"
-                        title="Active"
-                        render={(value, record: Cron) => (
-                            <Switch
-                                checked={value}
-                                onChange={() => handleToggleActive(record.jobid, value)}
-                            />
-                        )}
-                    />
-                    <Table.Column
-                        dataIndex="username"
-                        title="Run As"
-                    />
-                    <Table.Column
-                        title="Actions"
-                        render={(_, record: Cron) => (
-                            <Button
-                                type="link"
-                                icon={<EditOutlined />}
-                                onClick={() => handleEditSchedule(record)}
-                            >
-                                Edit Schedule
-                            </Button>
-                        )}
-                    />
-                </Table>
+                </div>
             </List>
 
             <Modal

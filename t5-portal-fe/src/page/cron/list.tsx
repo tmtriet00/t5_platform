@@ -12,9 +12,16 @@ import { supabaseClient } from "../../utility";
 
 export const CronList: React.FC = () => {
     const [editModalVisible, setEditModalVisible] = useState(false);
+    const [createModalVisible, setCreateModalVisible] = useState(false);
     const [editingJob, setEditingJob] = useState<Cron | null>(null);
     const [newSchedule, setNewSchedule] = useState("");
     const [loading, setLoading] = useState(false);
+
+    // New Cron State
+    const [newJobName, setNewJobName] = useState("");
+    const [newJobSchedule, setNewJobSchedule] = useState("");
+    const [newJobCommand, setNewJobCommand] = useState("");
+    const [modal, contextHolder] = Modal.useModal();
 
     const { query } = useList<Cron>({
         resource: "cron",
@@ -54,6 +61,29 @@ export const CronList: React.FC = () => {
         setEditModalVisible(true);
     };
 
+    const handleDelete = (job: Cron) => {
+        modal.confirm({
+            title: "Delete Cron Job",
+            content: `Are you sure you want to delete cron job "${job.jobname}"?`,
+            onOk: async () => {
+                try {
+                    const { error } = await supabaseClient.rpc("remove_cron", {
+                        p_jobname: job.jobname,
+                    });
+
+                    if (error) {
+                        message.error(`Failed to delete cron: ${error.message}`);
+                    } else {
+                        message.success("Cron deleted successfully");
+                        refetch();
+                    }
+                } catch (err) {
+                    message.error("Failed to delete cron");
+                }
+            }
+        });
+    };
+
     const handleSaveSchedule = async () => {
         if (!editingJob) return;
 
@@ -77,6 +107,47 @@ export const CronList: React.FC = () => {
             setLoading(false);
         }
     };
+
+    const handleCreate = () => {
+        setNewJobName("");
+        setNewJobSchedule("");
+        setNewJobCommand("");
+        setCreateModalVisible(true);
+    };
+
+    const handleSaveNewCron = async () => {
+        if (!newJobName || !newJobSchedule || !newJobCommand) {
+            message.error("Please fill in all fields");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const { error } = await supabaseClient.rpc("add_cron", {
+                p_jobname: newJobName,
+                p_schedule: newJobSchedule,
+                p_command: newJobCommand,
+            });
+
+            if (error) {
+                message.error(`Failed to create cron: ${error.message}`);
+            } else {
+                message.success("Cron created successfully");
+                setCreateModalVisible(false);
+                refetch();
+            }
+        } catch (err) {
+            message.error("Failed to create cron");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const CreateButton = (props: any) => {
+        return <div className="p-2">
+            <Button type="primary" onClick={props.onCreate}>Add Cron</Button>
+        </div>;
+    }
 
     const columnDefs = useMemo<ColDef<Cron>[]>(() => [
         {
@@ -127,25 +198,49 @@ export const CronList: React.FC = () => {
         {
             headerName: "Actions",
             field: "jobid",
-            width: 150,
+            width: 200,
             cellRenderer: (params: any) => (
-                <Button
-                    type="link"
-                    icon={<EditOutlined />}
-                    onClick={() => handleEditSchedule(params.data)}
-                >
-                    Edit Schedule
-                </Button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <Button
+                        type="link"
+                        icon={<EditOutlined />}
+                        onClick={() => handleEditSchedule(params.data)}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        type="link"
+                        danger
+                        onClick={() => handleDelete(params.data)}
+                    >
+                        Delete
+                    </Button>
+                </div>
             )
         }
     ], []);
 
     const defaultColDef = useMemo(() => ({
         resizable: true,
+        sortable: true,
+        filter: true,
+    }), []);
+
+    const statusBar = useMemo(() => ({
+        statusPanels: [
+            {
+                statusPanel: CreateButton,
+                align: 'left',
+                statusPanelParams: {
+                    onCreate: handleCreate
+                }
+            }
+        ]
     }), []);
 
     return (
         <>
+            {contextHolder}
             <List>
                 <div className="ag-theme-alpine" style={{ height: 600, width: '100%' }}>
                     <AgGridReact
@@ -155,6 +250,7 @@ export const CronList: React.FC = () => {
                         pagination={true}
                         paginationPageSize={10}
                         loading={isLoading}
+                        statusBar={statusBar}
                     />
                 </div>
             </List>
@@ -179,6 +275,40 @@ export const CronList: React.FC = () => {
                         onChange={(e) => setNewSchedule(e.target.value)}
                         placeholder="e.g., * * * * * or 30 seconds"
                         style={{ marginTop: 8 }}
+                    />
+                </div>
+            </Modal>
+
+            <Modal
+                title="Add New Cron Job"
+                open={createModalVisible}
+                onOk={handleSaveNewCron}
+                onCancel={() => setCreateModalVisible(false)}
+                confirmLoading={loading}
+            >
+                <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 8 }}><strong>Job Name:</strong></div>
+                    <Input
+                        value={newJobName}
+                        onChange={(e) => setNewJobName(e.target.value)}
+                        placeholder="unique_job_name"
+                    />
+                </div>
+                <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 8 }}><strong>Schedule:</strong></div>
+                    <Input
+                        value={newJobSchedule}
+                        onChange={(e) => setNewJobSchedule(e.target.value)}
+                        placeholder="e.g., * * * * * or 30 seconds"
+                    />
+                </div>
+                <div>
+                    <div style={{ marginBottom: 8 }}><strong>Command:</strong></div>
+                    <Input.TextArea
+                        value={newJobCommand}
+                        onChange={(e) => setNewJobCommand(e.target.value)}
+                        placeholder="SQL command to execute"
+                        rows={4}
                     />
                 </div>
             </Modal>

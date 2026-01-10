@@ -13,11 +13,8 @@ export const CalendarPage = () => {
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
             }}
-            initialView="dayGridMonth"
-            events={[
-                { title: 'event 1', date: '2026-01-10' },
-                { title: 'event 2', date: '2026-01-11' },
-            ]}
+            initialView="timeGridDay"
+            editable={true}
         />
     )
 }

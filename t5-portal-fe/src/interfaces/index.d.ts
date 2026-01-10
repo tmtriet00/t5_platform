@@ -15,3 +15,4 @@ export * from "./model/finance";
 export * from "./model/configuration";
 export * from "./model/cycle";
 export * from "./model/wish-list-item";
+export * from "./model/cron";

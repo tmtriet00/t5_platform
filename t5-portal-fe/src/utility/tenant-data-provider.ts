@@ -17,7 +17,7 @@ export const tenantDataProvider = (
             // Inject tenant filter if tenantCode exists
             // We assume all resources need filtering. 
             // If some don't (like 'tenants' itself), we should skip.
-            if (tenantCode && resource !== "tenants") {
+            if (tenantCode && resource !== "tenants" && resource !== "cron") {
                 newFilters.push({
                     field: "tenant_code",
                     operator: "eq",
@@ -48,7 +48,7 @@ export const tenantDataProvider = (
             const tenantCode = localStorage.getItem("current_tenant_code");
             const newVariables = { ...variables };
 
-            if (tenantCode && resource !== "tenants") {
+            if (tenantCode && resource !== "tenants" && resource !== "cron") {
                 // Check if tenant_code is already in variables to avoid overwrite if passed explicitly
                 if (!Object.prototype.hasOwnProperty.call(newVariables, "tenant_code")) {
                     (newVariables as any).tenant_code = tenantCode;

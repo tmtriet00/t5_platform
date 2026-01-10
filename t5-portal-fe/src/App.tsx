@@ -47,6 +47,7 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AllEnterpriseModule } from "ag-grid-enterprise";
 import { ModalProviderWrapper } from "./components/modals/modal-provider-wrapper";
 import { GanttChart } from "./page/gantt-chart";
+import { CronPage } from "./page/cron";
 
 import { AllEnterpriseModule as AgChartsAllEnterpriseModule, ModuleRegistry as AgChartsModuleRegistry } from 'ag-charts-enterprise';
 
@@ -92,6 +93,10 @@ function App() {
                   {
                     name: "home",
                     list: "/home",
+                  },
+                  {
+                    name: "cron",
+                    list: "/cron",
                   },
                   {
                     name: "gantt-chart",
@@ -286,6 +291,7 @@ function App() {
                         >
                           <Route index element={<Navigate to="/home" replace />} />
                           <Route path="/home" element={<Home />} />
+                          <Route path="/cron" element={<CronPage />} />
                           <Route path="/gantt-chart" element={<GanttChart />} />
                           <Route path="/financial-statistic" element={<FinancialStatistic />} />
                           <Route path="/daily-notes" element={<DailyNotePage />} />

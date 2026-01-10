@@ -32,8 +32,8 @@ const FileToVideoPage: React.FC = () => {
     const [converting, setConverting] = useState(false);
     const [cimbarLoaded, setCimbarLoaded] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const requestRef = useRef<number>();
-    const timeoutRef = useRef<NodeJS.Timeout>();
+    const requestRef = useRef<number | undefined>(undefined);
+    const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
     useEffect(() => {
         // 1. Setup global Module object for Emscripten
@@ -225,7 +225,7 @@ const FileToVideoPage: React.FC = () => {
         }
     };
 
-    const dummyRequest = ({ file, onSuccess }: any) => {
+    const dummyRequest = ({ onSuccess }: any) => {
         setTimeout(() => {
             onSuccess("ok");
         }, 0);

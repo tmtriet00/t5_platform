@@ -33,3 +33,11 @@ start-fe-tmux:
 
 stop-fe-tmux:
 	tmux kill-session -t t5-portal-fe
+
+# example: make run-edge-function-locally FUNCTION_NAME=send-slack-message
+run-edge-function-locally:
+	deno run --allow-net --allow-env --env-file supabase/functions/${FUNCTION_NAME}/index.ts
+
+# example: make deploy-edge-function FUNCTION_NAME=send-slack-message
+deploy-edge-function:
+	supabase functions deploy ${FUNCTION_NAME} --no-verify-jwt

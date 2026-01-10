@@ -9,6 +9,8 @@ import { ColDef } from 'ag-grid-community';
 import { useMemo, useState } from "react";
 import { Cron } from "interfaces";
 import { supabaseClient } from "../../utility";
+import { Cron as CronComponent } from 'react-js-cron';
+import 'react-js-cron/dist/styles.css';
 
 export const CronList: React.FC = () => {
     const [editModalVisible, setEditModalVisible] = useState(false);
@@ -19,7 +21,7 @@ export const CronList: React.FC = () => {
 
     // New Cron State
     const [newJobName, setNewJobName] = useState("");
-    const [newJobSchedule, setNewJobSchedule] = useState("");
+    const [newJobSchedule, setNewJobSchedule] = useState("30 5 * * *");
     const [newJobCommand, setNewJobCommand] = useState("");
     const [modal, contextHolder] = Modal.useModal();
 
@@ -110,7 +112,7 @@ export const CronList: React.FC = () => {
 
     const handleCreate = () => {
         setNewJobName("");
-        setNewJobSchedule("");
+        setNewJobSchedule("30 5 * * *");
         setNewJobCommand("");
         setCreateModalVisible(true);
     };
@@ -270,12 +272,12 @@ export const CronList: React.FC = () => {
                 </div>
                 <div>
                     <strong>New Schedule:</strong>
-                    <Input
-                        value={newSchedule}
-                        onChange={(e) => setNewSchedule(e.target.value)}
-                        placeholder="e.g., * * * * * or 30 seconds"
-                        style={{ marginTop: 8 }}
-                    />
+                    <div style={{ marginTop: 8 }}>
+                        <CronComponent
+                            value={newSchedule}
+                            setValue={setNewSchedule}
+                        />
+                    </div>
                 </div>
             </Modal>
 
@@ -292,14 +294,14 @@ export const CronList: React.FC = () => {
                         value={newJobName}
                         onChange={(e) => setNewJobName(e.target.value)}
                         placeholder="unique_job_name"
+                        defaultValue="unique_job_name"
                     />
                 </div>
                 <div style={{ marginBottom: 16 }}>
                     <div style={{ marginBottom: 8 }}><strong>Schedule:</strong></div>
-                    <Input
+                    <CronComponent
                         value={newJobSchedule}
-                        onChange={(e) => setNewJobSchedule(e.target.value)}
-                        placeholder="e.g., * * * * * or 30 seconds"
+                        setValue={setNewJobSchedule}
                     />
                 </div>
                 <div>
@@ -309,6 +311,7 @@ export const CronList: React.FC = () => {
                         onChange={(e) => setNewJobCommand(e.target.value)}
                         placeholder="SQL command to execute"
                         rows={4}
+                        defaultValue="SELECT 1"
                     />
                 </div>
             </Modal>

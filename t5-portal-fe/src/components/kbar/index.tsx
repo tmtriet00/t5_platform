@@ -3,9 +3,11 @@ import {
 } from "@refinedev/kbar";
 import React, { useState } from "react";
 import { TrackBreakTaskModal } from "../modals/track-break-task";
+import { QuickLogModal } from "../modals/quick-log-modal";
 
 export const KBarProviderWrapper = ({ children }: { children: React.ReactNode }) => {
     const [isBreakModalOpen, setIsBreakModalOpen] = useState(false);
+    const [isQuickLogModalOpen, setIsQuickLogModalOpen] = useState(false);
 
     const actions = [
         {
@@ -18,6 +20,16 @@ export const KBarProviderWrapper = ({ children }: { children: React.ReactNode })
                 setIsBreakModalOpen(true);
             },
         },
+        {
+            id: "quick_log",
+            name: "Quick Log",
+            shortcut: ["q"],
+            keywords: "quick log task time",
+            section: "Quick Actions",
+            perform: () => {
+                setIsQuickLogModalOpen(true);
+            },
+        },
     ];
 
     useRegisterActions(actions, []);
@@ -28,6 +40,10 @@ export const KBarProviderWrapper = ({ children }: { children: React.ReactNode })
             <TrackBreakTaskModal
                 open={isBreakModalOpen}
                 onClose={() => setIsBreakModalOpen(false)}
+            />
+            <QuickLogModal
+                open={isQuickLogModalOpen}
+                onClose={() => setIsQuickLogModalOpen(false)}
             />
         </>
     );

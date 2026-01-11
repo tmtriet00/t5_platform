@@ -71,6 +71,7 @@
     "start": "refine start",
     "refine": "refine",
     "lint": "eslint src --ext ts,tsx --fix --quiet",
+    "sync-eslint-seatbelt": "cp eslint.seatbelt.tsv public/eslint.seatbelt.tsv",
     "build": "npm run lint && tsc && refine build",
     "increase-eslint-error": "SEATBELT_INCREASE=ALL npm run lint",
     "prepare": "husky"

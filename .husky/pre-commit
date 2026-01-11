@@ -1,1 +1,1 @@
-cd t5-portal-fe && npm run lint
+cd t5-portal-fe && npm run lint && npm run sync-eslint-seatbelt

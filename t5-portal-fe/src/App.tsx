@@ -69,6 +69,7 @@ import { DataManagementPage } from "./page/data-management";
 import FileToVideoPage from "./page/file-to-video";
 import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
 import { CalendarPage } from "page/calendar";
+import { ESLintTagsPage } from "page/eslint-tags";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -241,6 +242,13 @@ function App() {
                     },
                   },
                   {
+                    name: "eslint_tags",
+                    list: "/eslint-tags",
+                    meta: {
+                      label: "ESLint Tags",
+                    },
+                  },
+                  {
                     name: "transactions",
                     meta: {
                       hide: true,
@@ -332,6 +340,7 @@ function App() {
                           <Route path="/cycles/edit/:id" element={<CycleEdit />} />
                           <Route path="/file-to-video" element={<FileToVideoPage />} />
                           <Route path="/data-management" element={<DataManagementPage />} />
+                          <Route path="/eslint-tags" element={<ESLintTagsPage />} />
 
                         </Route>
                         <Route

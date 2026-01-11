@@ -70,7 +70,9 @@
     "dev": "refine dev",
     "build": "tsc && refine build",
     "start": "refine start",
-    "refine": "refine"
+    "refine": "refine",
+    "increase-eslint-error": "SEATBELT_INCREASE=ALL eslint src --ext ts,tsx --fix",
+    "lint": "eslint src --ext ts,tsx --fix"
   },
   "browserslist": {
     "production": [

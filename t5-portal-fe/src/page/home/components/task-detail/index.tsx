@@ -3,6 +3,7 @@ import { TabsProps } from 'antd';
 import { TaskDetailEditor } from './task-detail-editor';
 import { TrackingList } from './tracking-list';
 import { TaskEstimationHistory } from './task-estimation-history';
+import { TaskInfo } from './task-info';
 import { useOne } from '@refinedev/core';
 import { Task } from 'interfaces';
 
@@ -31,6 +32,11 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId }) => {
                     initialNote={task?.note}
                 />
             ),
+        },
+        {
+            key: '4', // Changed key to avoid conflict if any, though 4 is next logical
+            label: 'Info',
+            children: task ? <TaskInfo task={task} /> : <Spin />,
         },
         {
             key: '2',

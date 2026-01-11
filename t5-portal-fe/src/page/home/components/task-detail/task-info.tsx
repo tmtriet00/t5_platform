@@ -23,8 +23,14 @@ export const TaskInfo: React.FC<TaskInfoProps> = ({ task }) => {
                     </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Task Type">{task.task_type || 'work'}</Descriptions.Item>
-                <Descriptions.Item label="Due Date">
-                    {task.due_date ? dayjs(task.due_date).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                <Descriptions.Item label="Start Time">
+                    {task.start_time ? dayjs(task.start_time).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                </Descriptions.Item>
+                <Descriptions.Item label="Due Time">
+                    {task.due_time ? dayjs(task.due_time).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                </Descriptions.Item>
+                <Descriptions.Item label="RRule">
+                    {task.rrule || '-'}
                 </Descriptions.Item>
                 <Descriptions.Item label="Remaining Time">
                     {task.remaining_time || '-'}

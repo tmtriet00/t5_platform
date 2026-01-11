@@ -91,11 +91,11 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
 
     const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
         const { data, colDef, newValue } = event;
-        // Fields that can be edited: name, risk_type, status, task_type, remaining_time, priority_score, due_date
-        if (['name', 'risk_type', 'status', 'task_type', 'remaining_time', 'priority_score', 'due_date'].includes(colDef.field || '')) {
+        // Fields that can be edited: name, risk_type, status, task_type, remaining_time, priority_score, due_time, start_time, rrule
+        if (['name', 'risk_type', 'status', 'task_type', 'remaining_time', 'priority_score', 'due_time', 'start_time', 'rrule'].includes(colDef.field || '')) {
             let valueToUpdate = newValue;
-            if (colDef.field === 'due_date' && newValue) {
-                valueToUpdate = dayjs(newValue).toISOString();
+            if (colDef.field === 'due_time' || colDef.field === 'start_time') {
+                valueToUpdate = newValue ? dayjs(newValue).toISOString() : null;
             }
             mutateUpdate({
                 resource: "tasks",
@@ -187,16 +187,36 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             width: 120
         },
         {
-            field: "due_date",
-            headerName: "Due Date",
+            field: "start_time",
+            headerName: "Start Time",
             width: 200,
             sortable: true,
             filter: true,
             editable: true,
             valueGetter: (params) => {
-                if (!params.data || !params.data.due_date) return '';
-                return dayjs(params.data.due_date).format('YYYY-MM-DD HH:mm:ss');
+                if (!params.data || !params.data.start_time) return '';
+                return dayjs(params.data.start_time).format('YYYY-MM-DD HH:mm:ss');
             },
+        },
+        {
+            field: "due_time",
+            headerName: "Due Time",
+            width: 200,
+            sortable: true,
+            filter: true,
+            editable: true,
+            valueGetter: (params) => {
+                if (!params.data || !params.data.due_time) return '';
+                return dayjs(params.data.due_time).format('YYYY-MM-DD HH:mm:ss');
+            },
+        },
+        {
+            field: "rrule",
+            headerName: "RRule",
+            width: 150,
+            sortable: true,
+            filter: true,
+            editable: true,
         },
         {
             field: "remaining_time",

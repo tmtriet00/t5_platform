@@ -1,17 +1,17 @@
 import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Button, message } from "antd";
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
+import { ColDef, CellValueChangedEvent, ICellRendererParams } from 'ag-grid-community';
 import { useMemo, useCallback } from "react";
 import { Configuration } from "../../interfaces";
 import { useCreate, useUpdate } from "@refinedev/core";
 
 interface ConfigurationListTableProps {
-    rowData: any[];
+    rowData: Configuration[];
     isLoading: boolean;
 }
 
-const CreateButton = (props: any) => {
+const CreateButton = (props: { onCreate: () => void }) => {
     return <div className="p-2">
         <Button type="primary" onClick={props.onCreate}>Create</Button>
     </div>;
@@ -40,7 +40,7 @@ export const ConfigurationListTable: React.FC<ConfigurationListTableProps> = ({ 
         });
     }, [mutateCreate]);
 
-    const onCellValueChanged = useCallback((event: any) => {
+    const onCellValueChanged = useCallback((event: CellValueChangedEvent<Configuration>) => {
         const { data, colDef, newValue } = event;
         // Fields that can be edited
         if (['config_key', 'config_value', 'config_category', 'description'].includes(colDef.field || '')) {
@@ -104,7 +104,7 @@ export const ConfigurationListTable: React.FC<ConfigurationListTableProps> = ({ 
         {
             headerName: "Actions",
             field: "id",
-            cellRenderer: (params: any) => {
+            cellRenderer: (params: ICellRendererParams) => {
                 return (
                     <Space>
                         <EditButton hideText size="small" recordItemId={params.value} />

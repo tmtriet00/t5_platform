@@ -2,7 +2,6 @@
 # docs: https://github.com/justjake/eslint-seatbelt#readme
 
 "src/authProvider.ts"	"@typescript-eslint/no-explicit-any"	5
-"src/components/configurations/configuration-list-table.tsx"	"@typescript-eslint/no-explicit-any"	2
 "src/components/cycles/cycle-list-table.tsx"	"@typescript-eslint/no-explicit-any"	2
 "src/components/cycles/cycle-list-table.tsx"	"@typescript-eslint/no-unused-vars"	1
 "src/components/finance/checkin-record-list-table.tsx"	"@typescript-eslint/no-explicit-any"	2

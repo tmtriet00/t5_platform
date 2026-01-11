@@ -1,4 +1,4 @@
-import { EditButton, ShowButton } from "@refinedev/antd";
+import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Tag, Button, message } from "antd";
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
@@ -7,6 +7,7 @@ import { Task } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
 import { FilterOutlined } from "@ant-design/icons";
 import { Segmented } from "antd";
+import dayjs from "dayjs";
 
 interface TaskListTableProps {
     rowData: Task[];
@@ -90,13 +91,17 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
 
     const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
         const { data, colDef, newValue } = event;
-        // Fields that can be edited: name, risk_type, status, task_type
-        if (['name', 'risk_type', 'status', 'task_type'].includes(colDef.field || '')) {
+        // Fields that can be edited: name, risk_type, status, task_type, remaining_time, priority_score, due_date
+        if (['name', 'risk_type', 'status', 'task_type', 'remaining_time', 'priority_score', 'due_date'].includes(colDef.field || '')) {
+            let valueToUpdate = newValue;
+            if (colDef.field === 'due_date' && newValue) {
+                valueToUpdate = dayjs(newValue).toISOString();
+            }
             mutateUpdate({
                 resource: "tasks",
                 id: data.id,
                 values: {
-                    [colDef.field!]: newValue,
+                    [colDef.field!]: valueToUpdate,
                 },
                 // mutationMode: "optimistic",
             }, {
@@ -182,6 +187,34 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             width: 120
         },
         {
+            field: "due_date",
+            headerName: "Due Date",
+            width: 200,
+            sortable: true,
+            filter: true,
+            editable: true,
+            valueGetter: (params) => {
+                if (!params.data || !params.data.due_date) return '';
+                return dayjs(params.data.due_date).format('YYYY-MM-DD HH:mm:ss');
+            },
+        },
+        {
+            field: "remaining_time",
+            headerName: "Remaining Time",
+            width: 150,
+            sortable: true,
+            filter: true,
+            editable: true,
+        },
+        {
+            field: "priority_score",
+            headerName: "Priority Score",
+            width: 130,
+            sortable: true,
+            filter: true,
+            editable: true,
+        },
+        {
             field: "status",
             headerName: "Status",
             sortable: true,
@@ -224,6 +257,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     <Space>
                         <EditButton hideText size="small" recordItemId={params.value} />
                         <ShowButton hideText size="small" recordItemId={params.value} />
+                        <DeleteButton hideText size="small" recordItemId={params.value} />
                     </Space>
                 );
             },

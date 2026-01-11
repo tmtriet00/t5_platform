@@ -13,4 +13,7 @@ export interface Task {
     task_type?: 'work' | 'break';
     note?: string;
     task_estimations?: TaskEstimation[];
+    due_date?: string;
+    remaining_time?: string;
+    priority_score?: number;
 }

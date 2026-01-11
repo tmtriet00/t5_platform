@@ -42,6 +42,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             // Status filters
             if (filterType === 'in_progress') return task.status === 'in_progress';
             if (filterType === 'completed') return task.status === 'completed';
+            if (filterType === 'not_completed') return task.status !== 'completed';
 
             return true;
         });
@@ -312,6 +313,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     { label: 'Low Risk', value: 'low_risk' },
                     { label: 'In Progress Task', value: 'in_progress' },
                     { label: 'Completed Task', value: 'completed' },
+                    { label: 'Not Completed Task', value: 'not_completed' },
                     { label: 'All Task', value: 'all' },
                 ]}
                 value={filterType}

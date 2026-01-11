@@ -40,7 +40,7 @@ export const ConfigurationListTable: React.FC<ConfigurationListTableProps> = ({ 
         });
     }, [mutateCreate]);
 
-    const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
+    const onCellValueChanged = useCallback((event: any) => {
         const { data, colDef, newValue } = event;
         // Fields that can be edited
         if (['config_key', 'config_value', 'config_category', 'description'].includes(colDef.field || '')) {

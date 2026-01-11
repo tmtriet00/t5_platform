@@ -5,7 +5,8 @@ trigger: always_on
 # General Rule
 
 1. For questions related to AntD, please refer to docs/llm/antd.txt
-2. **IMPORTAN** For FE changes always test with browser
+2. **IMPORTANT** You must always run lint on your changes and make sure that your changes is clean
+3. **IMPORTANT** For FE changes always test with browser
 
 # Page structure overview
 1. In page folder, we can have some structure as same as src folder which is for components that is only used for that page

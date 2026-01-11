@@ -1,0 +1,12 @@
+{
+  "name": "t5_platform",
+  "version": "1.0.0",
+  "description": "- Create new .env file in supabase directory from .env.old - Run `make setup-supabase` - Run `make start-supabase`",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "author": "",
+  "license": "ISC"
+}

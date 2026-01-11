@@ -7,7 +7,7 @@ import { Configuration } from "../../interfaces";
 import { useCreate, useUpdate } from "@refinedev/core";
 
 interface ConfigurationListTableProps {
-    rowData: Configuration[];
+    rowData: any[];
     isLoading: boolean;
 }
 

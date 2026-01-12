@@ -63,7 +63,7 @@ export const convertCronToEvents = (
                         end: endDate.toISOString(),
                         backgroundColor: schedule.color,
                     })
-                } catch (e) {
+                } catch {
                     // Done iterating
                     break
                 }

@@ -15,7 +15,11 @@ export interface TaskSummaryDto {
 }
 
 export interface TaskEvent {
+    task_id: string;
     title: string;
     start: Date;
     end: Date;
+    due?: Date;
+    backgroundColor: string;
+    delay?: number
 }

@@ -1,4 +1,4 @@
-import { fillTheGapOfBaseTaskEvents } from './task_schedule';
+import { fillTheGapOfBaseTaskEvents, findDueTaskEvents } from './task_schedule';
 import { TaskEvent } from 'interfaces/dto/task';
 import dayjs from 'dayjs';
 import { describe, it, expect } from 'vitest';
@@ -8,7 +8,7 @@ describe('fillTheGapOfBaseTaskEvents', () => {
     const createEvent = (title: string, startStr: string, endStr: string): TaskEvent => {
         const start = dayjs(startStr).toDate();
         const end = dayjs(endStr).toDate();
-        return { title, start, end };
+        return { title, start, end, task_id: 'default', backgroundColor: 'blue' };
     };
 
     it('should return base tasks when no new tasks are provided', () => {
@@ -137,27 +137,37 @@ describe('fillTheGapOfBaseTaskEvents', () => {
             {
                 title: 'Base 1',
                 start: "2023-01-01T23:40:00.000Z",
-                end: "2023-01-02T06:40:00.000Z"
+                end: "2023-01-02T06:40:00.000Z",
+                task_id: 'default',
+                backgroundColor: 'blue'
             },
             {
                 title: 'New Long 1',
                 start: "2023-01-01T23:27:00.000Z",
-                end: "2023-01-01T23:39:00.000Z"
+                end: "2023-01-01T23:39:00.000Z",
+                task_id: 'default',
+                backgroundColor: 'blue'
             },
             {
                 title: 'New Long 1',
                 start: "2023-01-02T06:41:00.000Z",
-                end: "2023-01-02T06:59:00.000Z"
+                end: "2023-01-02T06:59:00.000Z",
+                task_id: 'default',
+                backgroundColor: 'blue'
             },
             {
                 title: 'New Long 2',
                 start: "2023-01-02T07:00:00.000Z",
-                end: "2023-01-02T08:00:00.000Z"
+                end: "2023-01-02T08:00:00.000Z",
+                task_id: 'default',
+                backgroundColor: 'blue'
             },
             {
                 title: 'New Long 3',
                 start: "2023-01-02T08:01:00.000Z",
-                end: "2023-01-02T08:21:00.000Z"
+                end: "2023-01-02T08:21:00.000Z",
+                task_id: 'default',
+                backgroundColor: 'blue'
             }
         ]);
     });
@@ -202,5 +212,73 @@ describe('fillTheGapOfBaseTaskEvents', () => {
         // Only the first part should exist
         expect(dayjs(newEvents[0].start).format('HH:mm')).toBe('11:00');
         expect(dayjs(newEvents[0].end).format('HH:mm')).toBe('11:59');
+    });
+});
+
+describe('findDueTaskEvents', () => {
+    const createEventWithId = (title: string, startStr: string, endStr: string, taskId: string, dueStr?: string): TaskEvent => {
+        const start = dayjs(startStr).toDate();
+        const end = dayjs(endStr).toDate();
+        const event: TaskEvent = {
+            title,
+            start,
+            end,
+            task_id: taskId,
+            backgroundColor: 'blue'
+        };
+        if (dueStr) {
+            event.due = dayjs(dueStr).toDate();
+        }
+        return event;
+    };
+
+    it('should not mark events if max end date is before due date', () => {
+        // Due: 12:00. End: 11:30. Safe.
+        const events = [
+            createEventWithId('Task 1', '2023-01-01T11:00:00', '2023-01-01T11:30:00', 't1', '2023-01-01T12:00:00')
+        ];
+        const result = findDueTaskEvents(events);
+        expect(result[0].backgroundColor).toBe('blue');
+        expect(result[0].delay).toBeUndefined();
+    });
+
+    it('should mark events as red if max end date is after due date', () => {
+        // Due: 11:00. End: 11:30. Late by 30 mins (1800s).
+        const events = [
+            createEventWithId('Task 1', '2023-01-01T11:00:00', '2023-01-01T11:30:00', 't1', '2023-01-01T11:00:00')
+        ];
+        const result = findDueTaskEvents(events);
+        expect(result[0].backgroundColor).toBe('red');
+        expect(result[0].delay).toBe(1800);
+    });
+
+    it('should mark all events of the same task as red if the task finishes late', () => {
+        // Task t1 split into two parts.
+        // Part 1: 10:00 - 10:30 (Safe vs Due 12:00)
+        // Part 2: 12:30 - 13:00 (Late vs Due 12:00)
+        // All parts should be red.
+        const due = '2023-01-01T12:00:00';
+        const events = [
+            createEventWithId('Task 1 Part 1', '2023-01-01T10:00:00', '2023-01-01T10:30:00', 't1', due),
+            createEventWithId('Task 1 Part 2', '2023-01-01T12:30:00', '2023-01-01T13:00:00', 't1', due)
+        ];
+
+        const result = findDueTaskEvents(events);
+
+        expect(result).toHaveLength(2);
+        // Delay: 13:00 - 12:00 = 1 hour = 3600s
+        expect(result[0].backgroundColor).toBe('red');
+        expect(result[0].delay).toBe(3600);
+
+        expect(result[1].backgroundColor).toBe('red');
+        expect(result[1].delay).toBe(3600);
+    });
+
+    it('should handle tasks without due date', () => {
+        const events = [
+            createEventWithId('Task 1', '2023-01-01T11:00:00', '2023-01-01T11:30:00', 't1')
+        ];
+        const result = findDueTaskEvents(events);
+        expect(result[0].backgroundColor).toBe('blue');
     });
 });

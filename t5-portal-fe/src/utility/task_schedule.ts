@@ -25,7 +25,7 @@ export const sortWorkTaskByPriority = (tasks: Task[]): Task[] => {
             return (a.priority_score ?? 0) - (b.priority_score ?? 0)
         }
 
-        return a.id - b.id
+        return a.id.localeCompare(b.id)
     })
 
     return tasks
@@ -41,9 +41,12 @@ export const processWorkTask = (tasks: Task[]): TaskEvent[] => {
         const task = sortedTasks[i]
 
         const taskEvent: TaskEvent = {
+            task_id: task.id,
             title: task.name,
             start: accumulatedTime.toDate(),
             end: accumulatedTime.add(task.remaining_time || 0, 'second').toDate(),
+            backgroundColor: "blue",
+            ...(task.due_time ? { due: dayjs(task.due_time).toDate() } : {})
         }
         accumulatedTime = accumulatedTime.add(task.remaining_time || 0, 'second').add(1, 'minute')
         processTaskEvents.push(taskEvent)
@@ -60,9 +63,11 @@ export const processSleepTask = (tasks: Task[]): TaskEvent[] => {
         const taskStartTime = dayjs(task.start_time || '')
 
         const taskEvent: TaskEvent = {
+            task_id: task.id,
             title: task.name,
             start: taskStartTime.toDate(),
             end: taskStartTime.add(task.remaining_time || 0, 'second').toDate(),
+            backgroundColor: "green"
         }
         processTaskEvents.push(taskEvent)
     }
@@ -157,6 +162,55 @@ export const convertTaskToEvent = (tasks: Task[]): TaskEvent[] => {
 
     const resultEvents = fillTheGapOfBaseTaskEvents(processedSleepTaskEvents, processedWorkTaskEvents)
 
-    resultEvents.sort((a, b) => dayjs(a.start).valueOf() - dayjs(b.start).valueOf())
-    return resultEvents
+    const processedRiskEvents = findDueTaskEvents(resultEvents)
+
+    processedRiskEvents.sort((a, b) => dayjs(a.start).valueOf() - dayjs(b.start).valueOf())
+    return processedRiskEvents
+}
+
+export const findDueTaskEvents = (events: TaskEvent[]): TaskEvent[] => {
+    // Group events by task_id
+    const eventsByTask: Record<string, TaskEvent[]> = {};
+    for (const event of events) {
+        if (!event.task_id) continue;
+        if (!eventsByTask[event.task_id]) {
+            eventsByTask[event.task_id] = [];
+        }
+        eventsByTask[event.task_id].push(event);
+    }
+
+    const processedEvents = [...events];
+
+    // Iterate through each task group
+    for (const taskId in eventsByTask) {
+        const taskEvents = eventsByTask[taskId];
+
+        // Find the max end date for this task
+        let maxEndDate = dayjs(taskEvents[0].end);
+        let due: Date | undefined = undefined;
+
+        for (const event of taskEvents) {
+            if (dayjs(event.end).isAfter(maxEndDate)) {
+                maxEndDate = dayjs(event.end);
+            }
+            if (event.due) {
+                due = event.due;
+            }
+        }
+
+        // If due date exists and max end date > due date, mark as risk
+        if (due && maxEndDate.isAfter(dayjs(due))) {
+            const delay = maxEndDate.diff(dayjs(due), 'second'); // Calculate delay in seconds
+
+            // Update all events for this task
+            for (const event of processedEvents) {
+                if (event.task_id === taskId) {
+                    event.backgroundColor = 'red';
+                    event.delay = delay;
+                }
+            }
+        }
+    }
+
+    return processedEvents;
 }

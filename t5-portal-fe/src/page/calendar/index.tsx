@@ -6,7 +6,7 @@ import listPlugin from '@fullcalendar/list'
 import rrulePlugin from '@fullcalendar/rrule'
 import { useList } from "@refinedev/core";
 import { Task } from "../../interfaces";
-
+import { findDueTaskEvents } from "../../utility/task_schedule";
 import { convertTaskToEvent } from "../../utility/task_schedule";
 
 export const CalendarPage = () => {
@@ -18,29 +18,25 @@ export const CalendarPage = () => {
     });
 
     const tasks = query?.data?.data || [];
-
-
-
-
     const taskEvents = convertTaskToEvent(tasks)
 
-    console.log("taskEvents", taskEvents)
-
-
-
     return (
-        <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin, listPlugin, rrulePlugin]}
-            headerToolbar={{
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-            }}
-            initialView="timeGridDay"
-            editable={true}
-            events={taskEvents}
-            slotDuration={"00:10:00"}
-            slotEventOverlap={false}
-        />
+        <div>
+            <p>Total Delay: {findDueTaskEvents(taskEvents).reduce((acc, event) => acc + (event.delay || 0), 0) / 60}m</p>
+            <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin, listPlugin, rrulePlugin]}
+                headerToolbar={{
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                }}
+                initialView="timeGridDay"
+                editable={true}
+                events={taskEvents}
+                slotDuration={"00:10:00"}
+                slotEventOverlap={false}
+                nowIndicator
+            />
+        </div>
     )
 }

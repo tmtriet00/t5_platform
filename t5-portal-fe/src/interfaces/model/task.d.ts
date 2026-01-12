@@ -3,7 +3,7 @@ import { TimeEntry } from "./time-entry";
 import { TaskEstimation } from "./task-estimation";
 
 export interface Task {
-    id: number;
+    id: string;
     name: string;
     project?: Project;
     project_id?: number;

@@ -13,3 +13,9 @@ export interface TaskSummaryDto {
     task_type?: 'work' | 'break';
     latest_time_entry_start_time?: string;
 }
+
+export interface TaskEvent {
+    title: string;
+    start: Date;
+    end: Date;
+}

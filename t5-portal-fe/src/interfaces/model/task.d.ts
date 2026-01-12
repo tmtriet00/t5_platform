@@ -10,12 +10,12 @@ export interface Task {
     time_entries?: TimeEntry[];
     risk_type?: 'low' | 'medium' | 'high';
     status?: 'new' | 'in_progress' | 'completed' | 'canceled' | 'blocked';
-    task_type?: 'work' | 'break';
+    task_type?: 'work' | 'break' | 'sleep';
     note?: string;
     task_estimations?: TaskEstimation[];
     due_time?: string | null;
     start_time?: string | null;
     rrule?: string;
-    remaining_time?: string;
+    remaining_time?: number;
     priority_score?: number;
 }

@@ -7,6 +7,7 @@ import rrulePlugin from '@fullcalendar/rrule'
 import { useList } from "@refinedev/core";
 import { Task } from "../../interfaces";
 import { rrulestr } from 'rrule';
+import { convertTaskToEvent } from "../../utility/task_schedule";
 
 export const CalendarPage = () => {
     const { query } = useList<Task>({
@@ -28,11 +29,15 @@ export const CalendarPage = () => {
         }
     };
 
+    const taskEvents = convertTaskToEvent(tasks)
+
+    console.log("taskEvents", taskEvents)
+
     const events = tasks.map((task) => {
         let duration = undefined;
         if (task.remaining_time) {
             // remaining_time is in seconds
-            duration = parseInt(task.remaining_time, 10) * 1000;
+            duration = task.remaining_time * 1000;
         }
 
         const baseEvent = {
@@ -86,7 +91,7 @@ export const CalendarPage = () => {
             }}
             initialView="timeGridDay"
             editable={true}
-            events={events}
+            events={taskEvents}
         />
     )
 }

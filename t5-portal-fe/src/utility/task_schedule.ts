@@ -70,9 +70,10 @@ export const processSleepTask = (tasks: Task[]): TaskEvent[] => {
     return processTaskEvents
 }
 
-export const fillTheGapOfBaseTaskEvents = (baseTaskEvents: TaskEvent[], newTaskEvents: TaskEvent[]): TaskEvent[] => {
+export const fillTheGapOfBaseTaskEvents = (baseTaskEvents: TaskEvent[], newTaskEvents: TaskEvent[], minDurationMinutes: number = 10): TaskEvent[] => {
     const sortedBaseEvents = [...baseTaskEvents].sort((a, b) => dayjs(a.start).valueOf() - dayjs(b.start).valueOf());
     const resultEvents: TaskEvent[] = [];
+    const minDurationSeconds = minDurationMinutes * 60;
 
     if (newTaskEvents.length === 0) return baseTaskEvents;
 
@@ -112,10 +113,18 @@ export const fillTheGapOfBaseTaskEvents = (baseTaskEvents: TaskEvent[], newTaskE
                 timeToNextBlock = dayjs(futureEvents[0].start).diff(currentScheduleTime, 'second') - 60;
             }
 
+            // Check if loop gap is valid (>= minDurationMinutes)
+            if (timeToNextBlock < minDurationSeconds) {
+                if (futureEvents.length > 0) {
+                    currentScheduleTime = dayjs(futureEvents[0].end).add(1, 'minute');
+                    continue;
+                }
+            }
+
             // 3. Determine how much we can fit
             const durationToBook = Math.min(taskDurationSeconds, timeToNextBlock);
 
-            if (durationToBook > 0) {
+            if (durationToBook >= minDurationSeconds) {
                 const partStart = currentScheduleTime.toDate();
                 const partEnd = currentScheduleTime.add(durationToBook, 'second').toDate();
 
@@ -128,7 +137,7 @@ export const fillTheGapOfBaseTaskEvents = (baseTaskEvents: TaskEvent[], newTaskE
                 currentScheduleTime = dayjs(partEnd).add(1, 'minute');
                 taskDurationSeconds -= durationToBook;
             } else {
-                // Safety break to prevent infinite loops if something is wrong with diff
+                // If remaining duration is smaller than minDuration, discard it
                 break;
             }
         }

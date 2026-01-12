@@ -161,4 +161,46 @@ describe('fillTheGapOfBaseTaskEvents', () => {
             }
         ]);
     });
+    it('should skip gaps smaller than minDuration', () => {
+        const baseEvents = [
+            createEvent('Base 1', '2023-01-01T10:00:00', '2023-01-01T11:00:00'),
+            createEvent('Base 2', '2023-01-01T11:05:00', '2023-01-01T12:00:00')
+        ];
+        // Gap is 11:00 - 11:05 (5 mins). minDuration is 10 mins.
+        // Task is 30 mins.
+        // Should skip the 5 min gap and start after Base 2 (12:00 + 1 min buffer -> 12:01)
+        const newTask = createEvent('New Split', '2023-01-01T11:00:00', '2023-01-01T11:30:00');
+
+        const result = fillTheGapOfBaseTaskEvents(baseEvents, [newTask], 10);
+
+        const newEvents = result.filter(t => t.title === 'New Split');
+        expect(newEvents).toHaveLength(1);
+        expect(dayjs(newEvents[0].start).format('HH:mm')).toBe('12:01');
+        expect(dayjs(newEvents[0].end).format('HH:mm')).toBe('12:31');
+    });
+
+    it('should discard remaining task part if it is smaller than minDuration', () => {
+        const baseEvents = [
+            createEvent('Base 1', '2023-01-01T10:00:00', '2023-01-01T11:00:00'),
+            // Gap 1 hour (11:00 - 12:00)
+            createEvent('Base 2', '2023-01-01T12:00:00', '2023-01-01T13:00:00')
+        ];
+
+        // Task duration: 65 mins.
+        // Gap 1: 60 mins (minus 1 min buffer before Base 2 starts -> 59 mins available).
+        // 11:00 - 11:59.
+        // Remaining: 65 - 59 = 6 mins.
+        // Next gap starts at 13:01.
+        // Remaining 6 mins < 10 mins. Should be discarded.
+        const newTask = createEvent('New Long', '2023-01-01T11:00:00', '2023-01-01T12:05:00');
+
+        const result = fillTheGapOfBaseTaskEvents(baseEvents, [newTask], 10);
+
+        const newEvents = result.filter(t => t.title === 'New Long');
+        expect(newEvents).toHaveLength(1);
+
+        // Only the first part should exist
+        expect(dayjs(newEvents[0].start).format('HH:mm')).toBe('11:00');
+        expect(dayjs(newEvents[0].end).format('HH:mm')).toBe('11:59');
+    });
 });

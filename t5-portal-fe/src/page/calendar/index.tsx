@@ -39,6 +39,8 @@ export const CalendarPage = () => {
             initialView="timeGridDay"
             editable={true}
             events={taskEvents}
+            slotDuration={"00:10:00"}
+            slotEventOverlap={false}
         />
     )
 }

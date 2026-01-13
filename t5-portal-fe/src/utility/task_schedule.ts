@@ -1,6 +1,7 @@
 import { TaskEvent } from "interfaces/dto/task";
 import { Task } from "../interfaces/model/task";
 import dayjs from "dayjs";
+import { RRule, RRuleSet, rrulestr } from 'rrule';
 
 export const sortWorkTaskByPriority = (tasks: Task[]): Task[] => {
     const riskToScore = {
@@ -73,6 +74,47 @@ export const processSleepTask = (tasks: Task[]): TaskEvent[] => {
     }
 
     return processTaskEvents
+}
+
+
+export const expandRecurringEvents = (event: TaskEvent, recurrent_rule: string, rangeStart: Date, rangeEnd: Date): TaskEvent[] => {
+    const expandedEvents: TaskEvent[] = [];
+
+    try {
+        // Handle RRule string being just the rule part vs full string
+        let ruleString = recurrent_rule;
+        if (!ruleString.startsWith('DTSTART')) {
+            // If DTSTART is missing, we might need to prepend it or configure it
+            // The rrule library often parses without DTSTART if options are passed, 
+            // or we construct it via options.
+            // However, fullcalendar/rrule often saves just the rule part.
+            // Let's assume standard RRULE string format.
+            // If we use rrulestr, we can pass dtstart in options if it's missing in string
+        }
+
+        // We use rrulestr for flexibility
+        const rule = rrulestr(ruleString, {
+            dtstart: new Date(event.start) // Fallback start date if not in string
+        });
+
+        const instances = rule.between(rangeStart, rangeEnd, true); // true = inclusive
+
+        const duration = dayjs(event.end).diff(dayjs(event.start));
+
+        for (const date of instances) {
+            expandedEvents.push({
+                ...event,
+                start: date,
+                end: dayjs(date).add(duration, 'millisecond').toDate(),
+            });
+        }
+    } catch (e) {
+        console.error('Failed to parse rrule for event:', event, e);
+        // Fallback: keep original event
+        expandedEvents.push(event);
+    }
+
+    return expandedEvents;
 }
 
 export const fillTheGapOfBaseTaskEvents = (baseTaskEvents: TaskEvent[], newTaskEvents: TaskEvent[], minDurationMinutes: number = 10): TaskEvent[] => {

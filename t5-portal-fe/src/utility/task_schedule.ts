@@ -1,7 +1,7 @@
 import { TaskEvent } from "interfaces/dto/task";
 import { Task } from "../interfaces/model/task";
 import dayjs from "dayjs";
-import { RRule, RRuleSet, rrulestr } from 'rrule';
+import { rrulestr } from 'rrule';
 
 export const sortWorkTaskByPriority = (tasks: Task[]): Task[] => {
     const riskToScore = {
@@ -82,7 +82,7 @@ export const expandRecurringEvents = (event: TaskEvent, recurrent_rule: string, 
 
     try {
         // Handle RRule string being just the rule part vs full string
-        let ruleString = recurrent_rule;
+        const ruleString = recurrent_rule;
         if (!ruleString.startsWith('DTSTART')) {
             // If DTSTART is missing, we might need to prepend it or configure it
             // The rrule library often parses without DTSTART if options are passed, 

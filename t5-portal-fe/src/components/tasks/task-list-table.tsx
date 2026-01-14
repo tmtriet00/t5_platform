@@ -15,9 +15,12 @@ interface TaskListTableProps {
     projectId?: number;
 }
 
-const CreateButton = (props: any) => {
+const ActionsRenderer = (props: any) => {
     return <div className="p-2">
-        <Button type="primary" onClick={props.onCreate}>Create</Button>
+        <Space>
+            <Button type="primary" onClick={props.onCreate}>Create</Button>
+            <Button onClick={props.onReset}>Reset State</Button>
+        </Space>
     </div>;
 }
 
@@ -90,6 +93,11 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             },
         });
     }, [mutateCreate, projectId, filterType]);
+
+    const handleReset = useCallback(() => {
+        localStorage.removeItem('task-list-table-column-state');
+        window.location.reload();
+    }, []);
 
     const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
         const { data, colDef, newValue } = event;
@@ -219,6 +227,10 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             sortable: true,
             filter: true,
             editable: true,
+            valueGetter: (params) => {
+                if (!params.data || !params.data.rrule) return '';
+                return params.data.rrule;
+            },
         },
         {
             field: "remaining_time",
@@ -308,14 +320,15 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     const statusBar = useMemo(() => ({
         statusPanels: [
             {
-                statusPanel: CreateButton,
+                statusPanel: ActionsRenderer,
                 align: 'left',
                 statusPanelParams: {
-                    onCreate: handleCreate
+                    onCreate: handleCreate,
+                    onReset: handleReset
                 }
             }
         ]
-    }), [handleCreate]);
+    }), [handleCreate, handleReset]);
 
     return (
         <div style={{ height: 600, width: '100%' }}>

@@ -1,16 +1,4 @@
-export async function onRequest(context) {
-    const country = context.request.cf.country;
-    const ipAddress = context.request.headers.get("CF-Connecting-IP");
-
-    const isValidCountry = country === 'SG' || country === 'VN';
-    const isValidIP = ["45.77.37.89", "207.148.126.146"].includes(ipAddress);
-
-    if (isValidCountry && isValidIP) {
-        return context.next();
-    }
-
-    if (country == 'VN') {
-        const html = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -267,7 +255,7 @@ export async function onRequest(context) {
             // const result = libcimbar.decode_frame(imageData.data, canvas.width, canvas.height);
 
             // Since we don't have the WASM module loaded, we just update stats
-            debugInfo.innerText = \`Scanning: \${canvas.width}x\${canvas.height}px | FPS: 30\`;
+            debugInfo.innerText = `Scanning: ${canvas.width}x${canvas.height}px | FPS: 30`;
         }
 
         // --- Simulation (User Experience) ---
@@ -278,7 +266,7 @@ export async function onRequest(context) {
 
             setTimeout(() => {
                 // Mimic success
-                const fakeData = "Cimbar Project: High density air-gapped transfer successful.\\nPacket ID: #8842\\nPayload: 14kb";
+                const fakeData = "Cimbar Project: High density air-gapped transfer successful.\nPacket ID: #8842\nPayload: 14kb";
                 showResult(fakeData);
             }, 1500);
         }
@@ -322,19 +310,4 @@ export async function onRequest(context) {
     </script>
 </body>
 
-</html>`;
-
-        return new Response(html, {
-            headers: { 'Content-Type': 'text/html' }
-        });
-    }
-
-    return new Response(`
-        Sorry, this application is not available to you. 
-        Country: ${country}
-        IP: ${ipAddress}
-    `, {
-        status: 403,
-        headers: { 'Content-Type': 'text/plain' }
-    });
-}
+</html>

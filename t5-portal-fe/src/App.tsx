@@ -69,6 +69,7 @@ import { DataManagementPage } from "./page/data-management";
 import FileToVideoPage from "./page/file-to-video";
 import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
 import { CalendarPage } from "page/calendar";
+import { SandboxPage } from "page/sandbox";
 import { ESLintTagsPage } from "page/eslint-tags";
 
 dayjs.extend(utc);
@@ -249,6 +250,13 @@ function App() {
                     },
                   },
                   {
+                    name: "sandbox",
+                    list: "/sandbox",
+                    meta: {
+                      label: "Sandbox",
+                    },
+                  },
+                  {
                     name: "transactions",
                     meta: {
                       hide: true,
@@ -341,6 +349,7 @@ function App() {
                           <Route path="/file-to-video" element={<FileToVideoPage />} />
                           <Route path="/data-management" element={<DataManagementPage />} />
                           <Route path="/eslint-tags" element={<ESLintTagsPage />} />
+                          <Route path="/sandbox" element={<SandboxPage />} />
 
                         </Route>
                         <Route

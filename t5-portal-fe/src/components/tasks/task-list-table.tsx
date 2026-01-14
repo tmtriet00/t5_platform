@@ -1,8 +1,8 @@
 import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Tag, Button, message } from "antd";
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, CellValueChangedEvent } from 'ag-grid-community';
-import { useMemo, useCallback, useState } from "react";
+import { ColDef, CellValueChangedEvent, GridApi } from 'ag-grid-community';
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { Task } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
 import { FilterOutlined } from "@ant-design/icons";
@@ -25,6 +25,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     const { mutate: mutateCreate } = useCreate();
     const { mutate: mutateUpdate } = useUpdate();
     const [filterType, setFilterType] = useState<string>('high_risk');
+    const [gridApi, setGridApi] = useState<GridApi | null>(null);
 
     const filteredData = useMemo(() => {
         if (!rowData) return [];
@@ -292,6 +293,18 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         resizable: true,
     }), []);
 
+    useEffect(() => {
+        if (gridApi) {
+            const savedState = localStorage.getItem('task-list-table-column-state');
+            if (savedState) {
+                gridApi.applyColumnState({
+                    state: JSON.parse(savedState),
+                    applyOrder: true
+                });
+            }
+        }
+    }, [gridApi, columnDefs]);
+
     const statusBar = useMemo(() => ({
         statusPanels: [
             {
@@ -332,6 +345,38 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     hiddenByDefault: false
                 }}
                 statusBar={statusBar}
+                onGridReady={(params) => {
+                    setGridApi(params.api);
+                    const savedState = localStorage.getItem('task-list-table-column-state');
+                    if (savedState) {
+                        params.api.applyColumnState({
+                            state: JSON.parse(savedState),
+                            applyOrder: true
+                        });
+                    }
+                }}
+                onColumnResized={(params) => {
+                    if (params.finished) {
+                        const state = params.api.getColumnState();
+                        localStorage.setItem('task-list-table-column-state', JSON.stringify(state));
+                    }
+                }}
+                onColumnMoved={(params) => {
+                    const state = params.api.getColumnState();
+                    localStorage.setItem('task-list-table-column-state', JSON.stringify(state));
+                }}
+                onColumnVisible={(params) => {
+                    const state = params.api.getColumnState();
+                    localStorage.setItem('task-list-table-column-state', JSON.stringify(state));
+                }}
+                onColumnPinned={(params) => {
+                    const state = params.api.getColumnState();
+                    localStorage.setItem('task-list-table-column-state', JSON.stringify(state));
+                }}
+                onSortChanged={(params) => {
+                    const state = params.api.getColumnState();
+                    localStorage.setItem('task-list-table-column-state', JSON.stringify(state));
+                }}
             />
         </div>
     );

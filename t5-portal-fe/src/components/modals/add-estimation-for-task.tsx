@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { TaskEstimation } from '../../interfaces';
 
 export interface AddEstimationForTaskModalRef {
-    open: (taskId: number) => void;
+    open: (taskId: string) => void;
     close: () => void;
 }
 
@@ -14,13 +14,13 @@ export interface AddEstimationForTaskModalProps {
 
 export const AddEstimationForTaskModal = React.forwardRef<AddEstimationForTaskModalRef, AddEstimationForTaskModalProps>((_, ref) => {
     const [open, setOpen] = useState(false);
-    const [taskId, setTaskId] = useState<number | null>(null);
+    const [taskId, setTaskId] = useState<string | null>(null);
     const [form] = Form.useForm();
     const invalidate = useInvalidate();
     const queryClient = useQueryClient();
 
     useImperativeHandle(ref, () => ({
-        open: (id: number) => {
+        open: (id: string) => {
             setTaskId(id);
             setOpen(true);
         },

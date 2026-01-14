@@ -1,5 +1,5 @@
 export interface TaskSummaryDto {
-    id: number;
+    id: string;
     name: string;
     project_name?: string;
     time_entry_count?: number;

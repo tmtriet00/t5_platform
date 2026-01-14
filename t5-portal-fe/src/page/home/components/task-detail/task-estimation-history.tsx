@@ -5,7 +5,7 @@ import { formatDuration } from "utility/time";
 import dayjs from "dayjs";
 
 interface TaskEstimationHistoryProps {
-    taskId: number;
+    taskId: string;
 }
 
 export const TaskEstimationHistory: React.FC<TaskEstimationHistoryProps> = ({ taskId }) => {

@@ -8,7 +8,7 @@ import { useOne } from '@refinedev/core';
 import { Task } from 'interfaces';
 
 interface TaskDetailProps {
-    taskId: number;
+    taskId: string;
 }
 
 export const TaskDetail: React.FC<TaskDetailProps> = ({ taskId }) => {

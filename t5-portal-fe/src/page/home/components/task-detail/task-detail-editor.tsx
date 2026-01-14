@@ -3,7 +3,7 @@ import { useUpdate, useInvalidate } from "@refinedev/core";
 import { AutosaveBlockNoteEditor } from "../../../../components/common/autosave-block-note-editor";
 
 interface TaskDetailEditorProps {
-    taskId: number;
+    taskId: string;
     initialNote?: string;
 }
 

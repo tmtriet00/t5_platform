@@ -3,7 +3,7 @@ import { Task } from "./task";
 export interface TimeEntry {
     id: number;
     description: string;
-    task_id: number;
+    task_id: string;
     task?: Task;
     tags?: string[];
     start_time: string;

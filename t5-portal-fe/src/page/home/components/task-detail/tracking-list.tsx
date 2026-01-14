@@ -6,7 +6,7 @@ import { formatDuration } from "utility/time";
 import dayjs from "dayjs";
 
 interface TrackingListProps {
-    taskId: number;
+    taskId: string;
 }
 
 export const TrackingList: React.FC<TrackingListProps> = ({ taskId }) => {

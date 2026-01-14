@@ -15,7 +15,7 @@ export const TimelineChart: React.FC<TimelineProps> = ({ date }) => {
     const isLoading = query?.isLoading;
 
     const tasksMap = useMemo(() => {
-        const map = new Map<number, { task: any, entries: TimeEntry[] }>();
+        const map = new Map<string, { task: any, entries: TimeEntry[] }>();
         timeEntries.forEach((entry: TimeEntry) => {
             // Filter out entries that don't belong to the selected date visually (double check)
             // Although hook filters by start_time, let's just process safely.

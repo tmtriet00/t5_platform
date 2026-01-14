@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 interface UpdateRiskTypeModalProps {
     open: boolean;
     onClose: () => void;
-    taskId: number;
+    taskId: string;
     currentRiskType?: string;
 }
 

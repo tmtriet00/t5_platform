@@ -7,12 +7,18 @@
 
 name: supabase
 
+x-deploy-config: &deploy-config
+  resources:
+    limits:
+      memory: 1G
+
 services:
 
   studio:
     container_name: supabase-studio
     image: supabase/studio:2025.12.17-sha-43f4f7f
     restart: unless-stopped
+    deploy: *deploy-config
     healthcheck:
       test:
         [
@@ -64,6 +70,7 @@ services:
     container_name: supabase-kong
     image: kong:2.8.1
     restart: unless-stopped
+    deploy: *deploy-config
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
@@ -92,6 +99,7 @@ services:
     container_name: supabase-auth
     image: supabase/gotrue:v2.184.0
     restart: unless-stopped
+    deploy: *deploy-config
     healthcheck:
       test:
         [
@@ -175,6 +183,7 @@ services:
     container_name: supabase-rest
     image: postgrest/postgrest:v14.1
     restart: unless-stopped
+    deploy: *deploy-config
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -199,6 +208,7 @@ services:
     container_name: realtime-dev.supabase-realtime
     image: supabase/realtime:v2.68.0
     restart: unless-stopped
+    deploy: *deploy-config
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -237,6 +247,7 @@ services:
     container_name: supabase-storage
     image: supabase/storage-api:v1.33.0
     restart: unless-stopped
+    deploy: *deploy-config
     volumes:
       - supabase_storage:/var/lib/storage:z
     healthcheck:
@@ -281,6 +292,7 @@ services:
     container_name: supabase-imgproxy
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
+    deploy: *deploy-config
     volumes:
       - supabase_storage:/var/lib/storage:z
     healthcheck:
@@ -303,6 +315,7 @@ services:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.95.1
     restart: unless-stopped
+    deploy: *deploy-config
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -322,6 +335,7 @@ services:
     container_name: supabase-edge-functions
     image: supabase/edge-runtime:v1.69.28
     restart: unless-stopped
+    deploy: *deploy-config
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
     depends_on:
@@ -346,6 +360,7 @@ services:
     container_name: supabase-analytics
     image: supabase/logflare:1.27.0
     restart: unless-stopped
+    deploy: *deploy-config
     ports:
       - 4000:4000
     # Uncomment to use Big Query backend for analytics
@@ -394,6 +409,7 @@ services:
     container_name: supabase-db
     image: supabase/postgres:15.8.1.085
     restart: unless-stopped
+    deploy: *deploy-config
     volumes:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
@@ -451,6 +467,7 @@ services:
     container_name: supabase-vector
     image: timberio/vector:0.28.1-alpine
     restart: unless-stopped
+    deploy: *deploy-config
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
@@ -482,6 +499,7 @@ services:
     container_name: supabase-pooler
     image: supabase/supavisor:2.7.4
     restart: unless-stopped
+    deploy: *deploy-config
     ports:
       - ${POSTGRES_PORT}:5432
       - ${POOLER_PROXY_PORT_TRANSACTION}:6543

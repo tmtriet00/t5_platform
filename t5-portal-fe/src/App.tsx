@@ -71,6 +71,7 @@ import { FinanceCheckinRecordList } from "./page/finance/checkin-records";
 import { CalendarPage } from "page/calendar";
 import { SandboxPage } from "page/sandbox";
 import { ESLintTagsPage } from "page/eslint-tags";
+import FountainCamera from "page/fountain-camera";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -91,6 +92,10 @@ function App() {
                   {
                     name: "home",
                     list: "/home",
+                  },
+                  {
+                    name: "fountain-camera",
+                    list: "/fountain-camera",
                   },
                   {
                     name: "cron",
@@ -307,6 +312,7 @@ function App() {
                         >
                           <Route index element={<Navigate to="/home" replace />} />
                           <Route path="/home" element={<Home />} />
+                          <Route path="/fountain-camera" element={<FountainCamera />} />
                           <Route path="/cron" element={<CronPage />} />
                           <Route path="/calendar" element={<CalendarPage />} />
                           <Route path="/gantt-chart" element={<GanttChart />} />

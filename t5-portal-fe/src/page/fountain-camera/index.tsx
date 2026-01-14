@@ -43,10 +43,31 @@ interface DecoderState {
     chunkSize: number;
 }
 
+// --- EXTERNAL LIBRARY TYPES ---
+type QRCodeInstance = {
+    makeCode: (text: string) => void;
+};
+
+type Html5QrcodeInstance = {
+    start: (
+        cameraId: string | { facingMode: string },
+        config: unknown,
+        onSuccess: (decodedText: string) => void
+    ) => Promise<void>;
+    stop: () => Promise<void>;
+    clear: () => void;
+    isScanning: boolean;
+};
+
 declare global {
     interface Window {
-        QRCode: any;
-        Html5Qrcode: any;
+        QRCode: {
+            new(element: HTMLElement | null, options: unknown): QRCodeInstance;
+            CorrectLevel: { L: number; M: number; Q: number; H: number };
+        };
+        Html5Qrcode: {
+            new(elementId: string): Html5QrcodeInstance;
+        };
     }
 }
 
@@ -105,7 +126,7 @@ export default function App() {
     const [txStats, setTxStats] = useState("Idle");
     const qrRef = useRef<HTMLDivElement>(null);
     const txIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [qrCodeInstance, setQrCodeInstance] = useState<any>(null);
+    const [qrCodeInstance, setQrCodeInstance] = useState<QRCodeInstance | null>(null);
 
     // --- RECEIVER STATE ---
     const [isScanning, setIsScanning] = useState(false);
@@ -123,7 +144,7 @@ export default function App() {
         droplets: [],
         chunkSize: 48
     });
-    const scannerRef = useRef<any>(null);
+    const scannerRef = useRef<Html5QrcodeInstance | null>(null);
 
     // --- TRANSMITTER FUNCTIONS ---
     const startTransmitter = () => {
@@ -350,17 +371,20 @@ export default function App() {
             setRxStatus("Receiving droplets...");
         }).then(() => {
             setIsScanning(true);
-        }).catch((err: any) => {
+        }).catch((err: unknown) => {
             let msg = "Camera Error";
-            if (err?.name === "NotAllowedError") msg = "Permission Denied. Reset browser permissions.";
+            if (err && typeof err === 'object' && 'name' in err && (err as { name: string }).name === "NotAllowedError") {
+                msg = "Permission Denied. Reset browser permissions.";
+            }
             setCameraError(msg);
         });
     };
 
     const stopCamera = () => {
-        if (scannerRef.current) {
-            scannerRef.current.stop().then(() => {
-                scannerRef.current.clear();
+        const scanner = scannerRef.current;
+        if (scanner) {
+            scanner.stop().then(() => {
+                scanner.clear();
                 setIsScanning(false);
                 setRxStatus("Scanner paused.");
             }).catch(console.error);
@@ -370,8 +394,9 @@ export default function App() {
     useEffect(() => {
         return () => {
             if (txIntervalRef.current) clearInterval(txIntervalRef.current);
-            if (scannerRef.current && scannerRef.current.isScanning) {
-                scannerRef.current.stop();
+            const scanner = scannerRef.current;
+            if (scanner && scanner.isScanning) {
+                scanner.stop();
             }
         };
     }, []);

@@ -26,7 +26,7 @@ serve(async (req) => {
 
             // Get request body for optional timezone, default to UTC if not provided
             // In a real scenario, we might want to pass the user's timezone from the client
-            let { timezone } = await req.json().catch(() => ({ timezone: 'UTC' }))
+            let { timezone, lookup_size } = await req.json().catch(() => ({ timezone: 'UTC', lookup_size: 0 }))
             if (!timezone) timezone = 'UTC'
 
             // 1. Find all tasks with non-empty rrule
@@ -56,11 +56,14 @@ serve(async (req) => {
             // We will look for instances that fall within the current day (server time)
 
             const startOfDay = new Date(now)
+            startOfDay.setDate(startOfDay.getDate() - lookup_size)
             startOfDay.setUTCHours(0, 0, 0, 0)
+
             const endOfDay = new Date(now)
+            endOfDay.setDate(endOfDay.getDate() + lookup_size)
             endOfDay.setUTCHours(23, 59, 59, 999)
 
-            console.log(`Processing ${parents?.length} repeating tasks...`)
+            console.log(`Processing ${parents?.length} repeating tasks with time zone ${timezone} and lookup size ${lookup_size}...`)
             console.log(`Time window: ${startOfDay.toISOString()} - ${endOfDay.toISOString()}`)
 
             for (const parent of parents || []) {

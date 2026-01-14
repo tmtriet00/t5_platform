@@ -197,7 +197,7 @@ export const fillTheGapOfBaseTaskEvents = (baseTaskEvents: TaskEvent[], newTaskE
 
 export const convertTaskToEvent = (tasks: Task[]): TaskEvent[] => {
     const uncompleteWorkTasks = tasks.filter((task) => task.task_type === 'work' && task.status !== 'completed');
-    const sleepTasks = tasks.filter((task) => task.task_type === 'sleep');
+    const sleepTasks = tasks.filter((task) => task.task_type === 'sleep' && task?.parent_id);
 
     const processedWorkTaskEvents = processWorkTask(uncompleteWorkTasks)
     const processedSleepTaskEvents = processSleepTask(sleepTasks)

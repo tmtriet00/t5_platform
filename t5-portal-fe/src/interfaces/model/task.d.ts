@@ -18,4 +18,5 @@ export interface Task {
     rrule?: string;
     remaining_time?: number;
     priority_score?: number;
+    parent_id?: string;
 }

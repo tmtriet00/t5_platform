@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useUpdate, useInvalidate } from "@refinedev/core";
-import { AutosaveBlockNoteEditor } from "../../../../components/common/autosave-block-note-editor";
+import { AutosaveBlockNoteEditor } from "../../common/autosave-block-note-editor";
 
 interface TaskDetailEditorProps {
     taskId: string;

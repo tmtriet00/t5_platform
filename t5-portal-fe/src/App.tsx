@@ -47,7 +47,7 @@ import { TimeEntryCreate, TimeEntryEdit, TimeEntryList } from "./page/time-entri
 import { WishListList } from "./page/wish-lists/list";
 import { supabaseClient } from "./utility";
 import { tenantDataProvider } from "./utility/tenant-data-provider";
-
+import { FountainSoundPage } from "./page/fountain-sound";
 import { AllEnterpriseModule as AgChartsAllEnterpriseModule, ModuleRegistry as AgChartsModuleRegistry } from 'ag-charts-enterprise';
 
 
@@ -92,6 +92,10 @@ function App() {
                   {
                     name: "home",
                     list: "/home",
+                  },
+                  {
+                    name: "fountain-sound",
+                    list: "/fountain-sound",
                   },
                   {
                     name: "fountain-camera",
@@ -312,6 +316,7 @@ function App() {
                         >
                           <Route index element={<Navigate to="/home" replace />} />
                           <Route path="/home" element={<Home />} />
+                          <Route path="/fountain-sound" element={<FountainSoundPage />} />
                           <Route path="/fountain-camera" element={<FountainCamera />} />
                           <Route path="/cron" element={<CronPage />} />
                           <Route path="/calendar" element={<CalendarPage />} />

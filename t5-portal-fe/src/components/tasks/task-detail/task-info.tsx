@@ -2,7 +2,7 @@ import React from 'react';
 import { Descriptions, Tag } from 'antd';
 import { Task } from 'interfaces';
 import dayjs from 'dayjs';
-import { formatDuration } from 'utility/time';
+
 
 interface TaskInfoProps {
     task: Task;

@@ -48,7 +48,7 @@ export const TrackingList: React.FC<TrackingListProps> = ({ taskId }) => {
         {
             title: "Duration",
             key: "duration",
-            render: (_: any, record: TimeEntry) => {
+            render: (_: unknown, record: TimeEntry) => {
                 if (!record.end_time) return "Running...";
                 const start = dayjs(record.start_time);
                 const end = dayjs(record.end_time);
@@ -59,7 +59,7 @@ export const TrackingList: React.FC<TrackingListProps> = ({ taskId }) => {
         {
             title: "Action",
             key: "action",
-            render: (_: any, record: TimeEntry) => (
+            render: (_: unknown, record: TimeEntry) => (
                 <Space size="middle">
                     <DeleteButton hideText size="small" recordItemId={record.id} resource="time_entries" />
                 </Space>

@@ -1,13 +1,13 @@
 import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Tag, Button, message } from "antd";
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, CellValueChangedEvent, GridApi } from 'ag-grid-community';
+import { ColDef, CellValueChangedEvent, GridApi, ICellRendererParams } from 'ag-grid-community';
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { Task } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
-import { FilterOutlined } from "@ant-design/icons";
 import { Segmented } from "antd";
 import dayjs from "dayjs";
+import { TaskDetail } from './task-detail';
 
 interface TaskListTableProps {
     rowData: Task[];
@@ -15,7 +15,7 @@ interface TaskListTableProps {
     projectId?: number;
 }
 
-const ActionsRenderer = (props: any) => {
+const ActionsRenderer = (props: { onCreate: () => void; onReset: () => void; }) => {
     return <div className="p-2">
         <Space>
             <Button type="primary" onClick={props.onCreate}>Create</Button>
@@ -29,6 +29,14 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     const { mutate: mutateUpdate } = useUpdate();
     const [filterType, setFilterType] = useState<string>('high_risk');
     const [gridApi, setGridApi] = useState<GridApi | null>(null);
+
+    const DetailCellRenderer = useCallback(({ data }: { data: Task }) => {
+        return (
+            <div className="bg-gray-50 h-full p-4 border-t border-gray-200">
+                <TaskDetail taskId={data.id} />
+            </div>
+        );
+    }, []);
 
     const filteredData = useMemo(() => {
         if (!rowData) return [];
@@ -154,7 +162,8 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             flex: 2,
             editable: true,
             sortable: true,
-            filter: true
+            filter: true,
+            cellRenderer: 'agGroupCellRenderer',
         },
         {
             field: "project.name",
@@ -179,7 +188,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 values: ['work', 'break'],
             },
             width: 100,
-            cellRenderer: (params: any) => {
+            cellRenderer: (params: ICellRendererParams) => {
                 if (!params.value) return <Tag color="blue">work</Tag>;
                 return <Tag color={params.value === 'break' ? 'orange' : 'blue'}>{params.value}</Tag>;
             }
@@ -259,7 +268,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 values: ['new', 'in_progress', 'completed', 'canceled', 'blocked']
             },
             width: 120,
-            cellRenderer: (params: any) => {
+            cellRenderer: (params: ICellRendererParams) => {
                 if (!params.value) return null;
                 let color = "default";
                 switch (params.value) {
@@ -286,7 +295,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         {
             headerName: "Actions",
             field: "id",
-            cellRenderer: (params: any) => {
+            cellRenderer: (params: ICellRendererParams) => {
                 return (
                     <Space>
                         <EditButton hideText size="small" recordItemId={params.value} />
@@ -357,6 +366,9 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     toolPanels: ['columns', 'filters'],
                     hiddenByDefault: false
                 }}
+                masterDetail={true}
+                detailCellRenderer={DetailCellRenderer}
+                detailRowHeight={600}
                 statusBar={statusBar}
                 onGridReady={(params) => {
                     setGridApi(params.api);

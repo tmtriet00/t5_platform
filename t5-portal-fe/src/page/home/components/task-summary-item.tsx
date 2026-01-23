@@ -18,7 +18,7 @@ import { TaskSummaryDto } from 'interfaces/dto/task';
 import { formatDuration, formatTime } from 'utility/time';
 import { useStopTrackingTask } from '../hooks/use-stop-tracking';
 import { UpdateRiskTypeModal } from './modals/update-risk-type-modal';
-import { TaskDetail } from './task-detail';
+import { TaskDetail } from 'components/tasks/task-detail';
 import { ModalProviderService } from 'components/modals/modal-provider-wrapper';
 import { roundDecimal } from 'utility/number';
 import { TaskTags } from './task-tags';

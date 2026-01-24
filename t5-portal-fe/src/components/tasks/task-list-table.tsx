@@ -1,13 +1,12 @@
 import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
-import { Space, Tag, Button, message, Tabs, Modal, Form, Input, Select } from "antd";
+import { Space, Tag, Button, message, Tabs, Modal, Form, Input } from "antd";
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, CellValueChangedEvent, GridApi, ICellRendererParams, FilterModel } from 'ag-grid-community';
+import { ColDef, CellValueChangedEvent, GridApi, ICellRendererParams, FilterModel, FilterChangedEvent } from 'ag-grid-community';
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { Task } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
 import dayjs from "dayjs";
 import { TaskDetail } from './task-detail';
-import { PlusOutlined } from "@ant-design/icons";
 
 interface TaskListTableProps {
     rowData: Task[];
@@ -15,13 +14,14 @@ interface TaskListTableProps {
     projectId?: number;
 }
 
-type FilterOperator = 'eq' | 'neq' | 'contains';
+type FilterOperator = 'eq' | 'neq' | 'contains' | 'notContains' | 'startsWith' | 'endsWith' | 'greaterThan' | 'lessThan' | 'greaterThanOrEqual' | 'lessThanOrEqual' | 'inRange';
 
 interface FilterCondition {
     id: string;
     field: keyof Task;
     operator: FilterOperator;
     value: unknown;
+    valueTo?: unknown; // For 'inRange'
 }
 
 interface FilterDefinition {
@@ -117,12 +117,7 @@ const FilterEditorModal: React.FC<FilterEditorModalProps> = ({ open, onCancel, o
                 id: `custom_${Date.now()}`,
                 name: values.name,
                 isCustom: true,
-                conditions: values.conditions.map((c: Omit<FilterCondition, 'id'>, index: number) => ({
-                    id: `${Date.now()}_${index}`,
-                    field: c.field,
-                    operator: c.operator,
-                    value: c.value
-                }))
+                conditions: []
             };
             onSave(newFilter);
             form.resetFields();
@@ -130,59 +125,11 @@ const FilterEditorModal: React.FC<FilterEditorModalProps> = ({ open, onCancel, o
     };
 
     return (
-        <Modal title="Create Custom Filter" open={open} onOk={handleOk} onCancel={onCancel}>
-            <Form form={form} layout="vertical" initialValues={{ conditions: [{ field: 'status', operator: 'eq', value: 'new' }] }}>
+        <Modal title="Create New Filter" open={open} onOk={handleOk} onCancel={onCancel}>
+            <Form form={form} layout="vertical">
                 <Form.Item name="name" label="Filter Name" rules={[{ required: true, message: 'Please enter a name' }]}>
                     <Input placeholder="My Custom Filter" />
                 </Form.Item>
-                <Form.List name="conditions">
-                    {(fields, { add, remove }) => (
-                        <>
-                            {fields.map(({ key, name, ...restField }) => (
-                                <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'field']}
-                                        rules={[{ required: true, message: 'Missing field' }]}
-                                    >
-                                        <Select style={{ width: 120 }}>
-                                            <Select.Option value="status">Status</Select.Option>
-                                            <Select.Option value="risk_type">Risk Type</Select.Option>
-                                            <Select.Option value="task_type">Task Type</Select.Option>
-                                            <Select.Option value="name">Name</Select.Option>
-                                        </Select>
-                                    </Form.Item>
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'operator']}
-                                        rules={[{ required: true, message: 'Missing operator' }]}
-                                    >
-                                        <Select style={{ width: 100 }}>
-                                            <Select.Option value="eq">Equals</Select.Option>
-                                            <Select.Option value="neq">Not Equals</Select.Option>
-                                            <Select.Option value="contains">Contains</Select.Option>
-                                        </Select>
-                                    </Form.Item>
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'value']}
-                                        rules={[{ required: true, message: 'Missing value' }]}
-                                    >
-                                        <Input placeholder="Value" />
-                                    </Form.Item>
-                                    <Button type="text" danger onClick={() => remove(name)}>
-                                        X
-                                    </Button>
-                                </Space>
-                            ))}
-                            <Form.Item>
-                                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                                    Add Condition
-                                </Button>
-                            </Form.Item>
-                        </>
-                    )}
-                </Form.List>
             </Form>
         </Modal>
     );
@@ -238,13 +185,36 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         allFilters.find(f => f.id === activeFilterId) || DEFAULT_FILTERS[0],
         [allFilters, activeFilterId]);
 
+    // Map internal operators to AG Grid types
+    const mapOperatorToAgGrid = (op: FilterOperator) => {
+        switch (op) {
+            case 'eq': return 'equals';
+            case 'neq': return 'notEqual';
+            case 'contains': return 'contains';
+            case 'notContains': return 'notContains';
+            case 'startsWith': return 'startsWith';
+            case 'endsWith': return 'endsWith';
+            case 'greaterThan': return 'greaterThan';
+            case 'lessThan': return 'lessThan';
+            case 'greaterThanOrEqual': return 'greaterThanOrEqual';
+            case 'lessThanOrEqual': return 'lessThanOrEqual';
+            case 'inRange': return 'inRange';
+            default: return 'equals';
+        }
+    };
+
     // Apply filters to AG Grid
     useEffect(() => {
         if (!gridApi) return;
 
         const filter = currentFilter;
+
+        // If it's a new custom filter (empty), clear the grid
         if (filter.conditions.length === 0) {
-            gridApi.setFilterModel(null);
+            // Only clear if grid currently has filters (optimization)
+            if (Object.keys(gridApi.getFilterModel()).length > 0) {
+                gridApi.setFilterModel(null);
+            }
             return;
         }
 
@@ -262,29 +232,22 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         Object.keys(conditionsByField).forEach(field => {
             const conditions = conditionsByField[field];
 
-            // Map operator to AG Grid filter type
-            const mapOperator = (op: FilterOperator) => {
-                switch (op) {
-                    case 'eq': return 'equals';
-                    case 'neq': return 'notEqual';
-                    case 'contains': return 'contains';
-                    default: return 'equals';
-                }
+            const createFilterCondition = (c: FilterCondition) => {
+                const type = mapOperatorToAgGrid(c.operator);
+                return {
+                    filterType: (c.field === 'id' || c.field === 'priority_score') ? 'number' : 'text',
+                    type: type,
+                    filter: c.value,
+                    filterTo: c.valueTo // Only used for inRange
+                };
             };
-
-            const createFilterCondition = (c: FilterCondition) => ({
-                filterType: 'text', // Assuming text for simplicity as it covers most cases
-                type: mapOperator(c.operator),
-                filter: String(c.value)
-            });
 
             if (conditions.length === 1) {
                 model[field] = createFilterCondition(conditions[0]);
             } else {
-                // Map multiple conditions to AG Grid "AND" logic (standard filter supports max 2)
                 if (conditions.length === 2) {
                     model[field] = {
-                        filterType: 'text',
+                        filterType: (field === 'id' || field === 'priority_score') ? 'number' : 'text',
                         operator: 'AND',
                         condition1: createFilterCondition(conditions[0]),
                         condition2: createFilterCondition(conditions[1])
@@ -292,7 +255,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 } else {
                     console.warn('AG Grid standard filter only supports 2 conditions per column. Using first two.');
                     model[field] = {
-                        filterType: 'text',
+                        filterType: (field === 'id' || field === 'priority_score') ? 'number' : 'text',
                         operator: 'AND',
                         condition1: createFilterCondition(conditions[0]),
                         condition2: createFilterCondition(conditions[1])
@@ -301,17 +264,94 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             }
         });
 
-        // Use setTimeout to avoid interfering with current render cycle
-        setTimeout(() => {
-            try {
+        // Deep compare to avoid redundant updates which might cause loops or flickering
+        const currentGridModel = gridApi.getFilterModel();
+
+        // Simple JSON stringify comparison is usually enough for this
+        if (JSON.stringify(model) !== JSON.stringify(currentGridModel)) {
+            setTimeout(() => {
                 gridApi.setFilterModel(model);
-            } catch (error) {
-                console.error("Error setting filter model", error);
-            }
-        }, 0);
-        // gridApi.onFilterChanged(); // setFilterModel already triggers update
+            }, 0);
+        }
 
     }, [gridApi, currentFilter]);
+
+    const handleGridFilterChanged = useCallback((event: FilterChangedEvent) => {
+        if (!currentFilter.isCustom) return;
+
+        const model = event.api.getFilterModel();
+        const newConditions: FilterCondition[] = [];
+
+        Object.keys(model).forEach(field => {
+            // Function to map AG Grid item to FilterCondition
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const mapAgGridItem = (item: any, idx: number): FilterCondition => {
+                let op: FilterOperator = 'eq';
+                switch (item.type) {
+                    case 'equals': op = 'eq'; break;
+                    case 'notEqual': op = 'neq'; break;
+                    case 'contains': op = 'contains'; break;
+                    case 'notContains': op = 'notContains'; break;
+                    case 'startsWith': op = 'startsWith'; break;
+                    case 'endsWith': op = 'endsWith'; break;
+                    case 'greaterThan': op = 'greaterThan'; break;
+                    case 'lessThan': op = 'lessThan'; break;
+                    case 'greaterThanOrEqual': op = 'greaterThanOrEqual'; break;
+                    case 'lessThanOrEqual': op = 'lessThanOrEqual'; break;
+                    case 'inRange': op = 'inRange'; break;
+                }
+
+                return {
+                    id: `${Date.now()}_${field}_${idx}`,
+                    field: field as keyof Task,
+                    operator: op,
+                    value: item.filter,
+                    valueTo: item.filterTo
+                };
+            };
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const filterItem = model[field] as any;
+
+            if (filterItem.operator) {
+                // Combined filter (AND/OR)
+                // Note: AG Grid usually uses AND
+                if (filterItem.condition1) {
+                    newConditions.push(mapAgGridItem(filterItem.condition1, 1));
+                }
+                if (filterItem.condition2) {
+                    newConditions.push(mapAgGridItem(filterItem.condition2, 2));
+                }
+            } else {
+                newConditions.push(mapAgGridItem(filterItem, 1));
+            }
+        });
+
+        // Update state if different
+        setCustomFilters(prev => {
+            const updated = prev.map(f => {
+                if (f.id === currentFilter.id) {
+                    // Check if conditions actually changed to avoid loop
+                    if (JSON.stringify(f.conditions) === JSON.stringify(newConditions)) {
+                        return f;
+                    }
+                    return { ...f, conditions: newConditions };
+                }
+                return f;
+            });
+
+            // Only update local storage if actually changed
+            const targetFilter = updated.find(f => f.id === currentFilter.id);
+            const originalFilter = prev.find(f => f.id === currentFilter.id);
+
+            if (JSON.stringify(targetFilter) !== JSON.stringify(originalFilter)) {
+                localStorage.setItem(CUSTOM_FILTERS_KEY, JSON.stringify(updated));
+                return updated;
+            }
+            return prev;
+        });
+
+    }, [currentFilter]);
 
     const { options } = useSelect({
         resource: "projects",
@@ -640,6 +680,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 paginationPageSize={10}
                 loading={isLoading}
                 onCellValueChanged={onCellValueChanged}
+                onFilterChanged={handleGridFilterChanged}
                 sideBar={{
                     toolPanels: ['columns', 'filters'],
                     hiddenByDefault: false

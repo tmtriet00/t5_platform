@@ -1,7 +1,7 @@
 import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Tag, Button, message, Tabs, Modal, Form, Input, Select } from "antd";
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, CellValueChangedEvent, GridApi, ICellRendererParams } from 'ag-grid-community';
+import { ColDef, CellValueChangedEvent, GridApi, ICellRendererParams, FilterModel } from 'ag-grid-community';
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { Task } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
@@ -238,29 +238,80 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         allFilters.find(f => f.id === activeFilterId) || DEFAULT_FILTERS[0],
         [allFilters, activeFilterId]);
 
-    const evaluateFilter = useCallback((task: Task, filter: FilterDefinition) => {
-        if (filter.conditions.length === 0) return true; // 'All' case
+    // Apply filters to AG Grid
+    useEffect(() => {
+        if (!gridApi) return;
 
-        return filter.conditions.every(condition => {
-            const taskValue = task[condition.field];
+        const filter = currentFilter;
+        if (filter.conditions.length === 0) {
+            gridApi.setFilterModel(null);
+            return;
+        }
 
-            if (condition.operator === 'eq') {
-                return taskValue === condition.value;
+        const model: FilterModel = {};
+
+        // Group conditions by field
+        const conditionsByField: Record<string, FilterCondition[]> = {};
+        filter.conditions.forEach(c => {
+            if (!conditionsByField[c.field]) {
+                conditionsByField[c.field] = [];
             }
-            if (condition.operator === 'neq') {
-                return taskValue !== condition.value;
-            }
-            if (condition.operator === 'contains') {
-                return String(taskValue).toLowerCase().includes(String(condition.value).toLowerCase());
-            }
-            return true;
+            conditionsByField[c.field].push(c);
         });
-    }, []);
 
-    const filteredData = useMemo(() => {
-        if (!rowData) return [];
-        return rowData.filter(task => evaluateFilter(task, currentFilter));
-    }, [rowData, currentFilter, evaluateFilter]);
+        Object.keys(conditionsByField).forEach(field => {
+            const conditions = conditionsByField[field];
+
+            // Map operator to AG Grid filter type
+            const mapOperator = (op: FilterOperator) => {
+                switch (op) {
+                    case 'eq': return 'equals';
+                    case 'neq': return 'notEqual';
+                    case 'contains': return 'contains';
+                    default: return 'equals';
+                }
+            };
+
+            const createFilterCondition = (c: FilterCondition) => ({
+                filterType: 'text', // Assuming text for simplicity as it covers most cases
+                type: mapOperator(c.operator),
+                filter: String(c.value)
+            });
+
+            if (conditions.length === 1) {
+                model[field] = createFilterCondition(conditions[0]);
+            } else {
+                // Map multiple conditions to AG Grid "AND" logic (standard filter supports max 2)
+                if (conditions.length === 2) {
+                    model[field] = {
+                        filterType: 'text',
+                        operator: 'AND',
+                        condition1: createFilterCondition(conditions[0]),
+                        condition2: createFilterCondition(conditions[1])
+                    };
+                } else {
+                    console.warn('AG Grid standard filter only supports 2 conditions per column. Using first two.');
+                    model[field] = {
+                        filterType: 'text',
+                        operator: 'AND',
+                        condition1: createFilterCondition(conditions[0]),
+                        condition2: createFilterCondition(conditions[1])
+                    };
+                }
+            }
+        });
+
+        // Use setTimeout to avoid interfering with current render cycle
+        setTimeout(() => {
+            try {
+                gridApi.setFilterModel(model);
+            } catch (error) {
+                console.error("Error setting filter model", error);
+            }
+        }, 0);
+        // gridApi.onFilterChanged(); // setFilterModel already triggers update
+
+    }, [gridApi, currentFilter]);
 
     const { options } = useSelect({
         resource: "projects",
@@ -360,7 +411,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             field: "id",
             headerName: "ID",
             sortable: true,
-            filter: true,
+            filter: 'agNumberColumnFilter',
             width: 80
         },
         {
@@ -369,7 +420,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             flex: 2,
             editable: true,
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             cellRenderer: 'agGroupCellRenderer',
         },
         {
@@ -377,7 +428,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             headerName: "Project",
             flex: 1,
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
             cellEditor: 'agSelectCellEditor',
             cellEditorParams: {
@@ -388,7 +439,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             field: "task_type",
             headerName: "Type",
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
             cellEditor: 'agSelectCellEditor',
             cellEditorParams: {
@@ -404,7 +455,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             field: "risk_type",
             headerName: "Risk Type",
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
             cellEditor: 'agSelectCellEditor',
             cellEditorParams: {
@@ -417,7 +468,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             headerName: "Start Time",
             width: 200,
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
             valueGetter: (params) => {
                 if (!params.data || !params.data.start_time) return '';
@@ -429,7 +480,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             headerName: "Due Time",
             width: 200,
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
             valueGetter: (params) => {
                 if (!params.data || !params.data.due_time) return '';
@@ -441,7 +492,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             headerName: "RRule",
             width: 150,
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
             valueGetter: (params) => {
                 if (!params.data || !params.data.rrule) return '';
@@ -453,7 +504,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             headerName: "Remaining Time",
             width: 150,
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
         },
         {
@@ -461,14 +512,14 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             headerName: "Priority Score",
             width: 130,
             sortable: true,
-            filter: true,
+            filter: 'agNumberColumnFilter',
             editable: true,
         },
         {
             field: "status",
             headerName: "Status",
             sortable: true,
-            filter: true,
+            filter: 'agTextColumnFilter',
             editable: true,
             cellEditor: 'agSelectCellEditor',
             cellEditorParams: {
@@ -582,7 +633,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             />
 
             <AgGridReact
-                rowData={filteredData}
+                rowData={rowData || []}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
                 pagination={true}

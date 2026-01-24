@@ -33,9 +33,18 @@ interface FilterDefinition {
 
 const DEFAULT_FILTERS: FilterDefinition[] = [
     {
+        id: 'all',
+        name: 'All Task',
+        isCustom: false,
+        conditions: []
+    }
+];
+
+const SUGGESTED_FILTERS: FilterDefinition[] = [
+    {
         id: 'high_risk',
         name: 'High Risk',
-        isCustom: false,
+        isCustom: true,
         conditions: [
             { id: '1', field: 'risk_type', operator: 'eq', value: 'high' },
             { id: '2', field: 'status', operator: 'neq', value: 'completed' }
@@ -44,7 +53,7 @@ const DEFAULT_FILTERS: FilterDefinition[] = [
     {
         id: 'medium_risk',
         name: 'Medium Risk',
-        isCustom: false,
+        isCustom: true,
         conditions: [
             { id: '1', field: 'risk_type', operator: 'eq', value: 'medium' },
             { id: '2', field: 'status', operator: 'neq', value: 'completed' }
@@ -53,7 +62,7 @@ const DEFAULT_FILTERS: FilterDefinition[] = [
     {
         id: 'low_risk',
         name: 'Low Risk',
-        isCustom: false,
+        isCustom: true,
         conditions: [
             { id: '1', field: 'risk_type', operator: 'eq', value: 'low' },
             { id: '2', field: 'status', operator: 'neq', value: 'completed' }
@@ -62,7 +71,7 @@ const DEFAULT_FILTERS: FilterDefinition[] = [
     {
         id: 'in_progress',
         name: 'In Progress Task',
-        isCustom: false,
+        isCustom: true,
         conditions: [
             { id: '1', field: 'status', operator: 'eq', value: 'in_progress' }
         ]
@@ -70,7 +79,7 @@ const DEFAULT_FILTERS: FilterDefinition[] = [
     {
         id: 'completed',
         name: 'Completed Task',
-        isCustom: false,
+        isCustom: true,
         conditions: [
             { id: '1', field: 'status', operator: 'eq', value: 'completed' }
         ]
@@ -78,25 +87,20 @@ const DEFAULT_FILTERS: FilterDefinition[] = [
     {
         id: 'not_completed',
         name: 'Not Completed Task',
-        isCustom: false,
+        isCustom: true,
         conditions: [
             { id: '1', field: 'status', operator: 'neq', value: 'completed' }
         ]
-    },
-    {
-        id: 'all',
-        name: 'All Task',
-        isCustom: false,
-        conditions: []
     }
 ];
 
 const CUSTOM_FILTERS_KEY = 'task-list-custom-filters';
 
-const ActionsRenderer = (props: { onCreate: () => void; onReset: () => void; }) => {
+const ActionsRenderer = (props: { onCreate: () => void; onReset: () => void; onLoadSuggested: () => void; }) => {
     return <div className="p-2">
         <Space>
             <Button type="primary" onClick={props.onCreate}>Create</Button>
+            <Button onClick={props.onLoadSuggested}>Load Suggested Filter</Button>
             <Button onClick={props.onReset}>Reset State</Button>
         </Space>
     </div>;
@@ -140,7 +144,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     const { mutate: mutateUpdate } = useUpdate();
 
     // State for filters
-    const [activeFilterId, setActiveFilterId] = useState<string>('high_risk');
+    const [activeFilterId, setActiveFilterId] = useState<string>('all');
     const [customFilters, setCustomFilters] = useState<FilterDefinition[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -167,6 +171,17 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         updateCustomFilters(newFilters);
         setActiveFilterId(filter.id);
         setIsModalOpen(false);
+    };
+
+    const handleLoadSuggestedFilters = () => {
+        const newFilters = [...customFilters];
+        SUGGESTED_FILTERS.forEach(suggested => {
+            if (!newFilters.some(f => f.id === suggested.id)) {
+                newFilters.push(suggested);
+            }
+        });
+        updateCustomFilters(newFilters);
+        message.success("Suggested filters loaded");
     };
 
     const [gridApi, setGridApi] = useState<GridApi | null>(null);
@@ -634,7 +649,8 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 align: 'left',
                 statusPanelParams: {
                     onCreate: handleCreate,
-                    onReset: handleReset
+                    onReset: handleReset,
+                    onLoadSuggested: handleLoadSuggestedFilters
                 }
             }
         ]
@@ -648,7 +664,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             const newFilters = customFilters.filter(f => f.id !== targetKey);
             updateCustomFilters(newFilters);
             if (activeFilterId === targetKey) {
-                setActiveFilterId('high_risk');
+                setActiveFilterId('all');
             }
         }
     };

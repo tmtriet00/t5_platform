@@ -72,6 +72,7 @@ import { CalendarPage } from "page/calendar";
 import { SandboxPage } from "page/sandbox";
 import { ESLintTagsPage } from "page/eslint-tags";
 import FountainCamera from "page/fountain-camera";
+import { FaviconManager } from "components/favicon-manager";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -382,6 +383,7 @@ function App() {
                       <RefineKbar />
                       <UnsavedChangesNotifier />
                       <DocumentTitleHandler />
+                      <FaviconManager />
                     </ModalProviderWrapper>
                   </KBarProviderWrapper>
                 </TenantProvider>

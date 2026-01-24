@@ -60,6 +60,10 @@ export const useStartTrackingTask = () => {
                     resource: 'tasks',
                     invalidates: ['all'],
                 });
+                invalidate({
+                    resource: 'time_entries',
+                    invalidates: ['list'],
+                });
                 queryClient.invalidateQueries({
                     queryKey: ['list_task_tracked_by_date'],
                 });

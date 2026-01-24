@@ -2,7 +2,7 @@ import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Tag, Button, message, Tabs, Modal, Form, Input } from "antd";
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent, GridApi, ICellRendererParams, FilterModel, FilterChangedEvent } from 'ag-grid-community';
-import { useMemo, useCallback, useState, useEffect } from "react";
+import { useMemo, useCallback, useState, useEffect, useRef } from "react";
 import { Task } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
 import dayjs from "dayjs";
@@ -147,6 +147,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     const [activeFilterId, setActiveFilterId] = useState<string>('all');
     const [customFilters, setCustomFilters] = useState<FilterDefinition[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const ignoreNextFilterUpdate = useRef(false);
 
     // Load custom filters on mount
     useEffect(() => {
@@ -221,6 +222,11 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     // Apply filters to AG Grid
     useEffect(() => {
         if (!gridApi) return;
+
+        if (ignoreNextFilterUpdate.current) {
+            ignoreNextFilterUpdate.current = false;
+            return;
+        }
 
         const filter = currentFilter;
 
@@ -342,28 +348,29 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             }
         });
 
+
+
+        const stripIds = (conditions: FilterCondition[]) => conditions.map((c) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id, ...rest } = c;
+            return rest;
+        });
+        const conditionsChanged = JSON.stringify(stripIds(currentFilter.conditions)) !== JSON.stringify(stripIds(newConditions));
+
+        if (!conditionsChanged) return;
+
+        ignoreNextFilterUpdate.current = true;
+
         // Update state if different
         setCustomFilters(prev => {
             const updated = prev.map(f => {
                 if (f.id === currentFilter.id) {
-                    // Check if conditions actually changed to avoid loop
-                    if (JSON.stringify(f.conditions) === JSON.stringify(newConditions)) {
-                        return f;
-                    }
                     return { ...f, conditions: newConditions };
                 }
                 return f;
             });
-
-            // Only update local storage if actually changed
-            const targetFilter = updated.find(f => f.id === currentFilter.id);
-            const originalFilter = prev.find(f => f.id === currentFilter.id);
-
-            if (JSON.stringify(targetFilter) !== JSON.stringify(originalFilter)) {
-                localStorage.setItem(CUSTOM_FILTERS_KEY, JSON.stringify(updated));
-                return updated;
-            }
-            return prev;
+            localStorage.setItem(CUSTOM_FILTERS_KEY, JSON.stringify(updated));
+            return updated;
         });
 
     }, [currentFilter]);

@@ -33,6 +33,8 @@ interface FilterDefinition {
     name: string;
     isCustom: boolean;
     conditions: FilterCondition[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    advancedFilterModel?: any;
 }
 
 const DEFAULT_FILTERS: FilterDefinition[] = [
@@ -333,7 +335,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         }
     };
 
-    // Apply filters to AG Grid
+    // Effect to apply filters (both legacy and advanced)
     useEffect(() => {
         if (!gridApi) return;
 
@@ -344,6 +346,17 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
 
         const filter = currentFilter;
 
+        // Apply Advanced Filter if present
+        if (filter.advancedFilterModel) {
+            gridApi.setFilterModel(null); // Clear legacy filters
+            gridApi.setAdvancedFilterModel(filter.advancedFilterModel);
+            return;
+        } else {
+            // Ensure advanced filter is cleared if switching to a legacy filter
+            gridApi.setAdvancedFilterModel(null);
+        }
+
+        // Legacy filter logic
         // If it's a new custom filter (empty), clear the grid
         if (filter.conditions.length === 0) {
             // Only clear if grid currently has filters (optimization)
@@ -399,10 +412,9 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             }
         });
 
-        // Deep compare to avoid redundant updates which might cause loops or flickering
+        // Deep compare to avoid redundant updates
         const currentGridModel = gridApi.getFilterModel();
 
-        // Simple JSON stringify comparison is usually enough for this
         if (JSON.stringify(model) !== JSON.stringify(currentGridModel)) {
             setTimeout(() => {
                 gridApi.setFilterModel(model);
@@ -413,6 +425,45 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
 
     const handleGridFilterChanged = useCallback((event: FilterChangedEvent) => {
         if (!currentFilter.isCustom) return;
+
+        // Check for Advanced Filter Model first
+        const advancedModel = event.api.getAdvancedFilterModel();
+
+        // If advanced filter is active (or was just cleared but we are in advanced mode context), we might prioritize it
+        // But simply, if advancedModel exists, we save it.
+
+        if (advancedModel) {
+            // If the advanced filter has changed
+            if (JSON.stringify(advancedModel) !== JSON.stringify(currentFilter.advancedFilterModel)) {
+                ignoreNextFilterUpdate.current = true;
+
+                setCustomFilters(prev => {
+                    const updated = prev.map(f => {
+                        if (f.id === currentFilter.id) {
+                            return {
+                                ...f,
+                                advancedFilterModel: advancedModel,
+                                // We might want to clear conditions to avoid confusion, or keep them as backup? 
+                                // Let's clear conditions so we know this is an advanced filter
+                                conditions: []
+                            };
+                        }
+                        return f;
+                    });
+                    localStorage.setItem(CUSTOM_FILTERS_KEY, JSON.stringify(updated));
+                    return updated;
+                });
+            }
+            return;
+        } else {
+            // If we transitioned from Advanced to None, we need to clear the advanced model in state
+            if (currentFilter.advancedFilterModel && !advancedModel) {
+                // But wait, getFilterModel() might be active if user switched to Standard UI?
+                // AG Grid Advanced Filter usually replaces the UI. 
+                // If the user clears the advanced filter, advancedModel is null.
+            }
+        }
+
 
         const model = event.api.getFilterModel();
         const newConditions: FilterCondition[] = [];
@@ -450,7 +501,6 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
 
             if (filterItem.operator) {
                 // Combined filter (AND/OR)
-                // Note: AG Grid usually uses AND
                 if (filterItem.condition1) {
                     newConditions.push(mapAgGridItem(filterItem.condition1, 1));
                 }
@@ -471,7 +521,10 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         });
         const conditionsChanged = JSON.stringify(stripIds(currentFilter.conditions)) !== JSON.stringify(stripIds(newConditions));
 
-        if (!conditionsChanged) return;
+        // Also check if we need to clear advancedFilterModel (if it exists but now we use standard)
+        const advancedCleared = currentFilter.advancedFilterModel && !advancedModel;
+
+        if (!conditionsChanged && !advancedCleared) return;
 
         ignoreNextFilterUpdate.current = true;
 
@@ -479,7 +532,11 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         setCustomFilters(prev => {
             const updated = prev.map(f => {
                 if (f.id === currentFilter.id) {
-                    return { ...f, conditions: newConditions };
+                    return {
+                        ...f,
+                        conditions: newConditions,
+                        advancedFilterModel: advancedModel // Will be null here if we are in this block
+                    };
                 }
                 return f;
             });
@@ -837,6 +894,7 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                 loading={isLoading}
                 onCellValueChanged={onCellValueChanged}
                 onFilterChanged={handleGridFilterChanged}
+                enableAdvancedFilter={true}
                 sideBar={{
                     toolPanels: ['columns', 'filters'],
                     hiddenByDefault: false

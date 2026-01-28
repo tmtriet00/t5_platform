@@ -45,7 +45,7 @@ export const convertCronToEvents = (
             const interval = cronParser.parse(schedule.cron, options)
 
             // Iterate over all occurrences in the range
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             while (true) {
                 try {
                     const obj = interval.next()

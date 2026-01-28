@@ -99,6 +99,7 @@ const SUGGESTED_FILTERS: FilterDefinition[] = [
 ];
 
 const CUSTOM_FILTERS_KEY = 'task-list-custom-filters';
+const ACTIVE_FILTER_KEY = 'task-list-active-filter';
 
 const ActionsRenderer = (props: { onCreate: () => void; onReset: () => void; onLoadSuggested: () => void; }) => {
     return <div className="p-2">
@@ -160,7 +161,12 @@ const DraggableTabNode = (props: DraggableTabPaneProps) => {
         cursor: 'move',
     };
 
-    return React.cloneElement(props.children as React.ReactElement, {
+    const child = props.children as React.ReactElement<{ style?: React.CSSProperties } & React.RefAttributes<HTMLElement>>;
+    if (!React.isValidElement(child)) {
+        return <>{child}</>;
+    }
+
+    return React.cloneElement(child, {
         ref: setNodeRef,
         style: {
             ...props.style,
@@ -207,6 +213,29 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             if (savedOrder) setFilterOrder(JSON.parse(savedOrder));
         } catch (e) {
             console.error("Failed to parse filter order", e);
+        }
+
+        const savedActive = localStorage.getItem(ACTIVE_FILTER_KEY);
+        // Only set active if it exists in ALL filters (need to be careful about timing)
+        // Since we just loaded custom filters, we can check against combined
+        // However, 'allFilters' is derived from state which isn't updated in this render cycle yet
+        // So we construct the list manually to check validity
+        if (savedActive) {
+            const allIds = new Set(DEFAULT_FILTERS.map(f => f.id));
+            // Add loaded custom filters to set
+            if (saved) {
+                try {
+                    const loadedCustom = JSON.parse(saved) as FilterDefinition[];
+                    loadedCustom.forEach(f => allIds.add(f.id));
+                } catch { /* ignore */ }
+            }
+
+            if (allIds.has(savedActive)) {
+                setActiveFilterId(savedActive);
+            } else {
+                // Fallback to all if saved one not found
+                setActiveFilterId('all');
+            }
         }
     }, []);
 
@@ -770,7 +799,10 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             />
             <Tabs
                 type="editable-card"
-                onChange={setActiveFilterId}
+                onChange={(key) => {
+                    setActiveFilterId(key);
+                    localStorage.setItem(ACTIVE_FILTER_KEY, key);
+                }}
                 activeKey={activeFilterId}
                 onEdit={onEditTab}
                 items={allFilters.map(f => ({
@@ -782,11 +814,14 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     <DndContext sensors={sensors} onDragEnd={onDragEnd}>
                         <SortableContext items={allFilters.map((i) => i.id)} strategy={horizontalListSortingStrategy}>
                             <DefaultTabBar {...tabBarProps}>
-                                {(node) => (
-                                    <DraggableTabNode {...node.props} key={node.key}>
-                                        {node}
-                                    </DraggableTabNode>
-                                )}
+                                {(node) => {
+                                    const element = node as React.ReactElement;
+                                    return (
+                                        <DraggableTabNode {...element.props} data-node-key={element.key!} key={element.key}>
+                                            {element}
+                                        </DraggableTabNode>
+                                    );
+                                }}
                             </DefaultTabBar>
                         </SortableContext>
                     </DndContext>

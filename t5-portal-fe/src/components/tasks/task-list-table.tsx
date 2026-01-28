@@ -1,12 +1,16 @@
 import { EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Space, Tag, Button, message, Tabs, Modal, Form, Input } from "antd";
+import { DndContext, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, arrayMove, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, CellValueChangedEvent, GridApi, ICellRendererParams, FilterModel, FilterChangedEvent } from 'ag-grid-community';
-import { useMemo, useCallback, useState, useEffect, useRef } from "react";
+import React, { useMemo, useCallback, useState, useEffect, useRef } from "react";
 import { Task } from "../../interfaces";
 import { useCreate, useUpdate, useSelect } from "@refinedev/core";
 import dayjs from "dayjs";
 import { TaskDetail } from './task-detail';
+
 
 interface TaskListTableProps {
     rowData: Task[];
@@ -139,6 +143,34 @@ const FilterEditorModal: React.FC<FilterEditorModalProps> = ({ open, onCancel, o
     );
 };
 
+// Draggable Tab Node Component
+interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
+    'data-node-key': string;
+}
+
+const DraggableTabNode = (props: DraggableTabPaneProps) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+        id: props['data-node-key'],
+    });
+
+    const style: React.CSSProperties = {
+        ...props.style,
+        transform: CSS.Transform.toString(transform),
+        transition,
+        cursor: 'move',
+    };
+
+    return React.cloneElement(props.children as React.ReactElement, {
+        ref: setNodeRef,
+        style: {
+            ...props.style,
+            ...style,
+        },
+        ...attributes,
+        ...listeners,
+    });
+};
+
 export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading, projectId }) => {
     const { mutate: mutateCreate } = useCreate();
     const { mutate: mutateUpdate } = useUpdate();
@@ -146,10 +178,20 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
     // State for filters
     const [activeFilterId, setActiveFilterId] = useState<string>('all');
     const [customFilters, setCustomFilters] = useState<FilterDefinition[]>([]);
+    const [filterOrder, setFilterOrder] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const ignoreNextFilterUpdate = useRef(false);
 
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 10,
+            },
+        })
+    );
+
     // Load custom filters on mount
+    // Load custom filters and order on mount
     useEffect(() => {
         const saved = localStorage.getItem(CUSTOM_FILTERS_KEY);
         if (saved) {
@@ -158,6 +200,13 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
             } catch (e: unknown) {
                 console.error("Failed to parse custom filters", e);
             }
+        }
+
+        try {
+            const savedOrder = localStorage.getItem('task-list-filter-order');
+            if (savedOrder) setFilterOrder(JSON.parse(savedOrder));
+        } catch (e) {
+            console.error("Failed to parse filter order", e);
         }
     }, []);
 
@@ -195,7 +244,43 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
         );
     }, []);
 
-    const allFilters = useMemo(() => [...DEFAULT_FILTERS, ...customFilters], [customFilters]);
+    const allFilters = useMemo(() => {
+        const combined = [...DEFAULT_FILTERS, ...customFilters];
+        if (filterOrder.length === 0) return combined;
+
+        const map = new Map(combined.map(f => [f.id, f]));
+        const ordered: FilterDefinition[] = [];
+        const seen = new Set<string>();
+
+        filterOrder.forEach(id => {
+            if (map.has(id)) {
+                ordered.push(map.get(id)!);
+                seen.add(id);
+            }
+        });
+
+        // Append any new/unsaved ones
+        combined.forEach(f => {
+            if (!seen.has(f.id)) ordered.push(f);
+        });
+
+        return ordered;
+    }, [customFilters, filterOrder]);
+
+    const onDragEnd = ({ active, over }: DragEndEvent) => {
+        if (active.id !== over?.id) {
+            setFilterOrder(() => {
+                const currentOrder = allFilters.map(f => f.id);
+                // Fallback to active/over logic if prev not fully populated or aligned
+                const oldIndex = currentOrder.indexOf(active.id as string);
+                const newIndex = currentOrder.indexOf(over?.id as string);
+
+                const newOrder = arrayMove(currentOrder, oldIndex, newIndex);
+                localStorage.setItem('task-list-filter-order', JSON.stringify(newOrder));
+                return newOrder;
+            });
+        }
+    };
 
     const currentFilter = useMemo(() =>
         allFilters.find(f => f.id === activeFilterId) || DEFAULT_FILTERS[0],
@@ -693,6 +778,19 @@ export const TaskListTable: React.FC<TaskListTableProps> = ({ rowData, isLoading
                     key: f.id,
                     closable: f.isCustom,
                 }))}
+                renderTabBar={(tabBarProps, DefaultTabBar) => (
+                    <DndContext sensors={sensors} onDragEnd={onDragEnd}>
+                        <SortableContext items={allFilters.map((i) => i.id)} strategy={horizontalListSortingStrategy}>
+                            <DefaultTabBar {...tabBarProps}>
+                                {(node) => (
+                                    <DraggableTabNode {...node.props} key={node.key}>
+                                        {node}
+                                    </DraggableTabNode>
+                                )}
+                            </DefaultTabBar>
+                        </SortableContext>
+                    </DndContext>
+                )}
             />
 
             <AgGridReact

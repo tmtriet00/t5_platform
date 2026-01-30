@@ -72,6 +72,7 @@ import { CalendarPage } from "page/calendar";
 import { SandboxPage } from "page/sandbox";
 import { ESLintTagsPage } from "page/eslint-tags";
 import FountainCamera from "page/fountain-camera";
+import { DifferPage } from "page/differ";
 import { FaviconManager } from "components/favicon-manager";
 
 dayjs.extend(utc);
@@ -278,6 +279,13 @@ function App() {
                       hide: true,
                     },
                   },
+                  {
+                    name: "differ",
+                    list: "/differ",
+                    meta: {
+                      label: "Differ",
+                    },
+                  },
                 ]}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
@@ -362,6 +370,7 @@ function App() {
                           <Route path="/data-management" element={<DataManagementPage />} />
                           <Route path="/eslint-tags" element={<ESLintTagsPage />} />
                           <Route path="/sandbox" element={<SandboxPage />} />
+                          <Route path="/differ" element={<DifferPage />} />
 
                         </Route>
                         <Route

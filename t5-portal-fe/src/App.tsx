@@ -75,6 +75,8 @@ import FountainCamera from "page/fountain-camera";
 import { DifferPage } from "page/differ";
 import { FaviconManager } from "components/favicon-manager";
 
+import { CsvToJsonPage } from "page/utils/csv-to-json";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -286,6 +288,13 @@ function App() {
                       label: "Differ",
                     },
                   },
+                  {
+                    name: "utils",
+                    list: "/utils/csv-to-json",
+                    meta: {
+                      label: "Utils (CSV to JSON)",
+                    },
+                  },
                 ]}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
@@ -371,6 +380,7 @@ function App() {
                           <Route path="/eslint-tags" element={<ESLintTagsPage />} />
                           <Route path="/sandbox" element={<SandboxPage />} />
                           <Route path="/differ" element={<DifferPage />} />
+                          <Route path="/utils/csv-to-json" element={<CsvToJsonPage />} />
 
                         </Route>
                         <Route

@@ -10,7 +10,7 @@ export const CsvToJsonPage: React.FC = () => {
     const { token } = theme.useToken();
     const [messageApi, contextHolder] = message.useMessage();
 
-    const handleConvert = () => {
+    const handleCsvToJson = () => {
         try {
             if (!csvContent.trim()) {
                 setJsonContent("");
@@ -23,8 +23,7 @@ export const CsvToJsonPage: React.FC = () => {
                 return;
             }
 
-            // Basic CSV parsing (handling quotes is a bit simplified here but functional for standard CSV)
-            // For robust parsing, a library like papaparse is recommended, but we stick to no-deps as per plan.
+            // Basic CSV parsing
             const parseLine = (line: string) => {
                 const result = [];
                 let startValueIndex = 0;
@@ -35,17 +34,14 @@ export const CsvToJsonPage: React.FC = () => {
                         inQuotes = !inQuotes;
                     } else if (line[i] === ',' && !inQuotes) {
                         let value = line.substring(startValueIndex, i);
-                        // Remove surrounding quotes if present
                         if (value.startsWith('"') && value.endsWith('"')) {
                             value = value.substring(1, value.length - 1);
                         }
-                        // Handle double quotes escape inside quotes
                         value = value.replace(/""/g, '"');
                         result.push(value);
                         startValueIndex = i + 1;
                     }
                 }
-                // Push the last value
                 let lastValue = line.substring(startValueIndex);
                 if (lastValue.startsWith('"') && lastValue.endsWith('"')) {
                     lastValue = lastValue.substring(1, lastValue.length - 1);
@@ -68,37 +64,82 @@ export const CsvToJsonPage: React.FC = () => {
             });
 
             setJsonContent(JSON.stringify(result, null, 2));
-            messageApi.success("Converted successfully!");
+            messageApi.success("Converted CSV to JSON successfully!");
         } catch (error) {
             console.error(error);
             messageApi.error("Failed to convert CSV to JSON");
         }
     };
 
+    const handleJsonToCsv = () => {
+        try {
+            if (!jsonContent.trim()) {
+                setCsvContent("");
+                return;
+            }
+
+            const jsonData = JSON.parse(jsonContent);
+            if (!Array.isArray(jsonData)) {
+                messageApi.error("JSON must be an array of objects");
+                return;
+            }
+
+            if (jsonData.length === 0) {
+                setCsvContent("");
+                return;
+            }
+
+            // Collect all unique keys from all objects
+            const allKeys = new Set<string>();
+            jsonData.forEach(item => {
+                if (typeof item === 'object' && item !== null) {
+                    Object.keys(item).forEach(key => allKeys.add(key));
+                }
+            });
+            const headers = Array.from(allKeys);
+
+            const csvRows = [];
+            // Add header row
+            csvRows.push(headers.map(h => `"${h.replace(/"/g, '""')}"`).join(','));
+
+            // Add data rows
+            jsonData.forEach(item => {
+                const row = headers.map(header => {
+                    const val = (item as Record<string, unknown>)[header];
+                    const valStr = val === undefined || val === null ? "" : String(val);
+                    // Quote and escape quotes
+                    return `"${valStr.replace(/"/g, '""')}"`;
+                });
+                csvRows.push(row.join(','));
+            });
+
+            setCsvContent(csvRows.join('\n'));
+            messageApi.success("Converted JSON to CSV successfully!");
+
+        } catch (error) {
+            console.error(error);
+            messageApi.error("Failed to convert JSON to CSV. Invalid JSON?");
+        }
+    }
+
     const handleClear = () => {
         setCsvContent("");
         setJsonContent("");
-    };
-
-    const handleCopy = () => {
-        if (!jsonContent) return;
-        navigator.clipboard.writeText(jsonContent);
-        messageApi.success("JSON copied to clipboard!");
     };
 
     return (
         <Card>
             {contextHolder}
             <Space direction="vertical" style={{ width: "100%" }} size="large">
-                <Title level={2}>CSV to JSON Converter</Title>
+                <Title level={2}>CSV ↔ JSON Converter</Title>
 
                 <Row gutter={[16, 16]}>
                     <Col span={12}>
                         <Space direction="vertical" style={{ width: "100%" }}>
-                            <Typography.Text strong>CSV Input</Typography.Text>
+                            <Typography.Text strong>CSV</Typography.Text>
                             <div style={{ border: `1px solid ${token.colorBorder}`, borderRadius: token.borderRadius, overflow: 'hidden' }}>
                                 <Editor
-                                    height="50vh"
+                                    height="70vh"
                                     defaultLanguage="csv"
                                     value={csvContent}
                                     onChange={(value) => setCsvContent(value || "")}
@@ -113,18 +154,18 @@ export const CsvToJsonPage: React.FC = () => {
                     </Col>
                     <Col span={12}>
                         <Space direction="vertical" style={{ width: "100%" }}>
-                            <Typography.Text strong>JSON Output</Typography.Text>
+                            <Typography.Text strong>JSON</Typography.Text>
                             <div style={{ border: `1px solid ${token.colorBorder}`, borderRadius: token.borderRadius, overflow: 'hidden' }}>
                                 <Editor
-                                    height="50vh"
+                                    height="70vh"
                                     defaultLanguage="json"
                                     value={jsonContent}
+                                    onChange={(value) => setJsonContent(value || "")}
+                                    theme={token.colorBgBase === '#000000' || token.colorBgBase === '#141414' ? "vs-dark" : "light"}
                                     options={{
                                         minimap: { enabled: false },
                                         scrollBeyondLastLine: false,
-                                        readOnly: true
                                     }}
-                                    theme={token.colorBgBase === '#000000' || token.colorBgBase === '#141414' ? "vs-dark" : "light"}
                                 />
                             </div>
                         </Space>
@@ -132,14 +173,14 @@ export const CsvToJsonPage: React.FC = () => {
                 </Row>
 
                 <Space>
-                    <Button type="primary" onClick={handleConvert}>
-                        Convert
+                    <Button type="primary" onClick={handleCsvToJson}>
+                        CSV to JSON →
+                    </Button>
+                    <Button type="primary" onClick={handleJsonToCsv}>
+                        ← JSON to CSV
                     </Button>
                     <Button onClick={handleClear}>
-                        Clear
-                    </Button>
-                    <Button onClick={handleCopy} disabled={!jsonContent}>
-                        Copy JSON
+                        Clear All
                     </Button>
                 </Space>
             </Space>

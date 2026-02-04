@@ -76,6 +76,7 @@ import { DifferPage } from "page/differ";
 import { FaviconManager } from "components/favicon-manager";
 
 import { CsvToJsonPage } from "page/utils/csv-to-json";
+import { Base64ConverterPage } from "page/base64-converter";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -295,6 +296,13 @@ function App() {
                       label: "Utils (CSV to JSON)",
                     },
                   },
+                  {
+                    name: "base64_converter",
+                    list: "/utils/base64-converter",
+                    meta: {
+                      label: "Utils (Base64 Converter)",
+                    },
+                  },
                 ]}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
@@ -381,6 +389,7 @@ function App() {
                           <Route path="/sandbox" element={<SandboxPage />} />
                           <Route path="/differ" element={<DifferPage />} />
                           <Route path="/utils/csv-to-json" element={<CsvToJsonPage />} />
+                          <Route path="/utils/base64-converter" element={<Base64ConverterPage />} />
 
                         </Route>
                         <Route
